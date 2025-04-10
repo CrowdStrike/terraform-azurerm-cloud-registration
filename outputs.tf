@@ -6,7 +6,6 @@ output "tenant_id" {
 output "service_principal_object_id" {
   description = "Object ID of the CrowdStrike service principal"
   value       = module.service_principal.object_id
-  # sensitive   = true
 }
 
 output "configured_subscriptions" {

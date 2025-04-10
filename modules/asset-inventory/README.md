@@ -1,3 +1,4 @@
+<!-- BEGIN_TF_DOCS -->
 # CrowdStrike Asset Inventory Terraform Module for Azure
 
 ![CrowdStrike Asset Inventory terraform module](https://raw.githubusercontent.com/CrowdStrike/falconpy/main/docs/asset/cs-logo.png)

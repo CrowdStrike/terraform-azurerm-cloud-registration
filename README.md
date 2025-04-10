@@ -3,9 +3,9 @@
 
 [![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)<br/>
 
-# AWS Falcon Cloud Security Terraform Module
+# Azure Falcon Cloud Security Terraform Module
 
-This Terraform module enables registration and configuration of AWS accounts with CrowdStrike's Falcon Cloud Security.
+This Terraform module enables registration and configuration of Azure accounts with CrowdStrike's Falcon Cloud Security.
 
 Key features:
 - Service Principal
