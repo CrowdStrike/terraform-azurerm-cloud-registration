@@ -17,14 +17,14 @@ data "azurerm_client_config" "current" {
 }
 
 locals {
-  tenant_id = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
+  tenant_id     = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
   subscriptions = toset(var.subscription_ids)
 }
 
 module "service_principal" {
   source = "./modules/service-principal/"
 
-  azure_client_id = var.azure_client_id
+  azure_client_id      = var.azure_client_id
   entra_id_permissions = var.custom_entra_id_permissions
 
   providers = {

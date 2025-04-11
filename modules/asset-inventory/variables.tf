@@ -1,7 +1,7 @@
 variable "tenant_id" {
   type        = string
   default     = ""
-  description = "Used to create a graph dependency, not needed when running the module independently"
+  description = "Azure tenant ID (optional - will be retrieved from current client config if not provided)"
 
   validation {
     condition     = var.tenant_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.tenant_id))
@@ -12,7 +12,7 @@ variable "tenant_id" {
 variable "subscription_ids" {
   type        = list(string)
   default     = []
-  description = "List of subscription IDs"
+  description = "List of subscription IDs to monitor"
 
   validation {
     condition     = alltrue([for id in var.subscription_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
