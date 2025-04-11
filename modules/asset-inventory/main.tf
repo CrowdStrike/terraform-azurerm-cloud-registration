@@ -29,7 +29,6 @@ resource "azurerm_role_definition" "custom-appservice-reader-sub" {
   assignable_scopes = local.subscription_scopes
 }
 
-# Role assignments for subscriptions
 resource "azurerm_role_assignment" "appservice-reader-sub" {
   for_each                         = length(local.subscription_scopes) > 0 ? toset(local.subscription_scopes) : []
   scope                            = each.value
@@ -44,7 +43,6 @@ resource "azurerm_role_assignment" "appservice-reader-sub" {
   }
 }
 
-# For each management group scope
 resource "azurerm_role_definition" "custom-appservice-reader-mg" {
   for_each    = { for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}" => id }
   name        = "cs-website-reader-${each.value}"
@@ -59,7 +57,6 @@ resource "azurerm_role_definition" "custom-appservice-reader-mg" {
   assignable_scopes = [each.key]
 }
 
-# Role assignments for management groups
 resource "azurerm_role_assignment" "appservice-reader-mg" {
   for_each                         = { for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}" => id }
   scope                            = each.key

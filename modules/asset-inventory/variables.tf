@@ -2,6 +2,11 @@ variable "tenant_id" {
   type        = string
   default     = ""
   description = "Used to create a graph dependency, not needed when running the module independently"
+
+  validation {
+    condition     = var.tenant_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.tenant_id))
+    error_message = "The tenant_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
 }
 
 variable "subscription_ids" {

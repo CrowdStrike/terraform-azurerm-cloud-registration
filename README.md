@@ -12,9 +12,6 @@ Key features:
 - Asset Inventory configuration for both subscription and management group scopes
 
 ## Pre-requisites
-### Generate API Keys
-
-CrowdStrike API keys are required to use this module. It is highly recommended that you create a dedicated API client with only the required scopes.
 
 - Azure credentials with Global Administrator or Application Administrator permissions
 - Ability to create service principals and assign API permissions in Azure AD
@@ -87,14 +84,15 @@ module "crowdstrike_azure_registration" {
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| azure_client_id | Client ID of CrowdStrike's multi-tenant app | `string` | `""` | yes |
-| subscription_ids | List of subscription IDs to monitor | `list(string)` | `[]` | no |
-| management_group_ids | List of management group IDs to monitor | `list(string)` | `[]` | no |
-| custom_app_roles | Optional list of Microsoft Graph app role IDs to assign to the service principal | `list(string)` | `null` | no |
-| subscription_id | Azure subscription ID for provider configuration | `string` | `""` | no |
+| Name | Description                                                                               | Type | Default | Required |
+|------|-------------------------------------------------------------------------------------------|------|---------|:--------:|
 | tenant_id | Azure tenant ID (optional - will be retrieved from current client config if not provided) | `string` | `""` | no |
+| management_group_ids | List of management group IDs to monitor                                                   | `list(string)` | `[]` | no |
+| subscription_ids | List of subscription IDs to monitor                                                       | `list(string)` | `[]` | no |
+| crowdstrike_infrastructure_subscription_id | Azure subscription ID for provider configuration and hostnig CrowdStrike infrastructure   | `string` | `""` | yes |
+| azure_client_id | Client ID of CrowdStrike's multi-tenant app                                               | `string` | `""` | yes |
+| custom_app_roles | Optional list of Microsoft Graph app role IDs to assign to the service principal          | `list(string)` | `null` | no |
+
 
 ## Outputs
 

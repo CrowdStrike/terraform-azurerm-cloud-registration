@@ -2,7 +2,7 @@ provider "azuread" {
 }
 
 provider "azurerm" {
-  subscription_id = var.crowdstrike_infrastructure_subscription_id != "" ? var.crowdstrike_infrastructure_subscription_id : (length(var.subscription_ids) > 0 ? element(var.subscription_ids, 0) : null)
+  subscription_id = var.crowdstrike_infrastructure_subscription_id
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false

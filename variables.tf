@@ -53,7 +53,7 @@ variable "azure_client_id" {
 }
 
 variable "custom_entra_id_permissions" {
-  description = "Optional list of Microsoft Graph app role IDs to assign to the service principal (overrides default roles)"
+  description = "Optional list of Microsoft Graph permissions IDs to assign to the service principal (overrides default roles)"
   type        = list(string)
   default     = null
 
