@@ -11,11 +11,6 @@ locals {
   subscriptions            = toset(var.subscription_ids)
   collection               = var.use_azure_management_group ? toset([local.tenant_id]) : toset(var.subscription_ids)
   subscription_assign_list = [for s in local.subscriptions : "/subscriptions/${s}"]
-
-  reader_role_id          = "acdd72a7-3385-48ef-bd42-f606fba81ae7"
-  keyvault_reader_role_id = "21090545-7ca7-4776-b22c-e363652d74d2"
-  security_reader_role_id = "39bc4728-0917-49c7-9d2c-d95423bc2eb4"
-  kube_rbac_reader_role_id = "7f6c6a51-bcf8-42ba-9220-52d62157d7db"
 }
 
 resource "crowdstrike_horizon_azure_account" "accounts" {
@@ -28,7 +23,7 @@ resource "crowdstrike_horizon_azure_account" "accounts" {
 
 # Custom App Service reader role
 resource "azurerm_role_definition" "custom-appservice-reader" {
-  name        = "cs-website-reader-test-tf"
+  name        = "cs-website-reader"
   scope       = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${local.tenant_id}" : "/subscriptions/${data.azurerm_subscription.current.subscription_id}"
   description = "Crowdstrike Web App Service Custom Role"
 
@@ -48,7 +43,7 @@ resource "azurerm_role_definition" "custom-appservice-reader" {
 resource "azurerm_role_assignment" "reader" {
   for_each                         = local.collection
   scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
-  role_definition_id               = var.use_azure_management_group ? "/providers/Microsoft.Authorization/roleDefinitions/${local.reader_role_id}" : "/subscriptions/${each.key}/providers/Microsoft.Authorization/roleDefinitions/${local.reader_role_id}"
+  role_definition_name             = "Reader"
   principal_id                     = local.object_id
   skip_service_principal_aad_check = false
 
@@ -64,7 +59,7 @@ resource "azurerm_role_assignment" "reader" {
 resource "azurerm_role_assignment" "keyvault-reader" {
   for_each                         = local.collection
   scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
-  role_definition_id               = var.use_azure_management_group ? "/providers/Microsoft.Authorization/roleDefinitions/${local.keyvault_reader_role_id}" : "/subscriptions/${each.key}/providers/Microsoft.Authorization/roleDefinitions/${local.keyvault_reader_role_id}"
+  role_definition_name             = "Key Vault Reader"
   principal_id                     = local.object_id
   skip_service_principal_aad_check = false
 
@@ -80,7 +75,7 @@ resource "azurerm_role_assignment" "keyvault-reader" {
 resource "azurerm_role_assignment" "security-reader" {
   for_each                         = local.collection
   scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
-  role_definition_id               = var.use_azure_management_group ? "/providers/Microsoft.Authorization/roleDefinitions/${local.security_reader_role_id}" : "/subscriptions/${each.key}/providers/Microsoft.Authorization/roleDefinitions/${local.security_reader_role_id}"
+  role_definition_name             = "Security Reader"
   principal_id                     = local.object_id
   skip_service_principal_aad_check = false
 
@@ -96,7 +91,7 @@ resource "azurerm_role_assignment" "security-reader" {
 resource "azurerm_role_assignment" "kube-rbac-reader" {
   for_each                         = local.collection
   scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
-  role_definition_id               = var.use_azure_management_group ? "/providers/Microsoft.Authorization/roleDefinitions/${local.kube_rbac_reader_role_id}" : "/subscriptions/${each.key}/providers/Microsoft.Authorization/roleDefinitions/${local.kube_rbac_reader_role_id}"
+  role_definition_name             = "Azure Kubernetes Service RBAC Reader"
   principal_id                     = local.object_id
   skip_service_principal_aad_check = false
 
