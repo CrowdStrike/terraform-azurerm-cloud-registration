@@ -1,105 +1,78 @@
 data "azurerm_subscription" "current" {}
 data "azurerm_client_config" "current" {}
-data "crowdstrike_horizon_azure_client_id" "az" {
-  tenant_id = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
-}
 
 locals {
   tenant_id = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
-  object_id = var.object_id != "" ? var.object_id : data.crowdstrike_horizon_azure_client_id.az.object_id
+  subscription_scopes = [for id in var.subscription_ids : "/subscriptions/${id}"]
+  management_group_scopes = [for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}"]
+  all_scopes = concat(local.subscription_scopes, local.management_group_scopes)
 
-  subscriptions            = toset(var.subscription_ids)
-  collection               = var.use_azure_management_group ? toset([local.tenant_id]) : toset(var.subscription_ids)
-  subscription_assign_list = [for s in local.subscriptions : "/subscriptions/${s}"]
+  app_service_permissions = [
+    "Microsoft.Web/sites/config/list/Action",
+    "Microsoft.Web/sites/Read",
+    "Microsoft.Web/sites/config/Read"
+  ]
 }
 
-resource "crowdstrike_horizon_azure_account" "accounts" {
-  for_each                = local.subscriptions
-  tenant_id               = local.tenant_id
-  subscription_id         = each.key
-  default_subscription_id = each.key == data.azurerm_subscription.current.subscription_id ? true : false
-  is_commercial           = var.is_commercial
-}
-
-# Custom App Service reader role
-resource "azurerm_role_definition" "custom-appservice-reader" {
-  name        = "cs-website-reader"
-  scope       = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${local.tenant_id}" : "/subscriptions/${data.azurerm_subscription.current.subscription_id}"
+# Only create this if we have subscription scopes
+resource "azurerm_role_definition" "custom-appservice-reader-sub" {
+  count       = length(local.subscription_scopes) > 0 ? 1 : 0
+  name        = "cs-website-reader-sub"
+  scope       = local.subscription_scopes[0]
   description = "Crowdstrike Web App Service Custom Role"
 
   permissions {
-    actions = [
-      "Microsoft.Web/sites/config/list/Action",
-      "Microsoft.Web/sites/Read",
-      "Microsoft.Web/sites/config/Read"
-    ]
+    actions     = local.app_service_permissions
     not_actions = []
   }
 
-  assignable_scopes = var.use_azure_management_group ? ["/providers/Microsoft.Management/managementGroups/${local.tenant_id}"] : local.subscription_assign_list
+  assignable_scopes = local.subscription_scopes
 }
 
-# Reader role
+# Role assignments for subscriptions
+resource "azurerm_role_assignment" "appservice-reader-sub" {
+  for_each                         = length(local.subscription_scopes) > 0 ? toset(local.subscription_scopes) : []
+  scope                            = each.value
+  role_definition_id               = azurerm_role_definition.custom-appservice-reader-sub[0].role_definition_resource_id
+  principal_id                     = var.object_id
+  skip_service_principal_aad_check = false
+
+  lifecycle {
+    ignore_changes = [
+      role_definition_id,
+    ]
+  }
+}
+
+# For each management group scope
+resource "azurerm_role_definition" "custom-appservice-reader-mg" {
+  for_each    = { for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}" => id }
+  name        = "cs-website-reader-${each.value}"
+  scope       = each.key
+  description = "Crowdstrike Web App Service Custom Role"
+
+  permissions {
+    actions     = local.app_service_permissions
+    not_actions = []
+  }
+
+  assignable_scopes = [each.key]
+}
+
+# Role assignments for management groups
+resource "azurerm_role_assignment" "appservice-reader-mg" {
+  for_each                         = { for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}" => id }
+  scope                            = each.key
+  role_definition_id               = azurerm_role_definition.custom-appservice-reader-mg[each.key].role_definition_resource_id
+  principal_id                     = var.object_id
+  skip_service_principal_aad_check = false
+}
+
+# Reader role assignments for all scopes
 resource "azurerm_role_assignment" "reader" {
-  for_each                         = local.collection
-  scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
+  for_each                         = toset(local.all_scopes)
+  scope                            = each.value
   role_definition_name             = "Reader"
-  principal_id                     = local.object_id
+  principal_id                     = var.object_id
   skip_service_principal_aad_check = false
-
-  lifecycle {
-    ignore_changes = [
-      role_definition_id,
-      scope
-    ]
-  }
 }
-
-# KeyVault Reader role
-resource "azurerm_role_assignment" "keyvault-reader" {
-  for_each                         = local.collection
-  scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
-  role_definition_name             = "Key Vault Reader"
-  principal_id                     = local.object_id
-  skip_service_principal_aad_check = false
-
-  lifecycle {
-    ignore_changes = [
-      role_definition_id,
-      scope
-    ]
-  }
-}
-
-# Security Reader role
-resource "azurerm_role_assignment" "security-reader" {
-  for_each                         = local.collection
-  scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
-  role_definition_name             = "Security Reader"
-  principal_id                     = local.object_id
-  skip_service_principal_aad_check = false
-
-  lifecycle {
-    ignore_changes = [
-      role_definition_id,
-      scope
-    ]
-  }
-}
-
-# Azure Kubernetes Service RBAC Reader role
-resource "azurerm_role_assignment" "kube-rbac-reader" {
-  for_each                         = local.collection
-  scope                            = var.use_azure_management_group ? "/providers/Microsoft.Management/managementGroups/${each.key}" : "/subscriptions/${each.key}"
-  role_definition_name             = "Azure Kubernetes Service RBAC Reader"
-  principal_id                     = local.object_id
-  skip_service_principal_aad_check = false
-
-  lifecycle {
-    ignore_changes = [
-      role_definition_id,
-      scope
-    ]
-  }
-}
-

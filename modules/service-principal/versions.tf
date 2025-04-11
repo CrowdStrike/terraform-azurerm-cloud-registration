@@ -11,11 +11,5 @@ terraform {
       source  = "hashicorp/azurerm"
       version = ">= 3.63.0"
     }
-
-    # it is temporal provider used until official public provider ready
-    crowdstrike = {
-      source  = "cs-dev-cloudconnect-templates.s3.amazonaws.com/crowdstrike/crowdstrike"
-      version = ">= 0.2.0"
-    }
   }
 }

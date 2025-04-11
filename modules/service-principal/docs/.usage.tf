@@ -9,23 +9,7 @@ terraform {
       source  = "hashicorp/azuread"
       version = ">= 1.6.0"
     }
-    crowdstrike = {
-      source  = "cs-dev-cloudconnect-templates.s3.amazonaws.com/crowdstrike/crowdstrike"
-      version = ">= 0.2.0"
-    }
   }
-}
-
-variable "falcon_client_id" {
-  type        = string
-  sensitive   = true
-  description = "Falcon API Client ID"
-}
-
-variable "falcon_client_secret" {
-  type        = string
-  sensitive   = true
-  description = "Falcon API Client Secret"
 }
 
 provider "azurerm" {
@@ -34,28 +18,16 @@ provider "azurerm" {
 
 provider "azuread" {}
 
-provider "crowdstrike" {
-  client_id     = var.falcon_client_id
-  client_secret = var.falcon_client_secret
-}
-
-# Create service principal and register tenant with CrowdStrike
+# Create service principal
 module "service_principal" {
   source = "CrowdStrike/cloud-registration/azure//modules/service-principal"
 
-  # Use management group for automatic subscription discovery
-  use_azure_management_group = true
-  default_subscription_id    = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID
-  
-  # Optional: For GovCloud environments
-  # is_commercial = true
-}
+  # Client ID of CrowdStrike's multi-tenant app
+  azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
 
-output "service_principal_object_id" {
-  value     = module.service_principal.object_id
-  sensitive = true
-}
-
-output "monitored_subscriptions" {
-  value = module.asset_inventory.subscriptions
+  # Optionally customize Microsoft Graph app roles
+  # entra_id_permissions = [
+  #   "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All
+  #   "98830695-27a2-44f7-8c18-0c3ebc9698f6"  # GroupMember.Read.All
+  # ]
 }

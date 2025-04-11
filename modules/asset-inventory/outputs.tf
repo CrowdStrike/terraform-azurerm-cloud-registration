@@ -1,21 +1,14 @@
-output "crowdstrike_accounts" {
-  description = "The created CrowdStrike Horizon Azure accounts"
-  value       = crowdstrike_horizon_azure_account.accounts
-  sensitive   = true
+output "subscription_scopes" {
+  description = "List of Azure subscriptions scopes configured for CrowdStrike asset inventory"
+  value       = local.subscription_scopes
 }
 
-output "tenant_id" {
-  description = "Azure tenant ID used for asset inventory"
-  value       = local.tenant_id
+output "management_group_scopes" {
+  description = "List of Azure management group scopes configured for CrowdStrike asset inventory"
+  value       = local.management_group_scopes
 }
 
-output "object_id" {
-  description = "Object ID of the CrowdStrike service principal"
-  value       = local.object_id
-  sensitive   = true
-}
-
-output "subscriptions" {
-  description = "List of Azure subscriptions configured for CrowdStrike asset inventory"
-  value       = local.subscriptions
+output "app_service_permissions" {
+  description = "List of app service permissions granted to the custom app"
+  value       = local.app_service_permissions
 }

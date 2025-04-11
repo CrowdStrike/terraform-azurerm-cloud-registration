@@ -1,15 +1,8 @@
-provider "crowdstrike" {
-  client_id     = var.cs_client_id
-  client_secret = var.cs_client_secret
-}
-
 provider "azuread" {
-  tenant_id = var.tenant_id
 }
 
 provider "azurerm" {
-  tenant_id       = var.tenant_id
-  subscription_id = var.default_subscription_id != "" ? var.default_subscription_id : element(var.subscription_ids, 0)
+  subscription_id = var.crowdstrike_infrastructure_subscription_id != "" ? var.crowdstrike_infrastructure_subscription_id : (length(var.subscription_ids) > 0 ? element(var.subscription_ids, 0) : null)
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -17,47 +10,42 @@ provider "azurerm" {
   }
 }
 
+data "azurerm_subscription" "current" {
+}
+
 data "azurerm_client_config" "current" {
 }
 
-data "crowdstrike_horizon_azure_client_id" "target" {
+locals {
   tenant_id = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
+  subscriptions = toset(var.subscription_ids)
 }
 
 module "service_principal" {
   source = "./modules/service-principal/"
 
-  azure_client_id            = var.azure_client_id
-  use_azure_management_group = var.use_azure_management_group
-  default_subscription_id    = coalesce(var.default_subscription_id, data.azurerm_client_config.current.subscription_id)
-  is_commercial              = var.is_commercial
-
-  depends_on = [
-    data.crowdstrike_horizon_azure_client_id.target
-  ]
+  azure_client_id = var.azure_client_id
+  entra_id_permissions = var.custom_entra_id_permissions
 
   providers = {
-    azuread     = azuread
-    azurerm     = azurerm
-    crowdstrike = crowdstrike
+    azuread = azuread
+    azurerm = azurerm
   }
 }
 
 module "asset_inventory" {
   source = "./modules/asset-inventory/"
 
-  tenant_id                  = module.service_principal.tenant_id
-  object_id                  = module.service_principal.object_id
-  subscription_ids           = var.subscription_ids
-  is_commercial              = var.is_commercial
-  use_azure_management_group = var.use_azure_management_group
+  tenant_id            = local.tenant_id
+  management_group_ids = var.management_group_ids
+  subscription_ids     = var.subscription_ids
+  object_id            = module.service_principal.object_id
 
   depends_on = [
     module.service_principal
   ]
 
   providers = {
-    azurerm     = azurerm
-    crowdstrike = crowdstrike
+    azurerm = azurerm
   }
 }

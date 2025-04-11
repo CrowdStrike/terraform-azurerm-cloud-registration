@@ -4,35 +4,34 @@ variable "tenant_id" {
   description = "Used to create a graph dependency, not needed when running the module independently"
 }
 
-variable "use_azure_management_group" {
-  type        = bool
-  default     = false
-  description = "Set to `true` to enable automatic subscription discovery"
-}
-
 variable "subscription_ids" {
   type        = list(string)
   default     = []
-  description = "List of subscription IDs to include"
+  description = "List of subscription IDs"
+
+  validation {
+    condition     = alltrue([for id in var.subscription_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
+    error_message = "All subscription IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
+}
+
+variable "management_group_ids" {
+  type        = list(string)
+  default     = []
+  description = "List of management group IDs to monitor"
+
+  validation {
+    condition     = alltrue([for id in var.management_group_ids : can(regex("^[a-zA-Z0-9-_]{1,90}$", id))])
+    error_message = "Management group IDs must be 1-90 characters consisting of alphanumeric characters, hyphens, and underscores."
+  }
 }
 
 variable "object_id" {
   type        = string
-  default     = ""
-  description = "Used to create a graph dependency, not needed when running the module independently"
-}
+  description = "Service principal object_id to which all the roles will be assigned"
 
-variable "is_commercial" {
-  type        = bool
-  default     = false
-  description = "Is the account commercial? Only applicable when you're in the GovCloud Falcon environment"
-}
-
-resource "null_resource" "validate_subscription_ids" {
-  lifecycle {
-    precondition {
-      condition     = var.use_azure_management_group || length(var.subscription_ids) > 0
-      error_message = "subscription_ids must not be empty when use_azure_management_group is false."
-    }
+  validation {
+    condition     = var.object_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.object_id))
+    error_message = "The object_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
