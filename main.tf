@@ -14,11 +14,6 @@ module "service_principal" {
 
   azure_client_id      = var.azure_client_id
   entra_id_permissions = var.custom_entra_id_permissions
-
-  providers = {
-    azuread = azuread
-    azurerm = azurerm
-  }
 }
 
 module "asset_inventory" {
@@ -32,8 +27,4 @@ module "asset_inventory" {
   depends_on = [
     module.service_principal
   ]
-
-  providers = {
-    azurerm = azurerm
-  }
 }
