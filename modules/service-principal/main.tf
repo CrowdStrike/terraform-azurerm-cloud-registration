@@ -35,9 +35,6 @@ resource "crowdstrike_horizon_azure_management_group" "management_group" {
   tenant_id               = local.tenant_id
   default_subscription_id = var.default_subscription_id
 
-  provisioner "local-exec" {
-    command = "az rest --method post --url '/providers/Microsoft.Authorization/elevateAccess?api-version=2016-07-01'"
-  }
   depends_on = [crowdstrike_horizon_azure_account.account]
 }
 
