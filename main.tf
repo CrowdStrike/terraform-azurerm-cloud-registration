@@ -1,15 +1,3 @@
-provider "azuread" {
-}
-
-provider "azurerm" {
-  subscription_id = var.crowdstrike_infrastructure_subscription_id
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-}
-
 data "azurerm_subscription" "current" {
 }
 
