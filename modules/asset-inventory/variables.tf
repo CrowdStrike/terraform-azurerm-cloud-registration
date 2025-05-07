@@ -31,12 +31,12 @@ variable "management_group_ids" {
   }
 }
 
-variable "cs_infrastructure_subscription_id" {
+variable "cs_infra_subscription_id" {
   type        = string
   description = "Azure subscription ID that will host CrowdStrike infrastructure"
 
   validation {
-    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infrastructure_subscription_id))
+    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
     error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
@@ -48,20 +48,6 @@ variable "app_service_principal_id" {
   validation {
     condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.app_service_principal_id))
     error_message = "The object_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
-variable "feature_settings" {
-  description = "Settings of feature modules"
-  type = object({
-    realtime_visibility_detection = object({
-      enabled = bool
-    })
-  })
-  default = {
-    realtime_visibility_detection = {
-      enabled = true
-    }
   }
 }
 
@@ -77,13 +63,13 @@ variable "env" {
   type        = string
 }
 
-variable "resource_name_prefix" {
+variable "resource_prefix" {
   description = "The prefix to be added to the resource name."
   default     = ""
   type        = string
 }
 
-variable "resource_name_suffix" {
+variable "resource_suffix" {
   description = "The suffix to be added to the resource name."
   default     = ""
   type        = string

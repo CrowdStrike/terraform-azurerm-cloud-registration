@@ -5,8 +5,7 @@ output "tenant_id" {
 
 output "service_principal_object_id" {
   description = "Object ID of the CrowdStrike service principal"
-  # value       = module.service_principal.object_id
-  value = local.app_service_principal_id
+  value       = module.service_principal.object_id
 }
 
 output "subscription_scopes" {
@@ -26,22 +25,22 @@ output "active_subscriptions_in_groups" {
 
 output "activity_log_settings" {
   description = "Settings of activity log ingestion"
-  value = {
-    eventhub_namespace_id        = module.log_ingestion.activity_log_eventhub_namespace_id
-    eventhub_namespace_name      = module.log_ingestion.activity_log_eventhub_namespace_name
-    eventhub_name                = module.log_ingestion.activity_log_eventhub_name
-    eventhub_id                  = module.log_ingestion.activity_log_eventhub_id
-    eventhub_consumer_group_name = module.log_ingestion.activity_log_eventhub_consumer_group_name
-  }
+  value = var.enable_realtime_visibility && var.realtime_visibility_activity_log_settings.enabled ? {
+    eventhub_namespace_id        = module.log_ingestion[0].activity_log_eventhub_namespace_id
+    eventhub_namespace_name      = module.log_ingestion[0].activity_log_eventhub_namespace_name
+    eventhub_name                = module.log_ingestion[0].activity_log_eventhub_name
+    eventhub_id                  = module.log_ingestion[0].activity_log_eventhub_id
+    eventhub_consumer_group_name = module.log_ingestion[0].activity_log_eventhub_consumer_group_name
+  } : null
 }
 
 output "entra_id_log_settings" {
   description = "Settings of Entra ID log ingestion"
-  value = {
-    eventhub_namespace_id        = module.log_ingestion.entra_id_log_eventhub_namespace_id
-    eventhub_namespace_name      = module.log_ingestion.entra_id_log_eventhub_namespace_name
-    eventhub_name                = module.log_ingestion.entra_id_log_eventhub_name
-    eventhub_id                  = module.log_ingestion.entra_id_log_eventhub_id
-    eventhub_consumer_group_name = module.log_ingestion.entra_id_log_eventhub_consumer_group_name
-  }
+  value = var.enable_realtime_visibility && var.realtime_visibility_entra_id_log_settings.enabled ? {
+    eventhub_namespace_id        = module.log_ingestion[0].entra_id_log_eventhub_namespace_id
+    eventhub_namespace_name      = module.log_ingestion[0].entra_id_log_eventhub_namespace_name
+    eventhub_name                = module.log_ingestion[0].entra_id_log_eventhub_name
+    eventhub_id                  = module.log_ingestion[0].entra_id_log_eventhub_id
+    eventhub_consumer_group_name = module.log_ingestion[0].entra_id_log_eventhub_consumer_group_name
+  } : null
 }

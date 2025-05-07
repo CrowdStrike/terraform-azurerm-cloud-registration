@@ -1,7 +1,7 @@
 {
   "properties": {
-    "displayName": "Activity Logs must be sent to CrowdStrike for Real Time Visibility and Detection assessment",
-    "description": "Activity Log data must be sent to CrowdStrike for Time Visibility and Detection assessment.",
+    "displayName": "Activity Logs must be sent to CrowdStrike for Realtime Visibility assessment",
+    "description": "Activity Log data must be sent to CrowdStrike for Realtime Visibility assessment.",
     "policyType": "Custom",
     "metadata": {
       "version": "1.0.0",
@@ -13,8 +13,7 @@
         "type": "String",
         "metadata": {
           "displayName": "Diagnostic Setting Name"
-        },
-        "defaultValue": "cs-monitor-activity-to-eventhub"
+        }
       },
       "eventHubAuthorizationRuleId": {
         "type": "String",
@@ -42,7 +41,7 @@
       "eventHubSubscriptionId": {
         "type": "String",
         "metadata": {
-          "displayName": "Crowdstrike Infrastructure Subscription ID"
+          "displayName": "Subscription ID hosting the EventHub instance"
         }
       }
     },
@@ -162,8 +161,7 @@
           "roleDefinitionIds": [
             "/providers/microsoft.authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa",
             "/providers/microsoft.authorization/roleDefinitions/2a5c394f-5eb7-4d4f-9c8e-e8eae39faebc",
-            "/subscriptions/[parameters('eventHubSubscriptionId')]/providers/Microsoft.Authorization/roleDefinitions/f526a384-b230-433a-b45c-95f59c4a2dec",
-            "/subscriptions/[parameters('eventHubSubscriptionId')]/providers/Microsoft.Authorization/roleDefinitions/2b629674-e913-4c01-ae53-ef4638d8f975"
+            "/subscriptions/[parameters('eventHubSubscriptionId')]/providers/Microsoft.Authorization/roleDefinitions/f526a384-b230-433a-b45c-95f59c4a2dec"
           ]
         }
       }

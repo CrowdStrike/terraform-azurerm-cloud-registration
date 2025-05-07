@@ -68,12 +68,12 @@ variable "falcon_ip_addresses" {
   }
 }
 
-variable "cs_infrastructure_subscription_id" {
+variable "cs_infra_subscription_id" {
   type        = string
   description = "Azure subscription ID that will host CrowdStrike infrastructure"
 
   validation {
-    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infrastructure_subscription_id))
+    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
     error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
@@ -89,88 +89,116 @@ variable "azure_client_id" {
   }
 }
 
-variable "custom_entra_id_permissions" {
-  description = "Optional list of Microsoft Graph permissions IDs to assign to the service principal (overrides default roles)"
-  type        = list(string)
-  default     = null
-
-  validation {
-    condition     = var.custom_entra_id_permissions == null ? true : alltrue([for id in coalesce(var.custom_entra_id_permissions, []) : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
-    error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
-variable "feature_settings" {
-  description = "Settings of feature modules"
-  type = object({
-    realtime_visibility_detection = object({
-      enabled = bool
-      activity_log = object({
-        enabled                       = bool
-        use_existing_event_hub        = bool
-        event_hub_namespace_name      = optional(string)
-        event_hub_subscription_id     = optional(string)
-        event_hub_resource_group_name = optional(string)
-        event_hub_consumer_group_name = optional(string)
-        event_hub_name                = optional(string)
-        deploy_remediation_policy     = bool
-      })
-      entra_id_log = object({
-        enabled                       = bool
-        use_existing_event_hub        = bool
-        event_hub_namespace_name      = optional(string)
-        event_hub_subscription_id     = optional(string)
-        event_hub_resource_group_name = optional(string)
-        event_hub_consumer_group_name = optional(string)
-        event_hub_name                = optional(string)
-      })
-    })
-  })
-  default = {
-    realtime_visibility_detection = {
-      enabled = true
-      activity_log = {
-        enabled                       = true
-        use_existing_event_hub        = false
-        event_hub_namespace_name      = ""
-        event_hub_subscription_id     = ""
-        event_hub_resource_group_name = ""
-        event_hub_consumer_group_name = ""
-        event_hub_name                = ""
-        deploy_remediation_policy     = true
-      }
-      entra_id_log = {
-        enabled                       = true
-        use_existing_event_hub        = false
-        event_hub_namespace_name      = ""
-        event_hub_subscription_id     = ""
-        event_hub_resource_group_name = ""
-        event_hub_consumer_group_name = ""
-        event_hub_name                = ""
-      }
-    }
-  }
-}
-
 variable "env" {
   description = "Custom label indicating the environment to be monitored, such as `prod`, `stag`, `dev`, etc."
   default     = "prod"
   type        = string
 }
 
+variable "is_gov" {
+  type        = bool
+  default     = false
+  description = "Set to true if you are deploying in gov Falcon"
+}
+
+variable "account_type" {
+  type        = string
+  default     = "commercial"
+  description = "Account type can be either 'commercial' or 'gov'"
+  validation {
+    condition     = var.account_type == "commercial" || var.account_type == "gov"
+    error_message = "must be either 'commercial' or 'gov'"
+  }
+}
+
 variable "region" {
-  description = "Azure region for the resources deployed in this solution."
+  description = "Azure Region for deploying global Azure resources (Role definition, EventHub etc.) that are tenant-wide and only need to be created once."
   default     = "westus"
   type        = string
 }
 
-variable "resource_name_prefix" {
+variable "custom_entra_id_permissions" {
+  description = "Optional list of Microsoft Graph permissions IDs to assign to the service principal (overrides default roles)"
+  type        = list(string)
+  default     = null
+
+  validation {
+    condition     = var.custom_entra_id_permissions == null ? true : alltrue(concat([for id in coalesce(var.custom_entra_id_permissions, []) : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))], [contains(var.custom_entra_id_permissions, "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30")]))
+    error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX. 'Application.Read.All' permission must be included."
+  }
+}
+
+variable "enable_realtime_visibility" {
+  type        = bool
+  default     = false
+  description = "Set to true to install realtime visibility resources"
+}
+
+variable "realtime_visibility_activity_log_settings" {
+  description = "Settings of realtime visibility for activity log"
+  type = object({
+    enabled                   = bool
+    deploy_remediation_policy = bool
+    existing_eventhub = object({
+      use                   = bool
+      subscription_id       = optional(string)
+      resource_group_name   = optional(string)
+      namespace_name        = optional(string)
+      name                  = optional(string)
+      consumer_group_name   = optional(string)
+      authorization_rule_id = optional(string)
+    })
+  })
+  default = {
+    enabled                   = true
+    deploy_remediation_policy = true
+    existing_eventhub = {
+      use                   = false
+      subscription_id       = ""
+      resource_group_name   = ""
+      namespace_name        = ""
+      name                  = ""
+      consumer_group_name   = ""
+      authorization_rule_id = ""
+    }
+  }
+}
+
+variable "realtime_visibility_entra_id_log_settings" {
+  description = "Settings of realtime visibility for Entra ID log"
+  type = object({
+    enabled = bool
+    existing_eventhub = object({
+      use                   = bool
+      subscription_id       = optional(string)
+      resource_group_name   = optional(string)
+      namespace_name        = optional(string)
+      name                  = optional(string)
+      consumer_group_name   = optional(string)
+      authorization_rule_id = optional(string)
+    })
+  })
+  default = {
+    enabled = true
+    existing_eventhub = {
+      use                   = false
+      subscription_id       = ""
+      resource_group_name   = ""
+      namespace_name        = ""
+      name                  = ""
+      consumer_group_name   = ""
+      authorization_rule_id = ""
+    }
+  }
+}
+
+variable "resource_prefix" {
   description = "The prefix to be added to the resource name."
   default     = ""
   type        = string
 }
 
-variable "resource_name_suffix" {
+variable "resource_suffix" {
   description = "The suffix to be added to the resource name."
   default     = ""
   type        = string

@@ -39,13 +39,13 @@ variable "region" {
   type        = string
 }
 
-variable "resource_name_prefix" {
+variable "resource_prefix" {
   description = "The prefix to be added to the resource name."
   default     = ""
   type        = string
 }
 
-variable "resource_name_suffix" {
+variable "resource_suffix" {
   description = "The suffix to be added to the resource name."
   default     = ""
   type        = string

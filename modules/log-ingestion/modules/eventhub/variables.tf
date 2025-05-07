@@ -14,54 +14,36 @@ variable "falcon_ip_addresses" {
   }
 }
 
-variable "feature_settings" {
-  description = "Settings of feature modules"
+variable "activity_log_settings" {
+  description = "Settings of realtime visibility for activity log"
   type = object({
-    realtime_visibility_detection = object({
-      enabled = bool
-      activity_log = object({
-        enabled                       = bool
-        use_existing_event_hub        = bool
-        event_hub_namespace_name      = optional(string)
-        event_hub_subscription_id     = optional(string)
-        event_hub_resource_group_name = optional(string)
-        event_hub_consumer_group_name = optional(string)
-        event_hub_name                = optional(string)
-        deploy_remediation_policy     = bool
-      })
-      entra_id_log = object({
-        enabled                       = bool
-        use_existing_event_hub        = bool
-        event_hub_namespace_name      = optional(string)
-        event_hub_subscription_id     = optional(string)
-        event_hub_resource_group_name = optional(string)
-        event_hub_consumer_group_name = optional(string)
-        event_hub_name                = optional(string)
-      })
+    enabled                   = bool
+    deploy_remediation_policy = bool
+    existing_eventhub = object({
+      use = bool
     })
   })
   default = {
-    realtime_visibility_detection = {
-      enabled = true
-      activity_log = {
-        enabled                       = true
-        use_existing_event_hub        = false
-        event_hub_namespace_name      = ""
-        event_hub_subscription_id     = ""
-        event_hub_resource_group_name = ""
-        event_hub_consumer_group_name = ""
-        event_hub_name                = ""
-        deploy_remediation_policy     = true
-      }
-      entra_id_log = {
-        enabled                       = true
-        use_existing_event_hub        = false
-        event_hub_namespace_name      = ""
-        event_hub_subscription_id     = ""
-        event_hub_resource_group_name = ""
-        event_hub_consumer_group_name = ""
-        event_hub_name                = ""
-      }
+    enabled                   = true
+    deploy_remediation_policy = true
+    existing_eventhub = {
+      use = false
+    }
+  }
+}
+
+variable "entra_id_log_settings" {
+  description = "Settings of realtime visibility for Entra ID log"
+  type = object({
+    enabled = bool
+    existing_eventhub = object({
+      use = bool
+    })
+  })
+  default = {
+    enabled = true
+    existing_eventhub = {
+      use = false
     }
   }
 }
@@ -78,13 +60,13 @@ variable "region" {
   type        = string
 }
 
-variable "prefix" {
+variable "resource_prefix" {
   description = "The prefix to be added to the resource name."
   default     = ""
   type        = string
 }
 
-variable "suffix" {
+variable "resource_suffix" {
   description = "The suffix to be added to the resource name."
   default     = ""
   type        = string

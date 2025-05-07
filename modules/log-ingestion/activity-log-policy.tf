@@ -5,7 +5,7 @@ locals {
 resource "azurerm_policy_definition" "activity-log" {
   for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
 
-  name                = "${local.prefix}policy-cslogact${local.suffix}"
+  name                = "${var.resource_prefix}policy-cslogact${var.resource_suffix}"
   management_group_id = each.value
   display_name        = local.policy_definition.properties.displayName
   description         = local.policy_definition.properties.description
@@ -25,13 +25,13 @@ resource "azurerm_policy_definition" "activity-log" {
 resource "azurerm_management_group_policy_assignment" "activity-log" {
   for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
 
-  name     = "${local.prefix}pas-cslogact${local.suffix}"
+  name     = "pas-cslogact"
   location = var.region
   identity {
     type = "SystemAssigned"
   }
-  description          = "Ensures that Activity Log data is send to CrowdStrike for Real Time Visibility and Detection assessment."
-  display_name         = "CrowdStrike Real Time Visibility and Detection"
+  description          = "Ensures that Activity Log data is send to CrowdStrike for Realtime Visibility assessment."
+  display_name         = "CrowdStrike Realtime Visibility"
   policy_definition_id = azurerm_policy_definition.activity-log[each.key].id
   management_group_id  = each.value
   parameters = jsonencode({
@@ -93,23 +93,23 @@ resource "azurerm_role_assignment" "activity-log-policy-lab-azure-eventhubs-data
   ]
 }
 
-resource "azurerm_role_assignment" "activity-log-policy-lab-azure-eventhubs-data-sender" {
-  for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
-
-  scope                            = "/subscriptions/${local.activityLogEventHubSubscriptionId}"
-  role_definition_name             = "Azure Event Hubs Data Sender"
-  principal_id                     = azurerm_management_group_policy_assignment.activity-log[each.key].identity[0].principal_id
-  skip_service_principal_aad_check = false
-
-  depends_on = [
-    azurerm_management_group_policy_assignment.activity-log
-  ]
-}
+# resource "azurerm_role_assignment" "activity-log-policy-lab-azure-eventhubs-data-sender" {
+#   for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
+#
+#   scope                            = "/subscriptions/${local.activityLogEventHubSubscriptionId}"
+#   role_definition_name             = "Azure Event Hubs Data Sender"
+#   principal_id                     = azurerm_management_group_policy_assignment.activity-log[each.key].identity[0].principal_id
+#   skip_service_principal_aad_check = false
+#
+#   depends_on = [
+#     azurerm_management_group_policy_assignment.activity-log
+#   ]
+# }
 
 resource "azurerm_management_group_policy_remediation" "activity-log" {
   for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
 
-  name                           = "${local.prefix}remediate-cslogact${local.suffix}"
+  name                           = "${var.resource_prefix}remediate-cslogact${var.resource_suffix}"
   management_group_id            = each.value
   failure_percentage             = 1
   resource_count                 = 500
