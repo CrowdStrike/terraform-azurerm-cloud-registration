@@ -5,7 +5,7 @@ locals {
 resource "azurerm_policy_definition" "activity-log" {
   for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
 
-  name                = "${local.prefix}policy-csliactivity${local.suffix}"
+  name                = "${local.prefix}policy-cslogact${local.suffix}"
   management_group_id = each.value
   display_name        = local.policy_definition.properties.displayName
   description         = local.policy_definition.properties.description
@@ -25,7 +25,7 @@ resource "azurerm_policy_definition" "activity-log" {
 resource "azurerm_management_group_policy_assignment" "activity-log" {
   for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
 
-  name     = "${local.prefix}pas-csliactivity${local.suffix}"
+  name     = "${local.prefix}pas-cslogact${local.suffix}"
   location = var.region
   identity {
     type = "SystemAssigned"
@@ -109,7 +109,7 @@ resource "azurerm_role_assignment" "activity-log-policy-lab-azure-eventhubs-data
 resource "azurerm_management_group_policy_remediation" "activity-log" {
   for_each = local.shouldDeployRemediationPolicy ? toset(local.management_group_scopes) : []
 
-  name                           = "${local.prefix}remediate-csliactivity${local.suffix}"
+  name                           = "${local.prefix}remediate-cslogact${local.suffix}"
   management_group_id            = each.value
   failure_percentage             = 1
   resource_count                 = 500

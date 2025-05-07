@@ -5,8 +5,8 @@ locals {
   tenant_id                                = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
   prefix                                   = var.resource_name_prefix != "" ? "${var.resource_name_prefix}-" : ""
   suffix                                   = var.resource_name_suffix != "" ? "-${var.resource_name_suffix}" : ""
-  activityLogDiagnosticSettingsDefaultName = "${local.prefix}diag-csliactivity${local.suffix}"
-  entraIDLogDiagnosticSettingsDefaultName  = "${local.prefix}diag-cslientid${local.suffix}"
+  activityLogDiagnosticSettingsDefaultName = "${local.prefix}diag-cslogact${local.suffix}"
+  entraIDLogDiagnosticSettingsDefaultName  = "${local.prefix}diag-cslogentid${local.suffix}"
   subscription_scopes                      = [for id in var.subscription_ids : "/subscriptions/${id}"]
   management_group_scopes                  = [for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}"]
   activityLogEnabled                       = var.feature_settings.realtime_visibility_detection.enabled && var.feature_settings.realtime_visibility_detection.activity_log.enabled
@@ -30,7 +30,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "${local.prefix}rg-csli-${var.env}${local.suffix}"
+  name     = "${local.prefix}rg-cslog-${var.env}${local.suffix}"
   location = var.region
   tags     = var.tags
 }
