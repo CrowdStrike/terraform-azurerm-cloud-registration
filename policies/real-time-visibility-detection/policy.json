@@ -1,0 +1,172 @@
+{
+  "properties": {
+    "displayName": "Activity Logs must be sent to CrowdStrike for Real Time Visibility and Detection assessment",
+    "description": "Activity Log data must be sent to CrowdStrike for Time Visibility and Detection assessment.",
+    "policyType": "Custom",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Security"
+    },
+    "mode": "All",
+    "parameters": {
+      "diagnosticSettingName": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Diagnostic Setting Name"
+        },
+        "defaultValue": "cs-monitor-activity-to-eventhub"
+      },
+      "eventHubAuthorizationRuleId": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Event Hub Authorization Rule Id",
+          "strongType": "Microsoft.EventHub/Namespaces/AuthorizationRules",
+          "assignPermissions": true
+        }
+      },
+      "eventHubName": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Event Hub Name",
+          "strongType": "Microsoft.EventHub/Namespaces/EventHubs"
+        }
+      },
+      "policyEffect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Policy Effect"
+        },
+        "allowedValues": ["DeployIfNotExists", "Disabled"],
+        "defaultValue": "DeployIfNotExists"
+      },
+      "eventHubSubscriptionId": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Crowdstrike Infrastructure Subscription ID"
+        }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "equals": "Microsoft.Resources/subscriptions"
+      },
+      "then": {
+        "effect": "[parameters('policyEffect')]",
+        "details": {
+          "type": "Microsoft.Insights/diagnosticSettings",
+          "deploymentScope": "Subscription",
+          "existenceScope": "Subscription",
+          "existenceCondition": {
+            "allOf": [
+              {
+                "field": "name",
+                "equals": "[parameters('diagnosticSettingName')]"
+              },
+              {
+                "field": "Microsoft.Insights/diagnosticSettings/eventHubAuthorizationRuleId",
+                "equals": "[parameters('eventHubAuthorizationRuleId')]"
+              },
+              {
+                "field": "Microsoft.Insights/diagnosticSettings/eventHubName",
+                "equals": "[parameters('eventHubName')]"
+              }
+            ]
+          },
+          "deployment": {
+            "location": "westeurope",
+            "properties": {
+              "mode": "incremental",
+              "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "diagnosticSettingName": {
+                    "type": "String"
+                  },
+                  "eventHubAuthorizationRuleId": {
+                    "type": "String"
+                  },
+                  "eventHubName": {
+                    "type": "string"
+                  },
+                  "eventHubSubscriptionId": {
+                    "type": "string"
+                  }
+                },
+                "variables": {},
+                "resources": [
+                  {
+                    "name": "[parameters('diagnosticSettingName')]",
+                    "type": "Microsoft.Insights/diagnosticSettings",
+                    "apiVersion": "2021-05-01-preview",
+                    "location": "Global",
+                    "properties": {
+                      "eventHubAuthorizationRuleId": "[parameters('eventHubAuthorizationRuleId')]",
+                      "eventHubName": "[parameters('eventHubName')]",
+                      "logs": [
+                        {
+                          "category": "Administrative",
+                          "enabled": true
+                        },
+                        {
+                          "category": "Security",
+                          "enabled": true
+                        },
+                        {
+                          "category": "ServiceHealth",
+                          "enabled": true
+                        },
+                        {
+                          "category": "Alert",
+                          "enabled": true
+                        },
+                        {
+                          "category": "Recommendation",
+                          "enabled": true
+                        },
+                        {
+                          "category": "Policy",
+                          "enabled": true
+                        },
+                        {
+                          "category": "Autoscale",
+                          "enabled": true
+                        },
+                        {
+                          "category": "ResourceHealth",
+                          "enabled": true
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "outputs": {}
+              },
+              "parameters": {
+                "diagnosticSettingName": {
+                  "value": "[parameters('diagnosticSettingName')]"
+                },
+                "eventHubAuthorizationRuleId": {
+                  "value": "[parameters('eventHubAuthorizationRuleId')]"
+                },
+                "eventHubName": {
+                  "value": "[parameters('eventHubName')]"
+                },
+                "eventHubSubscriptionId": {
+                  "value": "[parameters('eventHubSubscriptionId')]"
+                }
+              }
+            }
+          },
+          "roleDefinitionIds": [
+            "/providers/microsoft.authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa",
+            "/providers/microsoft.authorization/roleDefinitions/2a5c394f-5eb7-4d4f-9c8e-e8eae39faebc",
+            "/subscriptions/[parameters('eventHubSubscriptionId')]/providers/Microsoft.Authorization/roleDefinitions/f526a384-b230-433a-b45c-95f59c4a2dec",
+            "/subscriptions/[parameters('eventHubSubscriptionId')]/providers/Microsoft.Authorization/roleDefinitions/2b629674-e913-4c01-ae53-ef4638d8f975"
+          ]
+        }
+      }
+    }
+  }
+}

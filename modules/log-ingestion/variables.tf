@@ -31,6 +31,16 @@ variable "subscription_ids" {
   }
 }
 
+variable "app_service_principal_id" {
+  type        = string
+  description = "Service principal ID of Crowdstrike app to which all the roles will be assigned"
+
+  validation {
+    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.app_service_principal_id))
+    error_message = "The object_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
+}
+
 variable "falcon_cid" {
   type        = string
   description = "Falcon CID"
@@ -60,7 +70,7 @@ variable "falcon_url" {
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
-  description = "List of IP addresses of Crowdstrike Falcon service. Please refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list of your Falcon region."
+  description = "List of IPv4 addresses of Crowdstrike Falcon service. Please refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list of your Falcon region."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -75,28 +85,6 @@ variable "cs_infrastructure_subscription_id" {
   validation {
     condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infrastructure_subscription_id))
     error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
-variable "azure_client_id" {
-  type        = string
-  default     = ""
-  description = "Client ID of CrowdStrike's multi-tenant app"
-
-  validation {
-    condition     = var.azure_client_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.azure_client_id))
-    error_message = "The azure_client_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
-variable "custom_entra_id_permissions" {
-  description = "Optional list of Microsoft Graph permissions IDs to assign to the service principal (overrides default roles)"
-  type        = list(string)
-  default     = null
-
-  validation {
-    condition     = var.custom_entra_id_permissions == null ? true : alltrue([for id in coalesce(var.custom_entra_id_permissions, []) : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
-    error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
 
@@ -153,7 +141,7 @@ variable "feature_settings" {
 }
 
 variable "env" {
-  description = "Custom label indicating the environment to be monitored, such as `prod`, `stag`, `dev`, etc."
+  description = "Custom label indicating the environment to be monitored, such as prod, stag or dev."
   default     = "prod"
   type        = string
 }

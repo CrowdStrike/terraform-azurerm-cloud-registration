@@ -31,12 +31,66 @@ variable "management_group_ids" {
   }
 }
 
-variable "object_id" {
+variable "cs_infrastructure_subscription_id" {
   type        = string
-  description = "Service principal object_id to which all the roles will be assigned"
+  description = "Azure subscription ID that will host CrowdStrike infrastructure"
 
   validation {
-    condition     = var.object_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.object_id))
+    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infrastructure_subscription_id))
+    error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
+}
+
+variable "app_service_principal_id" {
+  type        = string
+  description = "Service principal ID of Crowdstrike app to which all the roles will be assigned"
+
+  validation {
+    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.app_service_principal_id))
     error_message = "The object_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
+}
+
+variable "feature_settings" {
+  description = "Settings of feature modules"
+  type = object({
+    realtime_visibility_detection = object({
+      enabled = bool
+    })
+  })
+  default = {
+    realtime_visibility_detection = {
+      enabled = true
+    }
+  }
+}
+
+variable "region" {
+  description = "Azure region for the resources deployed in this solution."
+  default     = "westus"
+  type        = string
+}
+
+variable "env" {
+  description = "Custom label indicating the environment to be monitored, such as prod, stag or dev."
+  default     = "prod"
+  type        = string
+}
+
+variable "resource_name_prefix" {
+  description = "The prefix to be added to the resource name."
+  default     = ""
+  type        = string
+}
+
+variable "resource_name_suffix" {
+  description = "The suffix to be added to the resource name."
+  default     = ""
+  type        = string
+}
+
+variable "tags" {
+  description = "Tags to be applied to all resources"
+  default     = {}
+  type        = map(string)
 }

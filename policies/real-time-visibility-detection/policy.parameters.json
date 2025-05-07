@@ -1,0 +1,32 @@
+{
+  "diagnosticSettingName": {
+    "type": "String",
+    "metadata": {
+      "displayName": "Diagnostic Setting Name"
+    },
+    "defaultValue": "cs-monitor-activity-to-eventhub"
+  },
+  "eventHubAuthorizationRuleId": {
+    "type": "String",
+    "metadata": {
+      "displayName": "Event Hub Authorization Rule Id",
+      "strongType": "Microsoft.EventHub/Namespaces/AuthorizationRules",
+      "assignPermissions": true
+    }
+  },
+  "eventHubName": {
+    "type": "String",
+    "metadata": {
+      "displayName": "Event Hub Name",
+      "strongType": "Microsoft.EventHub/Namespaces/EventHubs"
+    }
+  },
+  "policyEffect": {
+    "type": "String",
+    "metadata": {
+      "displayName": "Policy Effect"
+    },
+    "allowedValues": ["DeployIfNotExists", "Disabled"],
+    "defaultValue": "DeployIfNotExists"
+  }
+}

@@ -84,25 +84,35 @@ module "crowdstrike_azure_registration" {
 
 ## Inputs
 
-| Name | Description                                                                               | Type | Default | Required |
-|------|-------------------------------------------------------------------------------------------|------|---------|:--------:|
-| tenant_id | Azure tenant ID (optional - will be retrieved from current client config if not provided) | `string` | `""` | no |
-| management_group_ids | List of management group IDs to monitor                                                   | `list(string)` | `[]` | no |
-| subscription_ids | List of subscription IDs to monitor                                                       | `list(string)` | `[]` | no |
-| crowdstrike_infrastructure_subscription_id | Azure subscription ID for provider configuration and hostnig CrowdStrike infrastructure   | `string` | `""` | yes |
-| azure_client_id | Client ID of CrowdStrike's multi-tenant app                                               | `string` | `""` | yes |
-| custom_app_roles | Optional list of Microsoft Graph app role IDs to assign to the service principal          | `list(string)` | `null` | no |
+| Name                              | Description                                                                                                                                                                                                                                 | Type           | Default               | Required |
+|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|-----------------------|:--------:|
+| tenant_id                         | Azure tenant ID (optional - will be retrieved from current client config if not provided)                                                                                                                                                   | `string`       | `""`                  |    no    |
+| management_group_ids              | List of management group IDs to monitor                                                                                                                                                                                                     | `list(string)` | `[]`                  |    no    |
+| subscription_ids                  | List of subscription IDs to monitor                                                                                                                                                                                                         | `list(string)` | `[]`                  |    no    |
+| cs_infrastructure_subscription_id | Azure subscription ID that will host CrowdStrike infrastructure                                                                                                                                                                             | `string`       | `""`                  |   yes    |
+| falcon_cid                        | Falcon CID                                                                                                                                                                                                                                  | `string`       | `""`                  |   yes    |
+| falcon_client_id                  | Client ID for the Falcon API                                                                                                                                                                                                                | `string`       | `""`                  |   yes    |
+| falcon_client_secret              | Client secret for the Falcon API                                                                                                                                                                                                            | `string`       | `""`                  |   yes    |
+| falcon_url                        | Falcon cloud API url                                                                                                                                                                                                                        | `string`       | `api.crowdstrike.com` |    no    |
+| falcon_ip_addresses               | List of IPv4 addresses of Crowdstrike Falcon service. Please refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list of your Falcon region. | `list(string)` | `[]`                  |    no    |
+| azure_client_id                   | Client ID of CrowdStrike's multi-tenant app                                                                                                                                                                                                 | `string`       | `""`                  |   yes    |
+| custom_app_roles                  | Optional list of Microsoft Graph app role IDs to assign to the service principal                                                                                                                                                            | `list(string)` | `null`                |    no    |
+| env                               | Custom label indicating the environment to be monitored, such as `prod`, `stag`, `dev`, etc.                                                                                                                                                | `string`       | `prod`                |    no    |
+| region                            | Azure region for the resources deployed in this solution                                                                                                                                                                                    | `string`       | `westus`              |    no    |
+| resource_name_prefix              | The prefix to be added to the resource name                                                                                                                                                                                                 | `string`       | `""`                  |    no    |
+| resource_name_suffix              | The suffix to be added to the resource name                                                                                                                                                                                                 | `string`       | `""`                  |    no    |
+| tags                              | Tags to be applied to all resources                                                                                                                                                                                                         | `map(string)`  | `{}`                  |    no    |
 
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| tenant_id | Azure tenant ID used for CrowdStrike integration |
-| service_principal_object_id | Object ID of the CrowdStrike service principal |
-| subscription_scopes | List of Azure subscription scopes configured for CrowdStrike asset inventory |
-| management_group_scopes | List of Azure management group scopes configured for CrowdStrike asset inventory |
-| subscription_role_name | The name of the custom role for subscriptions |
-| management_group_role_names | List of custom role names for management groups |
+| Name                        | Description                                                                      |
+|-----------------------------|----------------------------------------------------------------------------------|
+| tenant_id                   | Azure tenant ID used for CrowdStrike integration                                 |
+| service_principal_object_id | Object ID of the CrowdStrike service principal                                   |
+| subscription_scopes         | List of Azure subscription scopes configured for CrowdStrike asset inventory     |
+| management_group_scopes     | List of Azure management group scopes configured for CrowdStrike asset inventory |
+| subscription_role_name      | The name of the custom role for subscriptions                                    |
+| management_group_role_names | List of custom role names for management groups                                  |
 
 <!-- END_TF_DOCS -->
