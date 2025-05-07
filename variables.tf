@@ -1,7 +1,7 @@
 variable "tenant_id" {
   type        = string
   default     = ""
-  description = "Azure tenant ID (optional - will be retrieved from current client config if not provided)"
+  description = "Azure tenant ID for deployment. If not provided, it will be automatically retrieved from the current Azure client configuration."
 
   validation {
     condition     = var.tenant_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.tenant_id))
@@ -12,7 +12,7 @@ variable "tenant_id" {
 variable "management_group_ids" {
   type        = list(string)
   default     = []
-  description = "List of management group IDs to monitor"
+  description = "List of Azure management group IDs to monitor with CrowdStrike Falcon Cloud Security. All subscriptions within these management groups will be automatically discovered and monitored."
 
   validation {
     condition     = alltrue([for id in var.management_group_ids : can(regex("^[a-zA-Z0-9-_]{1,90}$", id))])
@@ -23,7 +23,7 @@ variable "management_group_ids" {
 variable "subscription_ids" {
   type        = list(string)
   default     = []
-  description = "List of subscription IDs to monitor"
+  description = "List of specific Azure subscription IDs to monitor with CrowdStrike Falcon Cloud Security. Use this for targeted monitoring of individual subscriptions."
 
   validation {
     condition     = alltrue([for id in var.subscription_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
@@ -33,34 +33,34 @@ variable "subscription_ids" {
 
 variable "falcon_cid" {
   type        = string
-  description = "Falcon CID"
+  description = "CrowdStrike Falcon Customer ID (CID) without checksum, used to identify your specific Falcon environment."
 
   validation {
     condition     = can(regex("^[0-9a-f]{32}$", var.falcon_cid))
-    error_message = "The tenant_id must be a valid KUID in the format XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX."
+    error_message = "The falcon_cid must be a valid 32-character hexadecimal string without the checksum."
   }
 }
 
 variable "falcon_client_id" {
   type        = string
-  description = "Client ID for the Falcon API"
+  description = "CrowdStrike Falcon API client ID used for authentication. This can be created in the Falcon console under API Clients & Keys."
 }
 
 variable "falcon_client_secret" {
   type        = string
-  description = "Client secret for the Falcon API"
+  description = "CrowdStrike Falcon API client secret used for authentication. This is provided when creating an API client in the Falcon console."
 }
 
 variable "falcon_url" {
   type        = string
   default     = "api.crowdstrike.com"
-  description = "Falcon cloud API url"
+  description = "CrowdStrike Falcon API endpoint URL. The default is for US-1 cloud. For other regions, use the appropriate regional endpoint (e.g., api.us-2.crowdstrike.com, api.eu-1.crowdstrike.com)."
 }
 
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
-  description = "List of IP addresses of Crowdstrike Falcon service. Please refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list of your Falcon region."
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -70,7 +70,7 @@ variable "falcon_ip_addresses" {
 
 variable "cs_infra_subscription_id" {
   type        = string
-  description = "Azure subscription ID that will host CrowdStrike infrastructure"
+  description = "Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials."
 
   validation {
     condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
@@ -81,7 +81,7 @@ variable "cs_infra_subscription_id" {
 variable "azure_client_id" {
   type        = string
   default     = ""
-  description = "Client ID of CrowdStrike's multi-tenant app"
+  description = "Client ID of CrowdStrike's multi-tenant application in Azure. This is typically provided by CrowdStrike and is used to establish the connection between Azure and Falcon Cloud Security."
 
   validation {
     condition     = var.azure_client_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.azure_client_id))
@@ -90,35 +90,24 @@ variable "azure_client_id" {
 }
 
 variable "env" {
-  description = "Custom label indicating the environment to be monitored, such as `prod`, `stag`, `dev`, etc."
+  description = "Environment identifier used in resource naming and tagging. Examples include 'prod', 'dev', 'test', etc. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions."
   default     = "prod"
   type        = string
-}
 
-variable "is_gov" {
-  type        = bool
-  default     = false
-  description = "Set to true if you are deploying in gov Falcon"
-}
-
-variable "account_type" {
-  type        = string
-  default     = "commercial"
-  description = "Account type can be either 'commercial' or 'gov'"
   validation {
-    condition     = var.account_type == "commercial" || var.account_type == "gov"
-    error_message = "must be either 'commercial' or 'gov'"
+    condition     = can(regex("^[0-9a-zA-Z]{4}$", var.env))
+    error_message = "The 'env' must only contain alphanumeric characters and be exactly 4 characters in length."
   }
 }
 
 variable "region" {
-  description = "Azure Region for deploying global Azure resources (Role definition, EventHub etc.) that are tenant-wide and only need to be created once."
+  description = "Azure region where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }
 
 variable "custom_entra_id_permissions" {
-  description = "Optional list of Microsoft Graph permissions IDs to assign to the service principal (overrides default roles)"
+  description = "Optional list of Microsoft Graph permission IDs to assign to the service principal. If provided, these will replace the default permissions. Must include 'Application.Read.All' (ID: 9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30) at minimum."
   type        = list(string)
   default     = null
 
@@ -131,14 +120,19 @@ variable "custom_entra_id_permissions" {
 variable "enable_realtime_visibility" {
   type        = bool
   default     = false
-  description = "Set to true to install realtime visibility resources"
+  description = "Enable real-time visibility by configuring log ingestion for Azure Activity Logs and Entra ID logs. This provides enhanced security monitoring capabilities."
+}
+
+variable "deploy_realtime_visibility_remediation_policy" {
+  type        = bool
+  default     = false
+  description = "When 'enable_realtime_visibility' is true, this option deploys an Azure Policy at each management group to automatically configure activity log diagnostic settings for EventHub in subscriptions where these settings are missing. Note that diagnostic settings deployed by this policy will not be tracked or managed by Terraform."
 }
 
 variable "realtime_visibility_activity_log_settings" {
-  description = "Settings of realtime visibility for activity log"
+  description = "Configuration settings for Azure Activity Log ingestion when 'enable_realtime_visibility' is true. Allows using either a newly created Event Hub or an existing one."
   type = object({
-    enabled                   = bool
-    deploy_remediation_policy = bool
+    enabled = bool
     existing_eventhub = object({
       use                   = bool
       subscription_id       = optional(string)
@@ -150,8 +144,7 @@ variable "realtime_visibility_activity_log_settings" {
     })
   })
   default = {
-    enabled                   = true
-    deploy_remediation_policy = true
+    enabled = true
     existing_eventhub = {
       use                   = false
       subscription_id       = ""
@@ -165,7 +158,7 @@ variable "realtime_visibility_activity_log_settings" {
 }
 
 variable "realtime_visibility_entra_id_log_settings" {
-  description = "Settings of realtime visibility for Entra ID log"
+  description = "Configuration settings for Microsoft Entra ID (formerly Azure AD) log ingestion when 'enable_realtime_visibility' is true. Allows using either a newly created Event Hub or an existing one."
   type = object({
     enabled = bool
     existing_eventhub = object({
@@ -193,19 +186,19 @@ variable "realtime_visibility_entra_id_log_settings" {
 }
 
 variable "resource_prefix" {
-  description = "The prefix to be added to the resource name."
+  description = "Prefix to add to all resource names created by this module. Useful for organization and to avoid naming conflicts when deploying multiple instances of this module."
   default     = ""
   type        = string
 }
 
 variable "resource_suffix" {
-  description = "The suffix to be added to the resource name."
+  description = "Suffix to add to all resource names created by this module. Useful for organization and to avoid naming conflicts when deploying multiple instances of this module."
   default     = ""
   type        = string
 }
 
 variable "tags" {
-  description = "Tags to be applied to all resources"
+  description = "Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag."
   default = {
     CSTagVendor : "Crowdstrike"
   }

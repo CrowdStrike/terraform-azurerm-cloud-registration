@@ -18,16 +18,67 @@ provider "azurerm" {
 
 provider "azuread" {}
 
-# Create service principal
+# First, create a service principal using the service-principal module
 module "service_principal" {
   source = "CrowdStrike/cloud-registration/azure//modules/service-principal"
 
-  # Client ID of CrowdStrike's multi-tenant app
   azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
+}
 
-  # Optionally customize Microsoft Graph app roles
-  # entra_id_permissions = [
-  #   "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All
-  #   "98830695-27a2-44f7-8c18-0c3ebc9698f6"  # GroupMember.Read.All
-  # ]
+# Configure log ingestion
+module "log_ingestion" {
+  source = "CrowdStrike/cloud-registration/azure//modules/log-ingestion"
+
+  # Service principal ID from the service-principal module
+  app_service_principal_id = module.service_principal.object_id
+
+  # CrowdStrike Falcon details
+  falcon_cid           = "abcdef0123456789abcdef0123456789"     # Your Falcon CID
+  falcon_client_id     = "abcdef01-2345-6789-abcd-ef0123456789" # Your Falcon API Client ID
+  falcon_client_secret = "YOUR_FALCON_CLIENT_SECRET"
+
+  # Azure infrastructure details
+  resource_group_name      = "crowdstrike-rg"
+  cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
+
+  # Scope of monitoring
+  subscription_ids     = ["subscription-id-1", "subscription-id-2"]
+  management_group_ids = ["mg-id-1", "mg-id-2"]
+
+  # Optional: Configure Activity Log settings
+  activity_log_settings = {
+    enabled = true
+    existing_eventhub = {
+      use = false
+      # If use = true, provide these values:
+      # subscription_id       = "00000000-0000-0000-0000-000000000000"
+      # resource_group_name   = "existing-rg"
+      # namespace_name        = "existing-namespace"
+      # name                  = "existing-eventhub"
+      # consumer_group_name   = "$Default"
+      # authorization_rule_id = "/subscriptions/.../authorizationRules/RootManageSharedAccessKey"
+    }
+  }
+
+  # Optional: Configure Entra ID Log settings
+  entra_id_log_settings = {
+    enabled = true
+    existing_eventhub = {
+      use = false
+      # Same parameters as activity_log_settings.existing_eventhub if use = true
+    }
+  }
+
+  # Optional: Deploy remediation policy
+  deploy_remediation_policy = true
+
+  # Optional: Resource naming
+  resource_prefix = "cs-"
+  resource_suffix = "-prod"
+
+  # Optional: Tagging
+  tags = {
+    Environment = "Production"
+    CSTagVendor = "Crowdstrike"
+  }
 }

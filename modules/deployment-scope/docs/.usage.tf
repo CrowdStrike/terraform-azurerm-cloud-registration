@@ -1,0 +1,23 @@
+terraform {
+  required_version = ">= 0.15"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.63.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+module "deployment_scope" {
+  source = "CrowdStrike/cloud-registration/azure//modules/deployment-scope"
+
+  # Specify subscription IDs directly
+  subscription_ids = ["subscription-id-1", "subscription-id-2"]
+
+  # AND/OR use management groups
+  management_group_ids = ["mg-id-1", "mg-id-2"]
+}

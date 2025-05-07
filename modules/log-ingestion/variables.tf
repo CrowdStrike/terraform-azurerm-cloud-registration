@@ -88,11 +88,21 @@ variable "cs_infra_subscription_id" {
   }
 }
 
+variable "resource_group_name" {
+  type        = string
+  description = "Resource group name that will host CrowdStrike infrastructure"
+}
+
+variable "deploy_remediation_policy" {
+  description = "Deploy a Azure Policy at each the management group to automatically detect and configure activity log diagnostic settings for EventHub in subscriptions where these settings are missing. Be aware that any diagnostic settings deployed by this Azure Policy will not be tracked or managed by Terraform."
+  type        = string
+  default     = false
+}
+
 variable "activity_log_settings" {
   description = "Settings of realtime visibility for activity log"
   type = object({
-    enabled                   = bool
-    deploy_remediation_policy = bool
+    enabled = bool
     existing_eventhub = object({
       use                   = bool
       subscription_id       = optional(string)
@@ -104,8 +114,7 @@ variable "activity_log_settings" {
     })
   })
   default = {
-    enabled                   = true
-    deploy_remediation_policy = true
+    enabled = true
     existing_eventhub = {
       use                   = false
       subscription_id       = ""

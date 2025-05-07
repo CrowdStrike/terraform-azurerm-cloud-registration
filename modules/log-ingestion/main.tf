@@ -10,13 +10,11 @@ locals {
   shouldDeployEventHubForActivityLog       = var.activity_log_settings.enabled && !var.activity_log_settings.existing_eventhub.use
   shouldDeployEventHubForEntraIDLog        = var.entra_id_log_settings.enabled && !var.entra_id_log_settings.existing_eventhub.use
   shouldDeployEventHubNamespace            = local.shouldDeployEventHubForActivityLog || local.shouldDeployEventHubForEntraIDLog
-  shouldDeployRemediationPolicy            = var.activity_log_settings.enabled && var.activity_log_settings.deploy_remediation_policy
+  shouldDeployRemediationPolicy            = var.activity_log_settings.enabled && var.deploy_remediation_policy
 }
 
-resource "azurerm_resource_group" "this" {
-  name     = "${var.resource_prefix}rg-cslog-${var.env}${var.resource_suffix}"
-  location = var.region
-  tags     = var.tags
+data "azurerm_resource_group" "this" {
+  name = var.resource_group_name
 }
 
 
@@ -24,7 +22,7 @@ module "new_eventhub" {
   source = "./modules/eventhub"
   count  = local.shouldDeployEventHubNamespace ? 1 : 0
 
-  resource_group_name   = azurerm_resource_group.this.name
+  resource_group_name   = data.azurerm_resource_group.this.name
   activity_log_settings = var.activity_log_settings
   entra_id_log_settings = var.entra_id_log_settings
   falcon_ip_addresses   = var.falcon_ip_addresses
@@ -35,7 +33,7 @@ module "new_eventhub" {
   tags                  = var.tags
 
   depends_on = [
-    azurerm_resource_group.this
+    data.azurerm_resource_group.this
   ]
 }
 

@@ -35,27 +35,30 @@ module "asset_inventory" {
   management_group_ids = ["mg-id-1", "mg-id-2"]
   
   # Service principal object ID that will be granted permissions
-  object_id = "00000000-0000-0000-0000-000000000000"
+  app_service_principal_id = "00000000-0000-0000-0000-000000000000"
+  
+  # Azure subscription ID that will host CrowdStrike infrastructure
+  cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 }
 ```
 
 ## Providers
 
-| Name | Version |
-|------|---------|
+| Name    | Version   |
+|---------|-----------|
 | azurerm | >= 3.63.0 |
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [azurerm_role_assignment.reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.appservice-reader-sub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.appservice-reader-mg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_definition.custom-appservice-reader-sub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
-| [azurerm_role_definition.custom-appservice-reader-mg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
-| [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
-| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+| Name                                                                                                                                                    | Type        |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| [azurerm_role_assignment.reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment)                       | resource    |
+| [azurerm_role_assignment.appservice-reader-sub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment)        | resource    |
+| [azurerm_role_assignment.appservice-reader-mg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment)         | resource    |
+| [azurerm_role_definition.custom-appservice-reader-sub](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource    |
+| [azurerm_role_definition.custom-appservice-reader-mg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition)  | resource    |
+| [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription)                         | data source |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config)                       | data source |
 
 ## Inputs
 
@@ -65,7 +68,7 @@ module "asset_inventory" {
 | subscription_ids         | List of subscription IDs                                                                     | list(string) | []       |    no    |
 | management_group_ids     | List of management group IDs                                                                 | list(string) | []       |    no    |
 | cs_infra_subscription_id | Azure subscription ID that will host CrowdStrike infrastructure                              | `string`     | `""`     |   yes    |
-| object_id                | Service principal object_id to which all the roles will be assigned                          | string       | ""       |    no    |
+| app_service_principal_id | Service principal object_id to which all the roles will be assigned                          | string       | ""       |    no    |
 | env                      | Custom label indicating the environment to be monitored, such as `prod`, `stag`, `dev`, etc. | `string`     | `prod`   |    no    |
 | region                   | Azure region for the resources deployed in this solution                                     | `string`     | `westus` |    no    |
 | resource_prefix          | The prefix to be added to the resource name                                                  | `string`     | `""`     |    no    |

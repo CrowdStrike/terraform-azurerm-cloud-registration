@@ -17,15 +17,13 @@ variable "falcon_ip_addresses" {
 variable "activity_log_settings" {
   description = "Settings of realtime visibility for activity log"
   type = object({
-    enabled                   = bool
-    deploy_remediation_policy = bool
+    enabled = bool
     existing_eventhub = object({
       use = bool
     })
   })
   default = {
-    enabled                   = true
-    deploy_remediation_policy = true
+    enabled = true
     existing_eventhub = {
       use = false
     }
