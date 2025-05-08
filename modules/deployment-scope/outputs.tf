@@ -1,7 +1,7 @@
 output "active_subscriptions_by_group" {
   description = "Map of management group ID to its enabled subscription IDs"
   value = {
-    for mg, subs in module.subscriptions_in_groups.subscriptions_by_group :
+    for mg, subs in local.subs_by_groups :
     mg => [
       for sub in data.azurerm_subscription.subscriptions-mg : sub.subscription_id if sub.state == "Enabled" && contains(subs, sub.subscription_id)
     ]

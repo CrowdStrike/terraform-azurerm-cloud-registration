@@ -3,8 +3,8 @@ resource "azurerm_monitor_diagnostic_setting" "activity-log" {
 
   name                           = local.activityLogDiagnosticSettingsDefaultName
   target_resource_id             = each.value
-  eventhub_name                  = module.new_eventhub[0].activity_log_eventhub_name
-  eventhub_authorization_rule_id = module.new_eventhub[0].eventhub_namespace_authorization_rule_id
+  eventhub_name                  = local.activityLogEventHubName
+  eventhub_authorization_rule_id = local.activityLogEventHubAuthorizationRuleId
   enabled_log {
     category = "Administrative"
   }
@@ -31,8 +31,7 @@ resource "azurerm_monitor_diagnostic_setting" "activity-log" {
   }
 
   depends_on = [
-    module.new_eventhub,
-    module.existing_activity_log_eventhub
+    azurerm_eventhub.activity-log
   ]
 }
 
@@ -40,8 +39,8 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra-id-log" {
   count = local.shouldDeployEventHubForEntraIDLog ? 1 : 0
 
   name                           = local.entraIDLogDiagnosticSettingsDefaultName
-  eventhub_name                  = module.new_eventhub[0].entra_id_log_eventhub_name
-  eventhub_authorization_rule_id = module.new_eventhub[0].eventhub_namespace_authorization_rule_id
+  eventhub_name                  = local.entraIDLogEventHubName
+  eventhub_authorization_rule_id = local.entraIDLogEventHubAuthorizationRuleId
   enabled_log {
     category = "AuditLogs"
   }
@@ -61,7 +60,6 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra-id-log" {
     category = "ADFSSignInLogs"
   }
   depends_on = [
-    module.new_eventhub,
-    module.existing_entra_id_log_eventhub
+    azurerm_eventhub.entra-id-log
   ]
 }

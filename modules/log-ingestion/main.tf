@@ -10,7 +10,7 @@ locals {
   shouldDeployEventHubForActivityLog       = var.activity_log_settings.enabled && !var.activity_log_settings.existing_eventhub.use
   shouldDeployEventHubForEntraIDLog        = var.entra_id_log_settings.enabled && !var.entra_id_log_settings.existing_eventhub.use
   shouldDeployEventHubNamespace            = local.shouldDeployEventHubForActivityLog || local.shouldDeployEventHubForEntraIDLog
-  shouldDeployRemediationPolicy            = var.activity_log_settings.enabled && var.deploy_remediation_policy
+  shouldDeployRemediationPolicy            = local.shouldDeployEventHubForActivityLog && var.deploy_remediation_policy
 }
 
 data "azurerm_resource_group" "this" {
@@ -18,64 +18,72 @@ data "azurerm_resource_group" "this" {
 }
 
 
-module "new_eventhub" {
-  source = "./modules/eventhub"
-  count  = local.shouldDeployEventHubNamespace ? 1 : 0
+resource "azurerm_eventhub_namespace" "this" {
+  count = local.shouldDeployEventHubNamespace ? 1 : 0
 
-  resource_group_name   = data.azurerm_resource_group.this.name
-  activity_log_settings = var.activity_log_settings
-  entra_id_log_settings = var.entra_id_log_settings
-  falcon_ip_addresses   = var.falcon_ip_addresses
-  resource_prefix       = var.resource_prefix
-  resource_suffix       = var.resource_suffix
-  env                   = var.env
-  region                = var.region
-  tags                  = var.tags
-
-  depends_on = [
-    data.azurerm_resource_group.this
-  ]
+  name                          = "${var.resource_prefix}evhns-cslog-${var.env}-${var.region}${var.resource_suffix}"
+  location                      = data.azurerm_resource_group.this.location
+  resource_group_name           = data.azurerm_resource_group.this.name
+  sku                           = "Standard"
+  capacity                      = 2
+  auto_inflate_enabled          = true
+  local_authentication_enabled  = true
+  maximum_throughput_units      = 10
+  minimum_tls_version           = "1.2"
+  public_network_access_enabled = true
+  network_rulesets {
+    default_action                = "Deny"
+    public_network_access_enabled = true
+    ip_rule = [for ip in var.falcon_ip_addresses : {
+      ip_mask = ip
+      action  = "Allow"
+    }]
+  }
+  tags = var.tags
 }
 
-module "existing_activity_log_eventhub" {
-  count  = !local.shouldDeployEventHubForActivityLog && var.activity_log_settings.enabled ? 1 : 0
-  source = "./modules/existing-eventhub"
-  providers = {
-    azurerm = azurerm.existing_activity_log_eventhub
-  }
-
-  subscription_id         = var.activity_log_settings.existing_eventhub.subscription_id
-  resource_group_name     = var.activity_log_settings.existing_eventhub.resource_group_name
-  eventhub_name           = var.activity_log_settings.existing_eventhub.name
-  eventhub_namespace_name = var.activity_log_settings.existing_eventhub.namespace_name
+resource "azurerm_eventhub" "activity-log" {
+  count             = local.shouldDeployEventHubForActivityLog ? 1 : 0
+  name              = "${var.resource_prefix}evh-cslogact-${var.env}-${var.region}${var.resource_suffix}"
+  namespace_id      = azurerm_eventhub_namespace.this[0].id
+  partition_count   = 16
+  message_retention = 1
 }
 
-module "existing_entra_id_log_eventhub" {
-  count  = !local.shouldDeployEventHubForEntraIDLog && var.entra_id_log_settings.enabled ? 1 : 0
-  source = "./modules/existing-eventhub"
-  providers = {
-    azurerm = azurerm.existing_entra_id_log_eventhub
-  }
+resource "azurerm_eventhub" "entra-id-log" {
+  count             = local.shouldDeployEventHubForEntraIDLog ? 1 : 0
+  name              = "${var.resource_prefix}evh-cslogentid-${var.env}-${var.region}${var.resource_suffix}"
+  namespace_id      = azurerm_eventhub_namespace.this[0].id
+  partition_count   = 16
+  message_retention = 1
+}
 
-  subscription_id         = var.entra_id_log_settings.existing_eventhub.subscription_id
-  resource_group_name     = var.entra_id_log_settings.existing_eventhub.resource_group_name
-  eventhub_name           = var.entra_id_log_settings.existing_eventhub.name
-  eventhub_namespace_name = var.entra_id_log_settings.existing_eventhub.namespace_name
+resource "azurerm_eventhub_namespace_authorization_rule" "this" {
+  count = local.shouldDeployEventHubNamespace ? 1 : 0
+
+  name                = "${var.resource_prefix}rule-cslogevhns-${var.env}-${var.region}${var.resource_suffix}"
+  namespace_name      = azurerm_eventhub_namespace.this[0].name
+  resource_group_name = data.azurerm_resource_group.this.name
+
+  listen = false
+  send   = true
+  manage = false
 }
 
 locals {
-  activityLogEventHubNamespaceName       = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? module.new_eventhub[0].eventhub_namespace_name : module.existing_activity_log_eventhub[0].eventhub_namespace_name) : ""
-  activityLogEventHubNamespaceId         = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? module.new_eventhub[0].eventhub_namespace_id : module.existing_activity_log_eventhub[0].eventhub_namespace_id) : ""
-  activityLogEventHubName                = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? module.new_eventhub[0].activity_log_eventhub_name : module.existing_activity_log_eventhub[0].eventhub_name) : ""
-  activityLogEventHubId                  = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? module.new_eventhub[0].activity_log_eventhub_id : module.existing_activity_log_eventhub[0].eventhub_id) : ""
+  activityLogEventHubNamespaceName       = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? azurerm_eventhub_namespace.this[0].name : data.azurerm_eventhub_namespace.activity-log[0].name) : ""
+  activityLogEventHubNamespaceId         = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? azurerm_eventhub_namespace.this[0].id : data.azurerm_eventhub_namespace.activity-log[0].id) : ""
+  activityLogEventHubName                = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? azurerm_eventhub.activity-log[0].name : data.azurerm_eventhub.activity-log[0].name) : ""
+  activityLogEventHubId                  = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? azurerm_eventhub.activity-log[0].id : data.azurerm_eventhub.activity-log[0].id) : ""
   activityLogEventHubConsumerGroupName   = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? "$Default" : var.activity_log_settings.existing_eventhub.consumer_group_name) : ""
-  activityLogEventHubAuthorizationRuleId = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? module.new_eventhub[0].eventhub_namespace_authorization_rule_id : var.activity_log_settings.existing_eventhub.authorization_rule_id) : ""
+  activityLogEventHubAuthorizationRuleId = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? azurerm_eventhub_namespace_authorization_rule.this[0].id : var.activity_log_settings.existing_eventhub.authorization_rule_id) : ""
   activityLogEventHubSubscriptionId      = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? var.cs_infra_subscription_id : var.activity_log_settings.existing_eventhub.subscription_id) : ""
-  entraIDLogEventHubNamespaceName        = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? module.new_eventhub[0].eventhub_namespace_name : module.existing_entra_id_log_eventhub[0].eventhub_namespace_name) : ""
-  entraIDLogEventHubNamespaceId          = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? module.new_eventhub[0].eventhub_namespace_id : module.existing_entra_id_log_eventhub[0].eventhub_namespace_id) : ""
-  entraIDLogEventHubName                 = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? module.new_eventhub[0].entra_id_log_eventhub_name : module.existing_entra_id_log_eventhub[0].eventhub_name) : ""
-  entraIDLogEventHubId                   = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? module.new_eventhub[0].entra_id_log_eventhub_id : module.existing_entra_id_log_eventhub[0].eventhub_id) : ""
+  entraIDLogEventHubNamespaceName        = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? azurerm_eventhub_namespace.this[0].name : data.azurerm_eventhub_namespace.entra-id-log[0].name) : ""
+  entraIDLogEventHubNamespaceId          = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? azurerm_eventhub_namespace.this[0].id : data.azurerm_eventhub_namespace.entra-id-log[0].id) : ""
+  entraIDLogEventHubName                 = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? azurerm_eventhub.entra-id-log[0].name : data.azurerm_eventhub.entra-id-log[0].name) : ""
+  entraIDLogEventHubId                   = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? azurerm_eventhub.entra-id-log[0].id : data.azurerm_eventhub.entra-id-log[0].id) : ""
   entraIDLogEventHubConsumerGroupName    = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? "$Default" : var.entra_id_log_settings.existing_eventhub.consumer_group_name) : ""
+  entraIDLogEventHubAuthorizationRuleId  = var.activity_log_settings.enabled ? (local.shouldDeployEventHubForActivityLog ? azurerm_eventhub_namespace_authorization_rule.this[0].id : var.entra_id_log_settings.existing_eventhub.authorization_rule_id) : ""
   entraIDLogEventHubSubscriptionId       = var.entra_id_log_settings.enabled ? (local.shouldDeployEventHubForEntraIDLog ? var.cs_infra_subscription_id : var.entra_id_log_settings.existing_eventhub.subscription_id) : ""
 }
 

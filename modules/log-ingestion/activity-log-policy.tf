@@ -16,8 +16,7 @@ resource "azurerm_policy_definition" "activity-log" {
   policy_rule         = jsonencode(local.policy_definition.properties.policyRule)
 
   depends_on = [
-    module.new_eventhub,
-    module.existing_activity_log_eventhub
+    azurerm_eventhub.activity-log
   ]
 }
 
