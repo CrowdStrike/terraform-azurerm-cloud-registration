@@ -55,6 +55,10 @@ module "crowdstrike_azure_registration" {
   # Azure subscription that will host CrowdStrike infrastructure
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
+  # Falcon cloud region - determines which IP addresses are used
+  # Valid values: US-1, US-2, EU-1
+  falcon_cloud_region = "US-1"
+
   # Optional: Enable real-time visibility with log ingestion
   enable_realtime_visibility = true
 
@@ -108,10 +112,4 @@ module "crowdstrike_azure_registration" {
     Project     = "CrowdStrike Integration"
     CSTagVendor = "Crowdstrike"
   }
-
-  # Optional: CrowdStrike Falcon IP addresses for network security configurations
-  falcon_ip_addresses = [
-    "1.2.3.4",
-    "5.6.7.8"
-  ]
 }

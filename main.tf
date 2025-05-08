@@ -14,6 +14,29 @@ locals {
     "df021288-bdef-4463-88db-98f22de89214"  // User.Read.All
   ]
   env = var.env == "" ? "" : "-${var.env}"
+  falcon_ip_addresses = {
+    US-1 : [
+      "13.52.148.107",
+      "52.52.20.134",
+      "54.176.76.126",
+      "54.176.197.246"
+    ],
+    US-2 : [
+      "35.160.117.193",
+      "52.43.192.139",
+      "54.187.226.134",
+      "44.238.201.139",
+      "35.155.6.7",
+      "54.185.138.46"
+    ],
+    EU-1 : [
+      "3.73.169.253",
+      "18.158.141.230",
+      "18.195.129.87",
+      "3.64.87.158",
+      "18.184.139.200"
+    ]
+  }
 }
 
 module "service_principal" {
@@ -68,7 +91,7 @@ module "log_ingestion" {
   deploy_remediation_policy = var.deploy_realtime_visibility_remediation_policy
   activity_log_settings     = var.realtime_visibility_activity_log_settings
   entra_id_log_settings     = var.realtime_visibility_entra_id_log_settings
-  falcon_ip_addresses       = var.falcon_ip_addresses
+  falcon_ip_addresses       = local.falcon_ip_addresses[var.falcon_cloud_region]
   env                       = var.env
   region                    = var.region
   resource_prefix           = var.resource_prefix

@@ -31,14 +31,14 @@ variable "subscription_ids" {
   }
 }
 
-variable "falcon_ip_addresses" {
-  type        = list(string)
-  default     = []
-  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
+variable "falcon_cloud_region" {
+  type        = string
+  default     = "US-1"
+  description = "Falcon cloud region. Defaults to US-1, allowed values are US-1, US-2 or EU-1."
 
   validation {
-    condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
-    error_message = "All IP addresses must be valid IPv4 address format."
+    condition     = contains(["US-1", "US-2", "EU-1"], var.falcon_cloud_region)
+    error_message = "Falcon cloud region must be US-1, US-2 or EU-1."
   }
 }
 
