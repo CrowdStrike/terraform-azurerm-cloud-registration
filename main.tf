@@ -39,7 +39,7 @@ module "asset_inventory" {
 resource "azurerm_resource_group" "this" {
   count = var.enable_realtime_visibility ? 1 : 0
 
-  name     = "${var.resource_prefix}rg-cs${local.env}-${var.resource_suffix}"
+  name     = "${var.resource_prefix}rg-cs${local.env}${var.resource_suffix}"
   location = var.region
   tags     = var.tags
 }
