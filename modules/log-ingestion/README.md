@@ -99,13 +99,8 @@ module "log_ingestion" {
     enabled = true
     existing_eventhub = {
       use = false
-      # If use = true, provide these values:
-      # subscription_id       = "00000000-0000-0000-0000-000000000000"
-      # resource_group_name   = "existing-rg"
-      # namespace_name        = "existing-namespace"
-      # name                  = "existing-eventhub"
-      # consumer_group_name   = "$Default"
-      # authorization_rule_id = "/subscriptions/.../authorizationRules/RootManageSharedAccessKey"
+      # If use = true, provide this value:
+      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg/providers/Microsoft.EventHub/namespaces/existing-namespace/eventhubs/existing-eventhub"
     }
   }
 
@@ -114,7 +109,8 @@ module "log_ingestion" {
     enabled = true
     existing_eventhub = {
       use = false
-      # Same parameters as activity_log_settings.existing_eventhub if use = true
+      # If use = true, provide this value:
+      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg/providers/Microsoft.EventHub/namespaces/existing-namespace/eventhubs/existing-eventhub"
     }
   }
 
@@ -143,7 +139,6 @@ module "log_ingestion" {
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.63.0 |
-
 ## Resources
 
 | Name | Type |
@@ -162,20 +157,16 @@ module "log_ingestion" {
 | [azurerm_role_assignment.activity_log_policy_lab_services_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.activity_log_policy_monitoring_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.entra_id_eventhub_data_receiver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_eventhub.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/eventhub) | data source |
-| [azurerm_eventhub.entra_id_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/eventhub) | data source |
-| [azurerm_eventhub_namespace.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/eventhub_namespace) | data source |
-| [azurerm_eventhub_namespace.entra_id_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/eventhub_namespace) | data source |
 | [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Settings of realtime visibility for activity log | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                  = bool<br/>      eventhub_resource_id = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "use": false,<br/>    "eventhub_resource_id": ""<br/>  }<br/>}</pre> | no |
+| <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Settings of realtime visibility for activity log | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                  = bool<br/>      eventhub_resource_id = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "eventhub_resource_id": "",<br/>    "use": false<br/>  }<br/>}</pre> | no |
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of Crowdstrike app to which all the roles will be assigned | `string` | n/a | yes |
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID that will host CrowdStrike infrastructure | `string` | n/a | yes |
 | <a name="input_deploy_remediation_policy"></a> [deploy\_remediation\_policy](#input\_deploy\_remediation\_policy) | Deploy a Azure Policy at each the management group to automatically detect and configure activity log diagnostic settings for EventHub in subscriptions where these settings are missing. Be aware that any diagnostic settings deployed by this Azure Policy will not be tracked or managed by Terraform. | `string` | `false` | no |
-| <a name="input_entra_id_log_settings"></a> [entra\_id\_log\_settings](#input\_entra\_id\_log\_settings) | Settings of realtime visibility for Entra ID log | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                  = bool<br/>      eventhub_resource_id = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "use": false,<br/>    "eventhub_resource_id": ""<br/>  }<br/>}</pre> | no |
+| <a name="input_entra_id_log_settings"></a> [entra\_id\_log\_settings](#input\_entra\_id\_log\_settings) | Settings of realtime visibility for Entra ID log | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                  = bool<br/>      eventhub_resource_id = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "eventhub_resource_id": "",<br/>    "use": false<br/>  }<br/>}</pre> | no |
 | <a name="input_env"></a> [env](#input\_env) | Custom label indicating the environment to be monitored, such as prod, stag or dev. | `string` | `"prod"` | no |
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
