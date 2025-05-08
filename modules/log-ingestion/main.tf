@@ -11,6 +11,7 @@ locals {
   shouldDeployEventHubForEntraIDLog        = var.entra_id_log_settings.enabled && !var.entra_id_log_settings.existing_eventhub.use
   shouldDeployEventHubNamespace            = local.shouldDeployEventHubForActivityLog || local.shouldDeployEventHubForEntraIDLog
   shouldDeployRemediationPolicy            = local.shouldDeployEventHubForActivityLog && var.deploy_remediation_policy
+  env                                      = var.env == "" ? "" : "-${var.env}"
 }
 
 data "azurerm_resource_group" "this" {
@@ -21,7 +22,7 @@ data "azurerm_resource_group" "this" {
 resource "azurerm_eventhub_namespace" "this" {
   count = local.shouldDeployEventHubNamespace ? 1 : 0
 
-  name                          = "${var.resource_prefix}evhns-cslog-${var.env}-${var.region}${var.resource_suffix}"
+  name                          = "${var.resource_prefix}evhns-cslog${local.env}-${var.region}${var.resource_suffix}"
   location                      = data.azurerm_resource_group.this.location
   resource_group_name           = data.azurerm_resource_group.this.name
   sku                           = "Standard"
@@ -44,7 +45,7 @@ resource "azurerm_eventhub_namespace" "this" {
 
 resource "azurerm_eventhub" "activity-log" {
   count             = local.shouldDeployEventHubForActivityLog ? 1 : 0
-  name              = "${var.resource_prefix}evh-cslogact-${var.env}-${var.region}${var.resource_suffix}"
+  name              = "${var.resource_prefix}evh-cslogact${local.env}-${var.region}${var.resource_suffix}"
   namespace_id      = azurerm_eventhub_namespace.this[0].id
   partition_count   = 16
   message_retention = 1
@@ -52,7 +53,7 @@ resource "azurerm_eventhub" "activity-log" {
 
 resource "azurerm_eventhub" "entra-id-log" {
   count             = local.shouldDeployEventHubForEntraIDLog ? 1 : 0
-  name              = "${var.resource_prefix}evh-cslogentid-${var.env}-${var.region}${var.resource_suffix}"
+  name              = "${var.resource_prefix}evh-cslogentid${local.env}-${var.region}${var.resource_suffix}"
   namespace_id      = azurerm_eventhub_namespace.this[0].id
   partition_count   = 16
   message_retention = 1
@@ -61,7 +62,7 @@ resource "azurerm_eventhub" "entra-id-log" {
 resource "azurerm_eventhub_namespace_authorization_rule" "this" {
   count = local.shouldDeployEventHubNamespace ? 1 : 0
 
-  name                = "${var.resource_prefix}rule-cslogevhns-${var.env}-${var.region}${var.resource_suffix}"
+  name                = "${var.resource_prefix}rule-cslogevhns${local.env}-${var.region}${var.resource_suffix}"
   namespace_name      = azurerm_eventhub_namespace.this[0].name
   resource_group_name = data.azurerm_resource_group.this.name
 

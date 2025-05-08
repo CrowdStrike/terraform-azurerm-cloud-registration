@@ -69,7 +69,7 @@ variable "env" {
   type        = string
 
   validation {
-    condition     = can(regex("^[0-9a-zA-Z]{4}$", var.env))
+    condition     = var.env == "" || can(regex("^[0-9a-zA-Z]{4}$", var.env))
     error_message = "The 'env' must only contain alphanumeric characters and be exactly 4 characters in length."
   }
 }

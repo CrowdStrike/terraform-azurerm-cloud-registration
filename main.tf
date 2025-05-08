@@ -14,6 +14,7 @@ locals {
     "483bed4a-2ad3-4361-a73b-c83ccdbdc53c", // RoleManagement.Read.All
     "df021288-bdef-4463-88db-98f22de89214"  // User.Read.All
   ]
+  env = var.env == "" ? "" : "-${var.env}"
 }
 
 module "service_principal" {
