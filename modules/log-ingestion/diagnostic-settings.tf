@@ -39,7 +39,7 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra_id_log" {
   count = local.should_deploy_eventhub_for_entra_id_log ? 1 : 0
 
   name                           = local.entra_id_log_diagnostic_settings_default_name
-  eventhub_name                  = azurerm_eventhub.entra_id_log[0].id
+  eventhub_name                  = azurerm_eventhub.entra_id_log[0].name
   eventhub_authorization_rule_id = azurerm_eventhub_namespace_authorization_rule.this[0].id
   enabled_log {
     category = "AuditLogs"
