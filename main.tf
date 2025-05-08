@@ -2,10 +2,9 @@ data "azurerm_subscription" "current" {}
 data "azurerm_client_config" "current" {}
 
 locals {
-  tenant_id                = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
-  subscriptions            = toset(var.subscription_ids)
-  management_groups        = toset(var.management_group_ids)
-  app_service_principal_id = "ee99a605-d48c-4806-a769-d76f88e96570"
+  tenant_id         = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
+  subscriptions     = toset(var.subscription_ids)
+  management_groups = toset(var.management_group_ids)
   default_entra_id_permissions = [
     "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", // Application.Read.All
     "98830695-27a2-44f7-8c18-0c3ebc9698f6", // GroupMember.Read.All
