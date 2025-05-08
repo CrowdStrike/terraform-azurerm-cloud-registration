@@ -28,6 +28,8 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.63.0"
+      
+      configuration_aliases = [azurerm.existing_activity_log_eventhub, azurerm.existing_entra_id_log_eventhub]
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -37,26 +39,36 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host Crowdstrike's infrastructure resources
   features {}
 }
 
 provider "azuread" {
 }
 
+# Provider aliases for existing Event Hubs
+provider "azurerm" {
+  alias           = "existing_activity_log_eventhub"
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the EventHub for activity log
+  features {}
+}
+
+provider "azurerm" {
+  alias           = "existing_entra_id_log_eventhub"
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the Eventhub for entra ID log
+  features {}
+}
+
 module "crowdstrike_azure_registration" {
   source = "CrowdStrike/cloud-registration/azure"
-
-  # CrowdStrike multi-tenant application client ID
-  azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
+  providers = {
+    azurerm.existing_activity_log_eventhub = azurerm.existing_activity_log_eventhub
+    azurerm.existing_entra_id_log_eventhub = azurerm.existing_entra_id_log_eventhub
+  }
   
   # Azure configuration - You can use subscriptions, management groups, or both
   subscription_ids = ["subscription-id-1", "subscription-id-2"]
   management_group_ids = ["mg-id-1", "mg-id-2"]
-  
-  # Falcon API credentials
-  falcon_cid           = "your-falcon-cid"
-  falcon_client_id     = "your-falcon-client-id"
-  falcon_client_secret = "your-falcon-client-secret"
   
   # Azure subscription that will host CrowdStrike infrastructure
   cs_infra_subscription_id = "your-infrastructure-subscription-id"

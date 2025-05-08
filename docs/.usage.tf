@@ -4,6 +4,8 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.63.0"
+
+      configuration_aliases = [azurerm.existing_activity_log_eventhub, azurerm.existing_entra_id_log_eventhub]
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -13,14 +15,32 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host Crowdstrike's infrastructure resources
   features {}
 }
 
 provider "azuread" {
 }
 
+# Provider aliases for existing Event Hubs
+provider "azurerm" {
+  alias           = "existing_activity_log_eventhub"
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the EventHub for activity log
+  features {}
+}
+
+provider "azurerm" {
+  alias           = "existing_entra_id_log_eventhub"
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the Eventhub for entra ID log
+  features {}
+}
+
 module "crowdstrike_azure_registration" {
   source = "CrowdStrike/cloud-registration/azure"
+  providers = {
+    azurerm.existing_activity_log_eventhub = azurerm.existing_activity_log_eventhub
+    azurerm.existing_entra_id_log_eventhub = azurerm.existing_entra_id_log_eventhub
+  }
 
   # Azure tenant ID (optional, will use current context if not specified)
   # tenant_id = "00000000-0000-0000-0000-000000000000"
@@ -76,7 +96,8 @@ module "crowdstrike_azure_registration" {
   # ]
 
   # Optional: Resource naming customization
-  env             = "prod"
+  # env can be empty or exactly 4 alphanumeric characters
+  env             = "prod" # or "" for no environment suffix
   region          = "westus"
   resource_prefix = "cs-"
   resource_suffix = "-001"

@@ -4,6 +4,8 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.63.0"
+
+      configuration_aliases = [azurerm.existing_activity_log_eventhub, azurerm.existing_entra_id_log_eventhub]
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -13,10 +15,25 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host Crowdstrike's infrastructure resources
   features {}
 }
 
-provider "azuread" {}
+provider "azuread" {
+}
+
+# Provider aliases for existing Event Hubs
+provider "azurerm" {
+  alias           = "existing_activity_log_eventhub"
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the EventHub for activity log
+  features {}
+}
+
+provider "azurerm" {
+  alias           = "existing_entra_id_log_eventhub"
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the Eventhub for entra ID log
+  features {}
+}
 
 # First, create a service principal using the service-principal module
 module "service_principal" {
@@ -28,6 +45,10 @@ module "service_principal" {
 # Configure log ingestion
 module "log_ingestion" {
   source = "CrowdStrike/cloud-registration/azure//modules/log-ingestion"
+  providers = {
+    azurerm.existing_activity_log_eventhub = azurerm.existing_activity_log_eventhub
+    azurerm.existing_entra_id_log_eventhub = azurerm.existing_entra_id_log_eventhub
+  }
 
   # Service principal ID from the service-principal module
   app_service_principal_id = module.service_principal.object_id
