@@ -29,7 +29,6 @@ module "asset_inventory" {
   tenant_id                = local.tenant_id
   management_group_ids     = local.management_groups
   subscription_ids         = local.subscriptions
-  cs_infra_subscription_id = var.cs_infra_subscription_id
   app_service_principal_id = module.service_principal.object_id
 
   depends_on = [

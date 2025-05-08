@@ -31,16 +31,6 @@ variable "management_group_ids" {
   }
 }
 
-variable "cs_infra_subscription_id" {
-  type        = string
-  description = "Azure subscription ID that will host CrowdStrike infrastructure"
-
-  validation {
-    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
-    error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
 variable "app_service_principal_id" {
   type        = string
   description = "Service principal ID of Crowdstrike app to which all the roles will be assigned"

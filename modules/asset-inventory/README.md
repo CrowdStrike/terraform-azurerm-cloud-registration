@@ -62,13 +62,12 @@ module "asset_inventory" {
 
 ## Inputs
 
-| Name                     | Description                                                                         | Type         | Default | Required |
-|--------------------------|-------------------------------------------------------------------------------------|--------------|---------|:--------:|
+| Name                     | Description                                                                               | Type         | Default | Required |
+|--------------------------|-------------------------------------------------------------------------------------------|--------------|---------|:--------:|
 | tenant_id                | Azure tenant ID (optional - will be retrieved from current client config if not provided) | string       | ""      |    no    |
-| subscription_ids         | List of subscription IDs to monitor                                                 | list(string) | []      |    no    |
-| management_group_ids     | List of management group IDs to monitor                                             | list(string) | []      |    no    |
-| cs_infra_subscription_id | Azure subscription ID that will host CrowdStrike infrastructure                     | string       | n/a     |   yes    |
-| app_service_principal_id | Service principal ID of Crowdstrike app to which all the roles will be assigned     | string       | n/a     |   yes    |
+| subscription_ids         | List of subscription IDs to monitor                                                       | list(string) | []      |    no    |
+| management_group_ids     | List of management group IDs to monitor                                                   | list(string) | []      |    no    |
+| app_service_principal_id | Service principal ID of Crowdstrike app to which all the roles will be assigned           | string       | n/a     |   yes    |
 
 ## Outputs
 
