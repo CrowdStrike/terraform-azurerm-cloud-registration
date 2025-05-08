@@ -4,8 +4,6 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.63.0"
-
-      configuration_aliases = [azurerm.existing_activity_log_eventhub, azurerm.existing_entra_id_log_eventhub]
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -22,19 +20,6 @@ provider "azurerm" {
 provider "azuread" {
 }
 
-# Provider aliases for existing Event Hubs
-provider "azurerm" {
-  alias           = "existing_activity_log_eventhub"
-  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the EventHub for activity log
-  features {}
-}
-
-provider "azurerm" {
-  alias           = "existing_entra_id_log_eventhub"
-  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the Eventhub for entra ID log
-  features {}
-}
-
 # First, create a service principal using the service-principal module
 module "service_principal" {
   source = "CrowdStrike/cloud-registration/azure//modules/service-principal"
@@ -46,17 +31,11 @@ module "service_principal" {
 module "log_ingestion" {
   source = "CrowdStrike/cloud-registration/azure//modules/log-ingestion"
   providers = {
-    azurerm.existing_activity_log_eventhub = azurerm.existing_activity_log_eventhub
-    azurerm.existing_entra_id_log_eventhub = azurerm.existing_entra_id_log_eventhub
+    azurerm = azurerm
   }
 
   # Service principal ID from the service-principal module
   app_service_principal_id = module.service_principal.object_id
-
-  # CrowdStrike Falcon details
-  falcon_cid           = "abcdef0123456789abcdef0123456789"     # Your Falcon CID
-  falcon_client_id     = "abcdef01-2345-6789-abcd-ef0123456789" # Your Falcon API Client ID
-  falcon_client_secret = "YOUR_FALCON_CLIENT_SECRET"
 
   # Azure infrastructure details
   resource_group_name      = "crowdstrike-rg"
@@ -71,13 +50,8 @@ module "log_ingestion" {
     enabled = true
     existing_eventhub = {
       use = false
-      # If use = true, provide these values:
-      # subscription_id       = "00000000-0000-0000-0000-000000000000"
-      # resource_group_name   = "existing-rg"
-      # namespace_name        = "existing-namespace"
-      # name                  = "existing-eventhub"
-      # consumer_group_name   = "$Default"
-      # authorization_rule_id = "/subscriptions/.../authorizationRules/RootManageSharedAccessKey"
+      # If use = true, provide this value:
+      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg/providers/Microsoft.EventHub/namespaces/existing-namespace/eventhubs/existing-eventhub"
     }
   }
 
@@ -86,16 +60,22 @@ module "log_ingestion" {
     enabled = true
     existing_eventhub = {
       use = false
-      # Same parameters as activity_log_settings.existing_eventhub if use = true
+      # If use = true, provide this value:
+      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg/providers/Microsoft.EventHub/namespaces/existing-namespace/eventhubs/existing-eventhub"
     }
   }
 
   # Optional: Deploy remediation policy
   deploy_remediation_policy = true
 
+  # Optional: CrowdStrike IP addresses for network security
+  falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
+
   # Optional: Resource naming
   resource_prefix = "cs-"
   resource_suffix = "-prod"
+  env             = "prod"
+  location        = "westus"
 
   # Optional: Tagging
   tags = {

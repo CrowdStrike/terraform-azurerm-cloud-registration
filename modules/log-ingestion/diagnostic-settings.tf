@@ -1,10 +1,10 @@
-resource "azurerm_monitor_diagnostic_setting" "activity-log" {
-  for_each = local.shouldDeployEventHubForActivityLog ? toset(local.subscription_scopes) : []
+resource "azurerm_monitor_diagnostic_setting" "activity_log" {
+  for_each = local.should_deploy_eventhub_for_activity_log ? toset(local.subscription_scopes) : []
 
-  name                           = local.activityLogDiagnosticSettingsDefaultName
+  name                           = local.activity_log_diagnostic_settings_default_name
   target_resource_id             = each.value
-  eventhub_name                  = local.activityLogEventHubName
-  eventhub_authorization_rule_id = local.activityLogEventHubAuthorizationRuleId
+  eventhub_name                  = azurerm_eventhub.activity_log[0].name
+  eventhub_authorization_rule_id = azurerm_eventhub_namespace_authorization_rule.this[0].id
   enabled_log {
     category = "Administrative"
   }
@@ -31,16 +31,16 @@ resource "azurerm_monitor_diagnostic_setting" "activity-log" {
   }
 
   depends_on = [
-    azurerm_eventhub.activity-log
+    azurerm_eventhub.activity_log
   ]
 }
 
-resource "azurerm_monitor_aad_diagnostic_setting" "entra-id-log" {
-  count = local.shouldDeployEventHubForEntraIDLog ? 1 : 0
+resource "azurerm_monitor_aad_diagnostic_setting" "entra_id_log" {
+  count = local.should_deploy_eventhub_for_entra_id_log ? 1 : 0
 
-  name                           = local.entraIDLogDiagnosticSettingsDefaultName
-  eventhub_name                  = local.entraIDLogEventHubName
-  eventhub_authorization_rule_id = local.entraIDLogEventHubAuthorizationRuleId
+  name                           = local.entra_id_log_diagnostic_settings_default_name
+  eventhub_name                  = azurerm_eventhub.entra_id_log[0].id
+  eventhub_authorization_rule_id = azurerm_eventhub_namespace_authorization_rule.this[0].id
   enabled_log {
     category = "AuditLogs"
   }
@@ -60,6 +60,6 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra-id-log" {
     category = "ADFSSignInLogs"
   }
   depends_on = [
-    azurerm_eventhub.entra-id-log
+    azurerm_eventhub.entra_id_log
   ]
 }

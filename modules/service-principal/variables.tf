@@ -8,7 +8,7 @@ variable "azure_client_id" {
   }
 }
 
-variable "entra_id_permissions" {
+variable "microsoft_graph_permission_ids" {
   description = "List of Microsoft Graph app role IDs to assign to the service principal"
   type        = list(string)
   default = [
@@ -22,7 +22,7 @@ variable "entra_id_permissions" {
   nullable = false
 
   validation {
-    condition     = alltrue([for id in var.entra_id_permissions : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
+    condition     = alltrue([for id in var.microsoft_graph_permission_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
     error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }

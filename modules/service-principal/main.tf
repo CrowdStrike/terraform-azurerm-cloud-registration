@@ -10,8 +10,8 @@ data "azuread_service_principal" "msgraph" {
 }
 
 # Assign application roles
-resource "azuread_app_role_assignment" "entra_id_permissions" {
-  for_each            = toset(var.entra_id_permissions)
+resource "azuread_app_role_assignment" "microsoft_graph_permissions" {
+  for_each            = toset(var.microsoft_graph_permission_ids)
   principal_object_id = azuread_service_principal.sp.object_id
   resource_object_id  = data.azuread_service_principal.msgraph.object_id
   app_role_id         = each.value

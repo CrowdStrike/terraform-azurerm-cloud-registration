@@ -1,14 +1,3 @@
-variable "tenant_id" {
-  type        = string
-  default     = ""
-  description = "Azure tenant ID (optional - will be retrieved from current client config if not provided)"
-
-  validation {
-    condition     = var.tenant_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.tenant_id))
-    error_message = "The tenant_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
 variable "management_group_ids" {
   type        = list(string)
   default     = []
@@ -44,7 +33,7 @@ variable "app_service_principal_id" {
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
-  description = "List of IPv4 addresses of Crowdstrike Falcon service. Please refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list of your Falcon region."
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -78,25 +67,15 @@ variable "activity_log_settings" {
   type = object({
     enabled = bool
     existing_eventhub = object({
-      use                   = bool
-      subscription_id       = optional(string)
-      resource_group_name   = optional(string)
-      namespace_name        = optional(string)
-      name                  = optional(string)
-      consumer_group_name   = optional(string)
-      authorization_rule_id = optional(string)
+      use                  = bool
+      eventhub_resource_id = optional(string)
     })
   })
   default = {
     enabled = true
     existing_eventhub = {
-      use                   = false
-      subscription_id       = ""
-      resource_group_name   = ""
-      namespace_name        = ""
-      name                  = ""
-      consumer_group_name   = ""
-      authorization_rule_id = ""
+      use                  = false
+      eventhub_resource_id = ""
     }
   }
 }
@@ -106,25 +85,15 @@ variable "entra_id_log_settings" {
   type = object({
     enabled = bool
     existing_eventhub = object({
-      use                   = bool
-      subscription_id       = optional(string)
-      resource_group_name   = optional(string)
-      namespace_name        = optional(string)
-      name                  = optional(string)
-      consumer_group_name   = optional(string)
-      authorization_rule_id = optional(string)
+      use                  = bool
+      eventhub_resource_id = optional(string)
     })
   })
   default = {
     enabled = true
     existing_eventhub = {
-      use                   = false
-      subscription_id       = ""
-      resource_group_name   = ""
-      namespace_name        = ""
-      name                  = ""
-      consumer_group_name   = ""
-      authorization_rule_id = ""
+      use                  = false
+      eventhub_resource_id = ""
     }
   }
 }
@@ -135,8 +104,8 @@ variable "env" {
   type        = string
 }
 
-variable "region" {
-  description = "Azure region for the resources deployed in this solution."
+variable "location" {
+  description = "Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }

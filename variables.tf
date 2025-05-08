@@ -1,14 +1,3 @@
-variable "tenant_id" {
-  type        = string
-  default     = ""
-  description = "Azure tenant ID for deployment. If not provided, it will be automatically retrieved from the current Azure client configuration."
-
-  validation {
-    condition     = var.tenant_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.tenant_id))
-    error_message = "The tenant_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
 variable "management_group_ids" {
   type        = list(string)
   default     = []
@@ -31,14 +20,14 @@ variable "subscription_ids" {
   }
 }
 
-variable "falcon_cloud_region" {
-  type        = string
-  default     = "US-1"
-  description = "Falcon cloud region. Defaults to US-1, allowed values are US-1, US-2 or EU-1."
+variable "falcon_ip_addresses" {
+  type        = list(string)
+  default     = []
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
 
   validation {
-    condition     = contains(["US-1", "US-2", "EU-1"], var.falcon_cloud_region)
-    error_message = "Falcon cloud region must be US-1, US-2 or EU-1."
+    condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
+    error_message = "All IP addresses must be valid IPv4 address format."
   }
 }
 
@@ -74,19 +63,19 @@ variable "env" {
   }
 }
 
-variable "region" {
-  description = "Azure region where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
+variable "location" {
+  description = "Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }
 
-variable "custom_entra_id_permissions" {
+variable "microsoft_graph_permission_ids" {
   description = "Optional list of Microsoft Graph permission IDs to assign to the service principal. If provided, these will replace the default permissions. Must include 'Application.Read.All' (ID: 9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30) at minimum."
   type        = list(string)
   default     = null
 
   validation {
-    condition     = var.custom_entra_id_permissions == null ? true : alltrue(concat([for id in coalesce(var.custom_entra_id_permissions, []) : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))], [contains(var.custom_entra_id_permissions, "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30")]))
+    condition     = var.microsoft_graph_permission_ids == null ? true : alltrue(concat([for id in coalesce(var.microsoft_graph_permission_ids, []) : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))], [contains(var.microsoft_graph_permission_ids, "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30")]))
     error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX. 'Application.Read.All' permission must be included."
   }
 }
@@ -108,25 +97,15 @@ variable "realtime_visibility_activity_log_settings" {
   type = object({
     enabled = bool
     existing_eventhub = object({
-      use                   = bool
-      subscription_id       = optional(string)
-      resource_group_name   = optional(string)
-      namespace_name        = optional(string)
-      name                  = optional(string)
-      consumer_group_name   = optional(string)
-      authorization_rule_id = optional(string)
+      use                  = bool
+      eventhub_resource_id = optional(string)
     })
   })
   default = {
     enabled = true
     existing_eventhub = {
-      use                   = false
-      subscription_id       = ""
-      resource_group_name   = ""
-      namespace_name        = ""
-      name                  = ""
-      consumer_group_name   = ""
-      authorization_rule_id = ""
+      use                  = false
+      eventhub_resource_id = ""
     }
   }
 }
@@ -136,25 +115,15 @@ variable "realtime_visibility_entra_id_log_settings" {
   type = object({
     enabled = bool
     existing_eventhub = object({
-      use                   = bool
-      subscription_id       = optional(string)
-      resource_group_name   = optional(string)
-      namespace_name        = optional(string)
-      name                  = optional(string)
-      consumer_group_name   = optional(string)
-      authorization_rule_id = optional(string)
+      use                  = bool
+      eventhub_resource_id = optional(string)
     })
   })
   default = {
     enabled = true
     existing_eventhub = {
-      use                   = false
-      subscription_id       = ""
-      resource_group_name   = ""
-      namespace_name        = ""
-      name                  = ""
-      consumer_group_name   = ""
-      authorization_rule_id = ""
+      use                  = false
+      eventhub_resource_id = ""
     }
   }
 }

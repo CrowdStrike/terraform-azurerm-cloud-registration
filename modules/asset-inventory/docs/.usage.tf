@@ -15,10 +15,9 @@ provider "azurerm" {
 module "asset_inventory" {
   source = "CrowdStrike/cloud-registration/azure//modules/asset-inventory"
 
-  # Option 1: Specify subscription IDs directly
+  # Specify subscription IDs directly
   subscription_ids = ["subscription-id-1", "subscription-id-2"]
-
-  # Option 2: Use management groups
+  # AND use management groups
   management_group_ids = ["mg-id-1", "mg-id-2"]
 
   # Service principal object ID that will be granted permissions

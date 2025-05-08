@@ -17,7 +17,7 @@ locals {
   }
 }
 
-data "azurerm_subscription" "subscriptions-mg" {
+data "azurerm_subscription" "subscriptions_mg" {
   for_each        = toset(local.groups_to_subs)
   subscription_id = each.value
 }

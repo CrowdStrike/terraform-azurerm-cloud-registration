@@ -1,14 +1,3 @@
-variable "tenant_id" {
-  type        = string
-  default     = ""
-  description = "Azure tenant ID (optional - will be retrieved from current client config if not provided)"
-
-  validation {
-    condition     = var.tenant_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.tenant_id))
-    error_message = "The tenant_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
 variable "subscription_ids" {
   type        = list(string)
   default     = []

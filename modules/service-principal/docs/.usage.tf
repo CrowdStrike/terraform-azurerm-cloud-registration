@@ -26,7 +26,7 @@ module "service_principal" {
   azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
 
   # Optionally customize Microsoft Graph app roles
-  # entra_id_permissions = [
+  # microsoft_graph_permission_ids = [
   #   "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All
   #   "98830695-27a2-44f7-8c18-0c3ebc9698f6"  # GroupMember.Read.All
   # ]

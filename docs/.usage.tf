@@ -4,8 +4,6 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.63.0"
-
-      configuration_aliases = [azurerm.existing_activity_log_eventhub, azurerm.existing_entra_id_log_eventhub]
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -22,31 +20,17 @@ provider "azurerm" {
 provider "azuread" {
 }
 
-# Provider aliases for existing Event Hubs
-provider "azurerm" {
-  alias           = "existing_activity_log_eventhub"
-  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the EventHub for activity log
-  features {}
-}
-
-provider "azurerm" {
-  alias           = "existing_entra_id_log_eventhub"
-  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID hosting the Eventhub for entra ID log
-  features {}
-}
-
 module "crowdstrike_azure_registration" {
   source = "CrowdStrike/cloud-registration/azure"
   providers = {
-    azurerm.existing_activity_log_eventhub = azurerm.existing_activity_log_eventhub
-    azurerm.existing_entra_id_log_eventhub = azurerm.existing_entra_id_log_eventhub
+    azurerm = azurerm
   }
 
   # Azure tenant ID (optional, will use current context if not specified)
   # tenant_id = "00000000-0000-0000-0000-000000000000"
 
   # CrowdStrike multi-tenant application client ID
-  azure_client_id = "00000000-0000-0000-0000-000000000000"
+  azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
 
   # Azure configuration - You can use subscriptions, management groups, or both
   subscription_ids     = ["subscription-id-1", "subscription-id-2"]
@@ -55,9 +39,8 @@ module "crowdstrike_azure_registration" {
   # Azure subscription that will host CrowdStrike infrastructure
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
-  # Falcon cloud region - determines which IP addresses are used
-  # Valid values: US-1, US-2, EU-1
-  falcon_cloud_region = "US-1"
+  # Optional: CrowdStrike IP addresses for network security
+  falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
 
   # Optional: Enable real-time visibility with log ingestion
   enable_realtime_visibility = true
@@ -70,13 +53,8 @@ module "crowdstrike_azure_registration" {
     enabled = true
     existing_eventhub = {
       use = false
-      # If use = true, provide existing Event Hub details:
-      # subscription_id       = "00000000-0000-0000-0000-000000000000"
-      # resource_group_name   = "rg-existing-eventhub"
-      # namespace_name        = "existing-eventhub-namespace"
-      # name                  = "existing-eventhub"
-      # consumer_group_name   = "crowdstrike"
-      # authorization_rule_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub/authorizationRules/RootManageSharedAccessKey"
+      # If use = true, provide existing Event Hub resource ID:
+      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
     }
   }
 
@@ -85,12 +63,13 @@ module "crowdstrike_azure_registration" {
     enabled = true
     existing_eventhub = {
       use = false
-      # If use = true, provide existing Event Hub details as shown above
+      # If use = true, provide existing Event Hub resource ID:
+      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
     }
   }
 
   # Optional: Customize Microsoft Graph app roles
-  # custom_entra_id_permissions = [
+  # microsoft_graph_permission_ids = [
   #   "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All
   #   "98830695-27a2-44f7-8c18-0c3ebc9698f6", # GroupMember.Read.All
   #   "246dd0d5-5bd0-4def-940b-0421030a5b68", # Policy.Read.All
@@ -102,7 +81,7 @@ module "crowdstrike_azure_registration" {
   # Optional: Resource naming customization
   # env can be empty or exactly 4 alphanumeric characters
   env             = "prod" # or "" for no environment suffix
-  region          = "westus"
+  location        = "westus"
   resource_prefix = "cs-"
   resource_suffix = "-001"
 
