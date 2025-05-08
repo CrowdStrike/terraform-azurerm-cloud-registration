@@ -36,9 +36,6 @@ module "asset_inventory" {
   
   # Service principal object ID that will be granted permissions
   app_service_principal_id = "00000000-0000-0000-0000-000000000000"
-  
-  # Azure subscription ID that will host CrowdStrike infrastructure
-  cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 }
 ```
 
