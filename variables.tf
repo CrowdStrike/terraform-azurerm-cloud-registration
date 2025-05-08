@@ -31,32 +31,6 @@ variable "subscription_ids" {
   }
 }
 
-variable "falcon_cid" {
-  type        = string
-  description = "CrowdStrike Falcon Customer ID (CID) without checksum, used to identify your specific Falcon environment."
-
-  validation {
-    condition     = can(regex("^[0-9a-f]{32}$", var.falcon_cid))
-    error_message = "The falcon_cid must be a valid 32-character hexadecimal string without the checksum."
-  }
-}
-
-variable "falcon_client_id" {
-  type        = string
-  description = "CrowdStrike Falcon API client ID used for authentication. This can be created in the Falcon console under API Clients & Keys."
-}
-
-variable "falcon_client_secret" {
-  type        = string
-  description = "CrowdStrike Falcon API client secret used for authentication. This is provided when creating an API client in the Falcon console."
-}
-
-variable "falcon_url" {
-  type        = string
-  default     = "api.crowdstrike.com"
-  description = "CrowdStrike Falcon API endpoint URL. The default is for US-1 cloud. For other regions, use the appropriate regional endpoint (e.g., api.us-2.crowdstrike.com, api.eu-1.crowdstrike.com)."
-}
-
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
