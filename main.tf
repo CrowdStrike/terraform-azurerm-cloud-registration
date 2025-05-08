@@ -38,7 +38,9 @@ module "asset_inventory" {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "${var.resource_prefix}rg-cs-${var.env}${var.resource_suffix}"
+  count = var.enable_realtime_visibility ? 1 : 0
+
+  name     = "${var.resource_prefix}rg-cs${local.env}-${var.resource_suffix}"
   location = var.region
   tags     = var.tags
 }
@@ -63,7 +65,7 @@ module "log_ingestion" {
   subscription_ids          = module.deployment_scope.all_active_subscription_ids
   cs_infra_subscription_id  = var.cs_infra_subscription_id
   app_service_principal_id  = module.service_principal.object_id
-  resource_group_name       = azurerm_resource_group.this.name
+  resource_group_name       = azurerm_resource_group.this[0].name
   deploy_remediation_policy = var.deploy_realtime_visibility_remediation_policy
   activity_log_settings     = var.realtime_visibility_activity_log_settings
   entra_id_log_settings     = var.realtime_visibility_entra_id_log_settings
