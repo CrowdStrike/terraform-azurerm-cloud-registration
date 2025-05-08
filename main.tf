@@ -6,7 +6,7 @@ locals {
   subscriptions     = toset(var.subscription_ids)
   management_groups = toset(var.management_group_ids)
   env               = var.env == "" ? "" : "-${var.env}"
-  falcon_ip_addresses = {
+  falcon_ip_addresses = { // https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0
     US-1 : [
       "13.52.148.107",
       "52.52.20.134",
