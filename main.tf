@@ -5,15 +5,7 @@ locals {
   tenant_id         = var.tenant_id != "" ? var.tenant_id : data.azurerm_client_config.current.tenant_id
   subscriptions     = toset(var.subscription_ids)
   management_groups = toset(var.management_group_ids)
-  default_entra_id_permissions = [
-    "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", // Application.Read.All
-    "98830695-27a2-44f7-8c18-0c3ebc9698f6", // GroupMember.Read.All
-    "246dd0d5-5bd0-4def-940b-0421030a5b68", // Policy.Read.All
-    "230c1aed-a721-4c5d-9cb4-a90514e508ef", // Reports.Read.All
-    "483bed4a-2ad3-4361-a73b-c83ccdbdc53c", // RoleManagement.Read.All
-    "df021288-bdef-4463-88db-98f22de89214"  // User.Read.All
-  ]
-  env = var.env == "" ? "" : "-${var.env}"
+  env               = var.env == "" ? "" : "-${var.env}"
   falcon_ip_addresses = {
     US-1 : [
       "13.52.148.107",
@@ -43,7 +35,7 @@ module "service_principal" {
   source = "./modules/service-principal/"
 
   azure_client_id      = var.azure_client_id
-  entra_id_permissions = var.custom_entra_id_permissions != null ? var.custom_entra_id_permissions : local.default_entra_id_permissions
+  entra_id_permissions = var.custom_entra_id_permissions != null ? var.custom_entra_id_permissions : []
 }
 
 module "asset_inventory" {
