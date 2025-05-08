@@ -5,8 +5,7 @@ output "tenant_id" {
 
 output "service_principal_object_id" {
   description = "Object ID of the CrowdStrike service principal used for Azure resource access"
-  # value       = module.service_principal.object_id
-  value = local.app_service_principal_id
+  value       = module.service_principal.object_id
 }
 
 output "subscription_scopes" {

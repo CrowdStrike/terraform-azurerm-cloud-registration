@@ -16,17 +16,17 @@ locals {
   ]
 }
 
-# module "service_principal" {
-#   source = "./modules/service-principal/"
-#
-#   azure_client_id      = var.azure_client_id
-#   entra_id_permissions = var.custom_entra_id_permissions != null ? var.custom_entra_id_permissions : local.default_entra_id_permissions
-#   env                  = var.env
-#   region               = var.region
-#   resource_prefix      = var.resource_prefix
-#   resource_suffix      = var.resource_suffix
-#   tags                 = var.tags
-# }
+module "service_principal" {
+  source = "./modules/service-principal/"
+
+  azure_client_id      = var.azure_client_id
+  entra_id_permissions = var.custom_entra_id_permissions != null ? var.custom_entra_id_permissions : local.default_entra_id_permissions
+  env                  = var.env
+  region               = var.region
+  resource_prefix      = var.resource_prefix
+  resource_suffix      = var.resource_suffix
+  tags                 = var.tags
+}
 
 module "asset_inventory" {
   source = "./modules/asset-inventory/"
@@ -35,17 +35,16 @@ module "asset_inventory" {
   management_group_ids     = local.management_groups
   subscription_ids         = local.subscriptions
   cs_infra_subscription_id = var.cs_infra_subscription_id
-  # app_service_principal_id = module.service_principal.object_id
-  app_service_principal_id = local.app_service_principal_id
+  app_service_principal_id = module.service_principal.object_id
   env                      = var.env
   region                   = var.region
   resource_prefix          = var.resource_prefix
   resource_suffix          = var.resource_suffix
   tags                     = var.tags
 
-  # depends_on = [
-  #   module.service_principal
-  # ]
+  depends_on = [
+    module.service_principal
+  ]
 }
 
 resource "azurerm_resource_group" "this" {
@@ -69,12 +68,11 @@ module "log_ingestion" {
     azurerm.existing_entra_id_log_eventhub = azurerm.existing_entra_id_log_eventhub
   }
 
-  tenant_id                = local.tenant_id
-  management_group_ids     = local.management_groups
-  subscription_ids         = module.deployment_scope.all_active_subscription_ids
-  cs_infra_subscription_id = var.cs_infra_subscription_id
-  # app_service_principal_id = module.service_principal.object_id
-  app_service_principal_id  = local.app_service_principal_id
+  tenant_id                 = local.tenant_id
+  management_group_ids      = local.management_groups
+  subscription_ids          = module.deployment_scope.all_active_subscription_ids
+  cs_infra_subscription_id  = var.cs_infra_subscription_id
+  app_service_principal_id  = module.service_principal.object_id
   resource_group_name       = azurerm_resource_group.this.name
   deploy_remediation_policy = var.deploy_realtime_visibility_remediation_policy
   activity_log_settings     = var.realtime_visibility_activity_log_settings
