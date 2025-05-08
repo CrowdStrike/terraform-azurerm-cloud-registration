@@ -41,32 +41,6 @@ variable "app_service_principal_id" {
   }
 }
 
-variable "falcon_cid" {
-  type        = string
-  description = "Falcon CID"
-
-  validation {
-    condition     = can(regex("^[0-9a-f]{32}$", var.falcon_cid))
-    error_message = "The tenant_id must be a valid KUID in the format XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX."
-  }
-}
-
-variable "falcon_client_id" {
-  type        = string
-  description = "Client ID for the Falcon API"
-}
-
-variable "falcon_client_secret" {
-  type        = string
-  description = "Client secret for the Falcon API"
-}
-
-variable "falcon_url" {
-  type        = string
-  default     = "api.crowdstrike.com"
-  description = "Falcon cloud API url"
-}
-
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []

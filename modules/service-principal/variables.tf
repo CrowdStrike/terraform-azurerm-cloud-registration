@@ -26,33 +26,3 @@ variable "entra_id_permissions" {
     error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
-
-variable "env" {
-  description = "Custom label indicating the environment to be monitored, such as `prod`, `stag`, `dev`, etc."
-  default     = "prod"
-  type        = string
-}
-
-variable "region" {
-  description = "Azure region for the resources deployed in this solution."
-  default     = "westus"
-  type        = string
-}
-
-variable "resource_prefix" {
-  description = "The prefix to be added to the resource name."
-  default     = ""
-  type        = string
-}
-
-variable "resource_suffix" {
-  description = "The suffix to be added to the resource name."
-  default     = ""
-  type        = string
-}
-
-variable "tags" {
-  description = "Tags to be applied to all resources"
-  default     = {}
-  type        = map(string)
-}

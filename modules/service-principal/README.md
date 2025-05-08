@@ -54,13 +54,8 @@ module "service_principal" {
 
 | Name                                                                                               | Description                                                                                                 | Type           | Default           | Required |
 |----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|----------------|-------------------|:--------:|
-| <a name="input_azure_client_id"></a> [azure\_client\_id](#input\_azure\_client\_id)                | Client ID of CrowdStrike's multi-tenant app (optional - will be retrieved from CrowdStrike if not provided) | `string`       | `""`              |    no    |
-| <a name="input_entra_id_permissions"></a> [app\_roles](#input\_app\_roles)                         | List of Microsoft Graph app role IDs to assign to the service principal                                     | `list(string)` | See default value |    no    |
-| <a name="input_env"></a> [env](#input\_env)                                                        | Custom label indicating the environment to be monitored, such as `prod`, `stag`, `dev`, etc.                | `string`       | `prod`            |    no    |
-| <a name="input_region"></a> [region](#input\_region)                                               | Azure region for the resources deployed in this solution.                                                   | `string`       | `westus`          |    no    |
-| <a name="input_resource_name_prefix"></a> [resource\_name\_prefix](#input\_resource\_name\_prefix) | The prefix to be added to the resource name                                                                 | `string`       | `""`              |    no    |
-| <a name="input_resource_name_suffix"></a> [resource\_name\_suffix](#input\_resource\_name\_suffix) | The suffix to be added to the resource name                                                                 | `string`       | `""`              |    no    |
-| <a name="input_tags"></a> [tags](#input\_tags)                                                     | Tags to be applied to all resources                                                                         | map(string)    | `{}`              |    no    |
+| <a name="input_azure_client_id"></a> [azure\_client\_id](#input\_azure\_client\_id)                | Client ID of CrowdStrike's multi-tenant app                                                                 | `string`       | `""`              |    no    |
+| <a name="input_entra_id_permissions"></a> [entra\_id\_permissions](#input\_entra\_id\_permissions) | List of Microsoft Graph app role IDs to assign to the service principal                                     | `list(string)` | See default value |    no    |
 
 ## Outputs
 

@@ -50,33 +50,3 @@ variable "app_service_principal_id" {
     error_message = "The object_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
-
-variable "region" {
-  description = "Azure region for the resources deployed in this solution."
-  default     = "westus"
-  type        = string
-}
-
-variable "env" {
-  description = "Custom label indicating the environment to be monitored, such as prod, stag or dev."
-  default     = "prod"
-  type        = string
-}
-
-variable "resource_prefix" {
-  description = "The prefix to be added to the resource name."
-  default     = ""
-  type        = string
-}
-
-variable "resource_suffix" {
-  description = "The suffix to be added to the resource name."
-  default     = ""
-  type        = string
-}
-
-variable "tags" {
-  description = "Tags to be applied to all resources"
-  default     = {}
-  type        = map(string)
-}

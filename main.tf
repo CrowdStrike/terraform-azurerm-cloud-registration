@@ -21,11 +21,6 @@ module "service_principal" {
 
   azure_client_id      = var.azure_client_id
   entra_id_permissions = var.custom_entra_id_permissions != null ? var.custom_entra_id_permissions : local.default_entra_id_permissions
-  env                  = var.env
-  region               = var.region
-  resource_prefix      = var.resource_prefix
-  resource_suffix      = var.resource_suffix
-  tags                 = var.tags
 }
 
 module "asset_inventory" {
@@ -36,11 +31,6 @@ module "asset_inventory" {
   subscription_ids         = local.subscriptions
   cs_infra_subscription_id = var.cs_infra_subscription_id
   app_service_principal_id = module.service_principal.object_id
-  env                      = var.env
-  region                   = var.region
-  resource_prefix          = var.resource_prefix
-  resource_suffix          = var.resource_suffix
-  tags                     = var.tags
 
   depends_on = [
     module.service_principal
@@ -77,9 +67,6 @@ module "log_ingestion" {
   deploy_remediation_policy = var.deploy_realtime_visibility_remediation_policy
   activity_log_settings     = var.realtime_visibility_activity_log_settings
   entra_id_log_settings     = var.realtime_visibility_entra_id_log_settings
-  falcon_cid                = var.falcon_cid
-  falcon_client_id          = var.falcon_client_id
-  falcon_client_secret      = var.falcon_client_secret
   falcon_ip_addresses       = var.falcon_ip_addresses
   env                       = var.env
   region                    = var.region
