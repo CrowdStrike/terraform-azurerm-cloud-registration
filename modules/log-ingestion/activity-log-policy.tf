@@ -1,5 +1,5 @@
 locals {
-  policy_definition = jsondecode(file("${path.root}/policies/real-time-visibility-detection/policy.json"))
+  policy_definition = jsondecode(file("${path.module}/../../policies/real-time-visibility-detection/policy.json"))
 }
 
 resource "azurerm_policy_definition" "activity-log" {
