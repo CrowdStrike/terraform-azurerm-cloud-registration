@@ -26,9 +26,6 @@ module "crowdstrike_azure_registration" {
     azurerm = azurerm
   }
 
-  # Azure tenant ID (optional, will use current context if not specified)
-  # tenant_id = "00000000-0000-0000-0000-000000000000"
-
   # CrowdStrike multi-tenant application client ID
   azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
 
