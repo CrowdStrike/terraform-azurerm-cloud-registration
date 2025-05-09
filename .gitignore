@@ -43,3 +43,6 @@ Makefile
 
 # IDE folders
 .idea/
+
+# Macos dummy files
+**/.DS_Store
