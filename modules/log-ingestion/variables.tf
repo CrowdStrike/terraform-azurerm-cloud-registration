@@ -56,12 +56,6 @@ variable "resource_group_name" {
   description = "Resource group name that will host CrowdStrike infrastructure"
 }
 
-variable "deploy_remediation_policy" {
-  description = "Deploy a Azure Policy at each the management group to automatically detect and configure activity log diagnostic settings for EventHub in subscriptions where these settings are missing. Be aware that any diagnostic settings deployed by this Azure Policy will not be tracked or managed by Terraform."
-  type        = string
-  default     = false
-}
-
 variable "activity_log_settings" {
   description = "Settings of realtime visibility for activity log"
   type = object({

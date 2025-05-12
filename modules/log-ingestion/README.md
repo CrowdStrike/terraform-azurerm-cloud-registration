@@ -22,7 +22,6 @@ This module performs several key actions:
 - Creates Event Hub resources for collecting Azure Activity Logs and Entra ID logs
 - Configures diagnostic settings to send logs to the Event Hubs
 - Assigns necessary permissions for the CrowdStrike service principal to access the logs
-- Optionally deploys a remediation policy to automatically configure diagnostic settings for new subscriptions
 
 The module supports two main log types:
 1. **Azure Activity Logs** - Administrative, security, service health, alert, recommendation, policy, autoscale, and resource health logs
@@ -35,7 +34,6 @@ This module offers flexibility in deployment:
 - Monitor specific subscriptions or entire management groups
 - Enable or disable Activity Log and Entra ID log collection independently
 - Customize resource naming with prefixes and suffixes
-- Deploy remediation policies to ensure consistent log collection across your environment
 - Configure network security with IP allowlisting for CrowdStrike services
 
 ## Integration with Other Modules
@@ -114,9 +112,6 @@ module "log_ingestion" {
     }
   }
 
-  # Optional: Deploy remediation policy
-  deploy_remediation_policy = true
-
   # Optional: CrowdStrike IP addresses for network security
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
 
@@ -147,15 +142,9 @@ module "log_ingestion" {
 | [azurerm_eventhub.entra_id_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub) | resource |
 | [azurerm_eventhub_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_namespace) | resource |
 | [azurerm_eventhub_namespace_authorization_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_namespace_authorization_rule) | resource |
-| [azurerm_management_group_policy_assignment.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_group_policy_assignment) | resource |
-| [azurerm_management_group_policy_remediation.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_group_policy_remediation) | resource |
 | [azurerm_monitor_aad_diagnostic_setting.entra_id_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_aad_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_policy_definition.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/policy_definition) | resource |
 | [azurerm_role_assignment.activity_log_event_hub_data_receiver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.activity_log_policy_lab_azure_eventhubs_data_owner](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.activity_log_policy_lab_services_reader](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.activity_log_policy_monitoring_contributor](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.entra_id_eventhub_data_receiver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 ## Inputs
@@ -165,7 +154,6 @@ module "log_ingestion" {
 | <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Settings of realtime visibility for activity log | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                  = bool<br/>      eventhub_resource_id = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "eventhub_resource_id": "",<br/>    "use": false<br/>  }<br/>}</pre> | no |
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of Crowdstrike app to which all the roles will be assigned | `string` | n/a | yes |
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID that will host CrowdStrike infrastructure | `string` | n/a | yes |
-| <a name="input_deploy_remediation_policy"></a> [deploy\_remediation\_policy](#input\_deploy\_remediation\_policy) | Deploy a Azure Policy at each the management group to automatically detect and configure activity log diagnostic settings for EventHub in subscriptions where these settings are missing. Be aware that any diagnostic settings deployed by this Azure Policy will not be tracked or managed by Terraform. | `string` | `false` | no |
 | <a name="input_entra_id_log_settings"></a> [entra\_id\_log\_settings](#input\_entra\_id\_log\_settings) | Settings of realtime visibility for Entra ID log | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                  = bool<br/>      eventhub_resource_id = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "eventhub_resource_id": "",<br/>    "use": false<br/>  }<br/>}</pre> | no |
 | <a name="input_env"></a> [env](#input\_env) | Custom label indicating the environment to be monitored, such as prod, stag or dev. | `string` | `"prod"` | no |
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. | `list(string)` | `[]` | no |

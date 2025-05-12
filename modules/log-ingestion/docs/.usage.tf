@@ -65,9 +65,6 @@ module "log_ingestion" {
     }
   }
 
-  # Optional: Deploy remediation policy
-  deploy_remediation_policy = true
-
   # Optional: CrowdStrike IP addresses for network security
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
 
