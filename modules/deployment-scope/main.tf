@@ -1,10 +1,4 @@
 # Discover active subscriptions under the specified management groups
-# module "subscriptions_in_groups" {
-#   source = "./modules/resolve-management-group/"
-#
-#   management_group_ids = var.management_group_ids
-# }
-
 data "azurerm_management_group" "groups" {
   for_each = toset(var.management_group_ids)
   name     = each.value
