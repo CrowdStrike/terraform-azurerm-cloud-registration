@@ -123,13 +123,13 @@ variable "log_ingestion_settings" {
 }
 
 variable "resource_prefix" {
-  description = "Prefix to add to all resource names created by this module. Useful for organization and to avoid naming conflicts when deploying multiple instances of this module."
+  description = "Prefix to be added to all created resource names for identification"
   default     = ""
   type        = string
 }
 
 variable "resource_suffix" {
-  description = "Suffix to add to all resource names created by this module. Useful for organization and to avoid naming conflicts when deploying multiple instances of this module."
+  description = "Suffix to be added to all created resource names for identification"
   default     = ""
   type        = string
 }
