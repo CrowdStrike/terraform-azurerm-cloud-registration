@@ -19,13 +19,3 @@ variable "management_group_ids" {
     error_message = "Management group IDs must be 1-90 characters consisting of alphanumeric characters, hyphens, and underscores."
   }
 }
-
-variable "app_service_principal_id" {
-  type        = string
-  description = "Service principal ID of CrowdStrike app to which all the roles will be assigned"
-
-  validation {
-    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.app_service_principal_id))
-    error_message = "The object_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
