@@ -80,50 +80,44 @@ variable "microsoft_graph_permission_ids" {
   }
 }
 
-variable "enable_realtime_visibility" {
-  type        = bool
-  default     = false
-  description = "Enable real-time visibility by configuring log ingestion for Azure Activity Logs and Entra ID logs. This provides enhanced security monitoring capabilities."
-}
-
-variable "deploy_realtime_visibility_remediation_policy" {
-  type        = bool
-  default     = false
-  description = "When 'enable_realtime_visibility' is true, this option deploys an Azure Policy at each management group to automatically configure activity log diagnostic settings for EventHub in subscriptions where these settings are missing. Note that diagnostic settings deployed by this policy will not be tracked or managed by Terraform."
-}
-
-variable "realtime_visibility_activity_log_settings" {
-  description = "Configuration settings for Azure Activity Log ingestion when 'enable_realtime_visibility' is true. Allows using either a newly created Event Hub or an existing one."
+variable "log_ingestion_settings" {
+  description = "Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones."
   type = object({
     enabled = bool
-    existing_eventhub = object({
-      use                  = bool
-      eventhub_resource_id = optional(string)
+    activity_log = object({
+      enabled = bool
+      existing_eventhub = object({
+        use                          = bool
+        eventhub_resource_id         = optional(string)
+        eventhub_consumer_group_name = optional(string)
+      })
+    })
+    entra_id_log = object({
+      enabled = bool
+      existing_eventhub = object({
+        use                          = bool
+        eventhub_resource_id         = optional(string)
+        eventhub_consumer_group_name = optional(string)
+      })
     })
   })
   default = {
     enabled = true
-    existing_eventhub = {
-      use                  = false
-      eventhub_resource_id = ""
+    activity_log = {
+      enabled = true
+      existing_eventhub = {
+        use                          = false
+        eventhub_resource_id         = ""
+        eventhub_consumer_group_name = ""
+      }
     }
-  }
-}
-
-variable "realtime_visibility_entra_id_log_settings" {
-  description = "Configuration settings for Microsoft Entra ID (formerly Azure AD) log ingestion when 'enable_realtime_visibility' is true. Allows using either a newly created Event Hub or an existing one."
-  type = object({
-    enabled = bool
-    existing_eventhub = object({
-      use                  = bool
-      eventhub_resource_id = optional(string)
-    })
-  })
-  default = {
-    enabled = true
-    existing_eventhub = {
-      use                  = false
-      eventhub_resource_id = ""
+    entra_id_log = {
+      enabled = true
+      existing_eventhub = {
+        use                          = false
+        eventhub_resource_id         = ""
+        eventhub_consumer_group_name = ""
+      }
     }
   }
 }
@@ -143,7 +137,7 @@ variable "resource_suffix" {
 variable "tags" {
   description = "Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag."
   default = {
-    CSTagVendor : "Crowdstrike"
+    CSTagVendor : "CrowdStrike"
   }
   type = map(string)
 }

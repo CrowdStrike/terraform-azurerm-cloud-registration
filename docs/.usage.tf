@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host Crowdstrike's infrastructure resources
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host CrowdStrike's infrastructure resources
   features {}
 }
 
@@ -39,29 +39,26 @@ module "crowdstrike_azure_registration" {
   # Optional: CrowdStrike IP addresses for network security
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
 
-  # Optional: Enable real-time visibility with log ingestion
-  enable_realtime_visibility = true
-
-  # Optional: Deploy remediation policy for real-time visibility
-  deploy_realtime_visibility_remediation_policy = true
-
-  # Optional: Configure Activity Log settings
-  realtime_visibility_activity_log_settings = {
+  # Optional: Configure log ingestion settings
+  log_ingestion_settings = {
     enabled = true
-    existing_eventhub = {
-      use = false
-      # If use = true, provide existing Event Hub resource ID:
-      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+    activity_log = {
+      enabled = true
+      existing_eventhub = {
+        use = false
+        # If use = true, provide existing Event Hub resource ID and consumer group name:
+        # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+        # eventhub_consumer_group_name = "$Default"
+      }
     }
-  }
-
-  # Optional: Configure Entra ID Log settings
-  realtime_visibility_entra_id_log_settings = {
-    enabled = true
-    existing_eventhub = {
-      use = false
-      # If use = true, provide existing Event Hub resource ID:
-      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+    entra_id_log = {
+      enabled = true
+      existing_eventhub = {
+        use = false
+        # If use = true, provide existing Event Hub resource ID and consumer group name:
+        # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+        # eventhub_consumer_group_name = "$Default"
+      }
     }
   }
 
@@ -86,6 +83,6 @@ module "crowdstrike_azure_registration" {
   tags = {
     Environment = "Production"
     Project     = "CrowdStrike Integration"
-    CSTagVendor = "Crowdstrike"
+    CSTagVendor = "CrowdStrike"
   }
 }

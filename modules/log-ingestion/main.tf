@@ -66,8 +66,10 @@ resource "azurerm_eventhub_namespace_authorization_rule" "this" {
 }
 
 locals {
-  activity_log_eventhub_id = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? azurerm_eventhub.activity_log[0].id : var.activity_log_settings.existing_eventhub.eventhub_resource_id) : ""
-  entra_id_log_eventhub_id = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? azurerm_eventhub.entra_id_log[0].id : var.entra_id_log_settings.existing_eventhub.eventhub_resource_id) : ""
+  activity_log_eventhub_id                  = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? azurerm_eventhub.activity_log[0].id : var.activity_log_settings.existing_eventhub.eventhub_resource_id) : ""
+  activity_log_eventhub_consumer_group_name = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? "$Default" : var.activity_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
+  entra_id_log_eventhub_id                  = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? azurerm_eventhub.entra_id_log[0].id : var.entra_id_log_settings.existing_eventhub.eventhub_resource_id) : ""
+  entra_id_log_eventhub_consumer_group_name = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? "$Default" : var.entra_id_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
 }
 
 # Azure Event Hubs Data Receiver role assignments in the infrastructure subscription if realtime visibility feature is enable

@@ -26,7 +26,7 @@ module "asset_inventory" {
 }
 
 resource "azurerm_resource_group" "this" {
-  count = var.enable_realtime_visibility ? 1 : 0
+  count = var.log_ingestion_settings.enabled ? 1 : 0
 
   name     = "${var.resource_prefix}rg-cs${local.env}${var.resource_suffix}"
   location = var.location
@@ -41,23 +41,22 @@ module "deployment_scope" {
 }
 
 module "log_ingestion" {
-  count  = var.enable_realtime_visibility ? 1 : 0
+  count  = var.log_ingestion_settings.enabled ? 1 : 0
   source = "./modules/log-ingestion/"
 
-  management_group_ids      = local.management_groups
-  subscription_ids          = module.deployment_scope.all_active_subscription_ids
-  cs_infra_subscription_id  = var.cs_infra_subscription_id
-  app_service_principal_id  = module.service_principal.object_id
-  resource_group_name       = azurerm_resource_group.this[0].name
-  deploy_remediation_policy = var.deploy_realtime_visibility_remediation_policy
-  activity_log_settings     = var.realtime_visibility_activity_log_settings
-  entra_id_log_settings     = var.realtime_visibility_entra_id_log_settings
-  falcon_ip_addresses       = var.falcon_ip_addresses
-  env                       = var.env
-  location                  = var.location
-  resource_prefix           = var.resource_prefix
-  resource_suffix           = var.resource_suffix
-  tags                      = var.tags
+  management_group_ids     = local.management_groups
+  subscription_ids         = module.deployment_scope.all_active_subscription_ids
+  cs_infra_subscription_id = var.cs_infra_subscription_id
+  app_service_principal_id = module.service_principal.object_id
+  resource_group_name      = azurerm_resource_group.this[0].name
+  activity_log_settings    = var.log_ingestion_settings.activity_log
+  entra_id_log_settings    = var.log_ingestion_settings.entra_id_log
+  falcon_ip_addresses      = var.falcon_ip_addresses
+  env                      = var.env
+  location                 = var.location
+  resource_prefix          = var.resource_prefix
+  resource_suffix          = var.resource_suffix
+  tags                     = var.tags
 
   depends_on = [
     module.deployment_scope,

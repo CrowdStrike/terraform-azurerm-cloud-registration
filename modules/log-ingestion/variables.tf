@@ -1,7 +1,7 @@
 variable "management_group_ids" {
   type        = list(string)
   default     = []
-  description = "List of management group IDs to monitor"
+  description = "List of Azure management group IDs to monitor for log ingestion"
 
   validation {
     condition     = alltrue([for id in var.management_group_ids : can(regex("^[a-zA-Z0-9-_]{1,90}$", id))])
@@ -12,7 +12,7 @@ variable "management_group_ids" {
 variable "subscription_ids" {
   type        = list(string)
   default     = []
-  description = "List of subscription IDs to monitor"
+  description = "List of Azure subscription IDs to monitor for log ingestion"
 
   validation {
     condition     = alltrue([for id in var.subscription_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
@@ -22,7 +22,7 @@ variable "subscription_ids" {
 
 variable "app_service_principal_id" {
   type        = string
-  description = "Service principal ID of Crowdstrike app to which all the roles will be assigned"
+  description = "Service principal ID of CrowdStrike app to which all the roles will be assigned for log ingestion"
 
   validation {
     condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.app_service_principal_id))
@@ -33,7 +33,7 @@ variable "app_service_principal_id" {
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
-  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations for log ingestion. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -43,7 +43,7 @@ variable "falcon_ip_addresses" {
 
 variable "cs_infra_subscription_id" {
   type        = string
-  description = "Azure subscription ID that will host CrowdStrike infrastructure"
+  description = "Azure subscription ID that will host CrowdStrike log ingestion infrastructure"
 
   validation {
     condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
@@ -53,73 +53,77 @@ variable "cs_infra_subscription_id" {
 
 variable "resource_group_name" {
   type        = string
-  description = "Resource group name that will host CrowdStrike infrastructure"
+  description = "Azure resource group name that will host CrowdStrike log ingestion infrastructure"
 }
 
 variable "activity_log_settings" {
-  description = "Settings of realtime visibility for activity log"
+  description = "Configuration settings for Azure Activity Log ingestion"
   type = object({
     enabled = bool
     existing_eventhub = object({
-      use                  = bool
-      eventhub_resource_id = optional(string)
+      use                          = bool
+      eventhub_resource_id         = optional(string)
+      eventhub_consumer_group_name = optional(string)
     })
   })
   default = {
     enabled = true
     existing_eventhub = {
-      use                  = false
-      eventhub_resource_id = ""
+      use                          = false
+      eventhub_resource_id         = ""
+      eventhub_consumer_group_name = ""
     }
   }
 }
 
 variable "entra_id_log_settings" {
-  description = "Settings of realtime visibility for Entra ID log"
+  description = "Configuration settings for Microsoft Entra ID log ingestion"
   type = object({
     enabled = bool
     existing_eventhub = object({
-      use                  = bool
-      eventhub_resource_id = optional(string)
+      use                          = bool
+      eventhub_resource_id         = optional(string)
+      eventhub_consumer_group_name = optional(string)
     })
   })
   default = {
     enabled = true
     existing_eventhub = {
-      use                  = false
-      eventhub_resource_id = ""
+      use                          = false
+      eventhub_resource_id         = ""
+      eventhub_consumer_group_name = ""
     }
   }
 }
 
 variable "env" {
-  description = "Custom label indicating the environment to be monitored, such as prod, stag or dev."
+  description = "Custom label indicating the environment to be monitored (e.g., prod, staging, dev)"
   default     = "prod"
   type        = string
 }
 
 variable "location" {
-  description = "Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
+  description = "Azure region where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }
 
 variable "resource_prefix" {
-  description = "The prefix to be added to the resource name."
+  description = "Prefix to be added to all created resource names for identification"
   default     = ""
   type        = string
 }
 
 variable "resource_suffix" {
-  description = "The suffix to be added to the resource name."
+  description = "Suffix to be added to all created resource names for identification"
   default     = ""
   type        = string
 }
 
 variable "tags" {
-  description = "Tags to be applied to all resources"
+  description = "Tags to be applied to all resources created by this module"
   default = {
-    CSTagVendor : "Crowdstrike"
+    CSTagVendor : "CrowdStrike"
   }
   type = map(string)
 }

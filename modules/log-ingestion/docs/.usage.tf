@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host Crowdstrike's infrastructure resources
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host CrowdStrike's infrastructure resources
   features {}
 }
 
@@ -49,19 +49,19 @@ module "log_ingestion" {
   activity_log_settings = {
     enabled = true
     existing_eventhub = {
-      use = false
-      # If use = true, provide this value:
-      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg/providers/Microsoft.EventHub/namespaces/existing-namespace/eventhubs/existing-eventhub"
+      use                          = false
+      eventhub_resource_id         = ""  # Required if use = true
+      eventhub_consumer_group_name = ""  # Required if use = true
     }
   }
 
-  # Optional: Configure Entra ID Log settings
+  # Optional: Configure Microsoft Entra ID Log settings
   entra_id_log_settings = {
     enabled = true
     existing_eventhub = {
-      use = false
-      # If use = true, provide this value:
-      # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/existing-rg/providers/Microsoft.EventHub/namespaces/existing-namespace/eventhubs/existing-eventhub"
+      use                          = false
+      eventhub_resource_id         = ""  # Required if use = true
+      eventhub_consumer_group_name = ""  # Required if use = true
     }
   }
 
@@ -77,6 +77,6 @@ module "log_ingestion" {
   # Optional: Tagging
   tags = {
     Environment = "Production"
-    CSTagVendor = "Crowdstrike"
+    CSTagVendor = "CrowdStrike"
   }
 }
