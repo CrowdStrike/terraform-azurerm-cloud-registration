@@ -95,21 +95,23 @@ module "log_ingestion" {
   # Optional: Configure Activity Log settings
   activity_log_settings = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""  # Required if use = true
-      eventhub_consumer_group_name = ""  # Required if use = true
-    }
+    # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+    # existing_eventhub = {
+    #     use = true
+    #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+    #     eventhub_consumer_group_name = "$Default"
+    # }
   }
 
   # Optional: Configure Microsoft Entra ID Log settings
   entra_id_log_settings = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""  # Required if use = true
-      eventhub_consumer_group_name = ""  # Required if use = true
-    }
+    # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+    # existing_eventhub = {
+    #     use = true
+    #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+    #     eventhub_consumer_group_name = "$Default"
+    # }
   }
 
   # Optional: CrowdStrike IP addresses for network security

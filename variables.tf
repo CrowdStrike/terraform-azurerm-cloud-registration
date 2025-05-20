@@ -84,41 +84,25 @@ variable "log_ingestion_settings" {
   description = "Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones."
   type = object({
     enabled = bool
-    activity_log = object({
+    activity_log = optional(object({
       enabled = bool
-      existing_eventhub = object({
+      existing_eventhub = optional(object({
         use                          = bool
-        eventhub_resource_id         = optional(string)
-        eventhub_consumer_group_name = optional(string)
-      })
-    })
-    entra_id_log = object({
+        eventhub_resource_id         = optional(string, "")
+        eventhub_consumer_group_name = optional(string, "")
+      }), { use = false })
+    }), { enabled = true })
+    entra_id_log = optional(object({
       enabled = bool
-      existing_eventhub = object({
+      existing_eventhub = optional(object({
         use                          = bool
-        eventhub_resource_id         = optional(string)
-        eventhub_consumer_group_name = optional(string)
-      })
-    })
+        eventhub_resource_id         = optional(string, "")
+        eventhub_consumer_group_name = optional(string, "")
+      }), { use = false })
+    }), { enabled = true })
   })
   default = {
     enabled = true
-    activity_log = {
-      enabled = true
-      existing_eventhub = {
-        use                          = false
-        eventhub_resource_id         = ""
-        eventhub_consumer_group_name = ""
-      }
-    }
-    entra_id_log = {
-      enabled = true
-      existing_eventhub = {
-        use                          = false
-        eventhub_resource_id         = ""
-        eventhub_consumer_group_name = ""
-      }
-    }
   }
 }
 

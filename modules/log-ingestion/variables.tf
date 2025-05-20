@@ -60,19 +60,14 @@ variable "activity_log_settings" {
   description = "Configuration settings for Azure Activity Log ingestion"
   type = object({
     enabled = bool
-    existing_eventhub = object({
+    existing_eventhub = optional(object({
       use                          = bool
-      eventhub_resource_id         = optional(string)
-      eventhub_consumer_group_name = optional(string)
-    })
+      eventhub_resource_id         = optional(string, "")
+      eventhub_consumer_group_name = optional(string, "")
+    }), { use = false })
   })
   default = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""
-      eventhub_consumer_group_name = ""
-    }
   }
 }
 
@@ -80,19 +75,14 @@ variable "entra_id_log_settings" {
   description = "Configuration settings for Microsoft Entra ID log ingestion"
   type = object({
     enabled = bool
-    existing_eventhub = object({
+    existing_eventhub = optional(object({
       use                          = bool
       eventhub_resource_id         = optional(string)
       eventhub_consumer_group_name = optional(string)
-    })
+    }), { use = false })
   })
   default = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""
-      eventhub_consumer_group_name = ""
-    }
   }
 }
 
