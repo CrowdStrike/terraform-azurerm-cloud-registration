@@ -8,15 +8,30 @@ locals {
   env                                           = var.env == "" ? "" : "-${var.env}"
 }
 
+data "azurerm_client_config" "this" {}
+
 data "azurerm_resource_group" "this" {
   name = var.resource_group_name
 }
 
+resource "random_string" "eventhub_namespace" {
+  count = local.should_deploy_eventhub_namespace ? 1 : 0
+
+  length = 13
+  keepers = {
+    tenant_id           = data.azurerm_client_config.this.tenant_id
+    subscription_id     = data.azurerm_client_config.this.subscription_id
+    resource_group_name = data.azurerm_resource_group.this.name
+    env                 = var.env
+    location            = var.location
+  }
+  special = false
+}
 
 resource "azurerm_eventhub_namespace" "this" {
   count = local.should_deploy_eventhub_namespace ? 1 : 0
 
-  name                          = "${var.resource_prefix}evhns-cslog${local.env}-${var.location}${var.resource_suffix}"
+  name                          = "${var.resource_prefix}evhns-cslog-${random_string.eventhub_namespace[0].id}${var.resource_suffix}"
   location                      = data.azurerm_resource_group.this.location
   resource_group_name           = data.azurerm_resource_group.this.name
   sku                           = "Standard"

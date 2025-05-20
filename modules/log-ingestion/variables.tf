@@ -1,17 +1,5 @@
-variable "management_group_ids" {
-  type        = list(string)
-  default     = []
-  description = "List of Azure management group IDs to monitor for log ingestion"
-
-  validation {
-    condition     = alltrue([for id in var.management_group_ids : can(regex("^[a-zA-Z0-9-_]{1,90}$", id))])
-    error_message = "Management group IDs must be 1-90 characters consisting of alphanumeric characters, hyphens, and underscores."
-  }
-}
-
 variable "subscription_ids" {
   type        = list(string)
-  default     = []
   description = "List of Azure subscription IDs to monitor for log ingestion"
 
   validation {
@@ -38,16 +26,6 @@ variable "falcon_ip_addresses" {
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
     error_message = "All IP addresses must be valid IPv4 address format."
-  }
-}
-
-variable "cs_infra_subscription_id" {
-  type        = string
-  description = "Azure subscription ID that will host CrowdStrike log ingestion infrastructure"
-
-  validation {
-    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
-    error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
 

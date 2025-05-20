@@ -38,31 +38,31 @@ module "log_ingestion" {
   app_service_principal_id = module.service_principal.object_id
 
   # Azure infrastructure details
-  resource_group_name      = "crowdstrike-rg"
-  cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
+  resource_group_name = "crowdstrike-rg"
 
   # Scope of monitoring
-  subscription_ids     = ["subscription-id-1", "subscription-id-2"]
-  management_group_ids = ["mg-id-1", "mg-id-2"]
+  subscription_ids = ["subscription-id-1", "subscription-id-2"]
 
   # Optional: Configure Activity Log settings
   activity_log_settings = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""  # Required if use = true
-      eventhub_consumer_group_name = ""  # Required if use = true
-    }
+    # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+    # existing_eventhub = {
+    #     use = true
+    #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+    #     eventhub_consumer_group_name = "$Default"
+    # }
   }
 
   # Optional: Configure Microsoft Entra ID Log settings
   entra_id_log_settings = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""  # Required if use = true
-      eventhub_consumer_group_name = ""  # Required if use = true
-    }
+    # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+    # existing_eventhub = {
+    #     use = true
+    #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+    #     eventhub_consumer_group_name = "$Default"
+    # }
   }
 
   # Optional: CrowdStrike IP addresses for network security

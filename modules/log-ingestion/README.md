@@ -85,12 +85,10 @@ module "log_ingestion" {
   app_service_principal_id = module.service_principal.object_id
 
   # Azure infrastructure details
-  resource_group_name      = "crowdstrike-rg"
-  cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
+  resource_group_name = "crowdstrike-rg"
 
   # Scope of monitoring
-  subscription_ids     = ["subscription-id-1", "subscription-id-2"]
-  management_group_ids = ["mg-id-1", "mg-id-2"]
+  subscription_ids = ["subscription-id-1", "subscription-id-2"]
 
   # Optional: Configure Activity Log settings
   activity_log_settings = {
@@ -136,6 +134,7 @@ module "log_ingestion" {
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.63.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 3.1.0 |
 ## Resources
 
 | Name | Type |
@@ -148,23 +147,23 @@ module "log_ingestion" {
 | [azurerm_monitor_diagnostic_setting.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_role_assignment.activity_log_event_hub_data_receiver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.entra_id_eventhub_data_receiver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [random_string.eventhub_namespace](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
+| [azurerm_client_config.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 | [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Configuration settings for Azure Activity Log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string)<br/>      eventhub_consumer_group_name = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "eventhub_consumer_group_name": "",<br/>    "eventhub_resource_id": "",<br/>    "use": false<br/>  }<br/>}</pre> | no |
+| <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Configuration settings for Azure Activity Log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = optional(object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string, "")<br/>      eventhub_consumer_group_name = optional(string, "")<br/>    }), { use = false })<br/>  })</pre> | <pre>{<br/>  "enabled": true<br/>}</pre> | no |
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of CrowdStrike app to which all the roles will be assigned for log ingestion | `string` | n/a | yes |
-| <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID that will host CrowdStrike log ingestion infrastructure | `string` | n/a | yes |
-| <a name="input_entra_id_log_settings"></a> [entra\_id\_log\_settings](#input\_entra\_id\_log\_settings) | Configuration settings for Microsoft Entra ID log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string)<br/>      eventhub_consumer_group_name = optional(string)<br/>    })<br/>  })</pre> | <pre>{<br/>  "enabled": true,<br/>  "existing_eventhub": {<br/>    "eventhub_consumer_group_name": "",<br/>    "eventhub_resource_id": "",<br/>    "use": false<br/>  }<br/>}</pre> | no |
+| <a name="input_entra_id_log_settings"></a> [entra\_id\_log\_settings](#input\_entra\_id\_log\_settings) | Configuration settings for Microsoft Entra ID log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = optional(object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string)<br/>      eventhub_consumer_group_name = optional(string)<br/>    }), { use = false })<br/>  })</pre> | <pre>{<br/>  "enabled": true<br/>}</pre> | no |
 | <a name="input_env"></a> [env](#input\_env) | Custom label indicating the environment to be monitored (e.g., prod, staging, dev) | `string` | `"prod"` | no |
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations for log ingestion. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
-| <a name="input_management_group_ids"></a> [management\_group\_ids](#input\_management\_group\_ids) | List of Azure management group IDs to monitor for log ingestion | `list(string)` | `[]` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Azure resource group name that will host CrowdStrike log ingestion infrastructure | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
-| <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of Azure subscription IDs to monitor for log ingestion | `list(string)` | `[]` | no |
+| <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of Azure subscription IDs to monitor for log ingestion | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources created by this module | `map(string)` | <pre>{<br/>  "CSTagVendor": "CrowdStrike"<br/>}</pre> | no |
 ## Outputs
 
