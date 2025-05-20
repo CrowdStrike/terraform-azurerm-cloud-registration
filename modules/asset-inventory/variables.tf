@@ -29,3 +29,15 @@ variable "app_service_principal_id" {
     error_message = "The object_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
+
+variable "resource_prefix" {
+  description = "Prefix to be added to all created resource names for identification"
+  default     = ""
+  type        = string
+}
+
+variable "resource_suffix" {
+  description = "Suffix to be added to all created resource names for identification"
+  default     = ""
+  type        = string
+}

@@ -19,6 +19,8 @@ module "asset_inventory" {
   management_group_ids     = local.management_groups
   subscription_ids         = local.subscriptions
   app_service_principal_id = module.service_principal.object_id
+  resource_prefix          = var.resource_prefix
+  resource_suffix          = var.resource_suffix
 
   depends_on = [
     module.service_principal
