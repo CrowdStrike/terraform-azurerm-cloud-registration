@@ -1,8 +1,8 @@
 data "azurerm_client_config" "current" {}
 
 locals {
-  subscriptions     = toset(var.subscription_ids)
-  management_groups = toset(var.management_group_ids)
+  subscriptions     = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
+  management_groups = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : [])
   env               = var.env == "" ? "" : "-${var.env}"
 }
 
