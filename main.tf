@@ -1,8 +1,8 @@
 data "azurerm_client_config" "current" {}
 
 locals {
-  subscriptions     = toset(var.subscription_ids)
-  management_groups = toset(var.management_group_ids)
+  subscriptions     = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
+  management_groups = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
   env               = var.env == "" ? "" : "-${var.env}"
 }
 
@@ -19,6 +19,8 @@ module "asset_inventory" {
   management_group_ids     = local.management_groups
   subscription_ids         = local.subscriptions
   app_service_principal_id = module.service_principal.object_id
+  resource_prefix          = var.resource_prefix
+  resource_suffix          = var.resource_suffix
 
   depends_on = [
     module.service_principal
@@ -44,9 +46,7 @@ module "log_ingestion" {
   count  = var.log_ingestion_settings.enabled ? 1 : 0
   source = "./modules/log-ingestion/"
 
-  management_group_ids     = local.management_groups
   subscription_ids         = module.deployment_scope.all_active_subscription_ids
-  cs_infra_subscription_id = var.cs_infra_subscription_id
   app_service_principal_id = module.service_principal.object_id
   resource_group_name      = azurerm_resource_group.this[0].name
   activity_log_settings    = var.log_ingestion_settings.activity_log

@@ -23,7 +23,7 @@ variable "subscription_ids" {
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
-  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `log_ingestion_settings.enabled` is set to `true`."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -33,10 +33,11 @@ variable "falcon_ip_addresses" {
 
 variable "cs_infra_subscription_id" {
   type        = string
-  description = "Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials."
+  default     = ""
+  description = "Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `log_ingestion_settings.enabled` is set to `true`."
 
   validation {
-    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
+    condition     = var.cs_infra_subscription_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
     error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
@@ -84,41 +85,25 @@ variable "log_ingestion_settings" {
   description = "Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones."
   type = object({
     enabled = bool
-    activity_log = object({
+    activity_log = optional(object({
       enabled = bool
-      existing_eventhub = object({
+      existing_eventhub = optional(object({
         use                          = bool
-        eventhub_resource_id         = optional(string)
-        eventhub_consumer_group_name = optional(string)
-      })
-    })
-    entra_id_log = object({
+        eventhub_resource_id         = optional(string, "")
+        eventhub_consumer_group_name = optional(string, "")
+      }), { use = false })
+    }), { enabled = true })
+    entra_id_log = optional(object({
       enabled = bool
-      existing_eventhub = object({
+      existing_eventhub = optional(object({
         use                          = bool
-        eventhub_resource_id         = optional(string)
-        eventhub_consumer_group_name = optional(string)
-      })
-    })
+        eventhub_resource_id         = optional(string, "")
+        eventhub_consumer_group_name = optional(string, "")
+      }), { use = false })
+    }), { enabled = true })
   })
   default = {
-    enabled = true
-    activity_log = {
-      enabled = true
-      existing_eventhub = {
-        use                          = false
-        eventhub_resource_id         = ""
-        eventhub_consumer_group_name = ""
-      }
-    }
-    entra_id_log = {
-      enabled = true
-      existing_eventhub = {
-        use                          = false
-        eventhub_resource_id         = ""
-        eventhub_consumer_group_name = ""
-      }
-    }
+    enabled = false
   }
 }
 

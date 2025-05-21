@@ -44,21 +44,21 @@ module "crowdstrike_azure_registration" {
     enabled = true
     activity_log = {
       enabled = true
-      existing_eventhub = {
-        use = false
-        # If use = true, provide existing Event Hub resource ID and consumer group name:
-        # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
-        # eventhub_consumer_group_name = "$Default"
-      }
+      # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+      # existing_eventhub = {
+      #     use = true
+      #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+      #     eventhub_consumer_group_name = "$Default"
+      # }
     }
     entra_id_log = {
       enabled = true
-      existing_eventhub = {
-        use = false
-        # If use = true, provide existing Event Hub resource ID and consumer group name:
-        # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
-        # eventhub_consumer_group_name = "$Default"
-      }
+      # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+      # existing_eventhub = {
+      #     use = true
+      #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+      #     eventhub_consumer_group_name = "$Default"
+      # }
     }
   }
 

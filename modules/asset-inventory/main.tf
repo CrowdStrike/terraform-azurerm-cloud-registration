@@ -13,7 +13,7 @@ locals {
 # Only create this if we have subscription scopes
 resource "azurerm_role_definition" "custom_appservice_reader_sub" {
   count       = length(local.subscription_scopes) > 0 ? 1 : 0
-  name        = "cs-website-reader-sub"
+  name        = "${var.resource_prefix}role-csreader-sub${var.resource_suffix}"
   scope       = local.subscription_scopes[0]
   description = "CrowdStrike Web App Service Custom Role"
   permissions {
@@ -40,7 +40,7 @@ resource "azurerm_role_assignment" "appservice_reader_sub" {
 
 resource "azurerm_role_definition" "custom_appservice_reader_mg" {
   for_each    = { for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}" => id }
-  name        = "cs-website-reader-${each.value}"
+  name        = "${var.resource_prefix}role-csreader-${each.value}${var.resource_suffix}"
   scope       = each.key
   description = "CrowdStrike Web App Service Custom Role"
 

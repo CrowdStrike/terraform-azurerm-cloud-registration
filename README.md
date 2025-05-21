@@ -62,21 +62,21 @@ module "crowdstrike_azure_registration" {
     enabled = true
     activity_log = {
       enabled = true
-      existing_eventhub = {
-        use = false
-        # If use = true, provide existing Event Hub resource ID and consumer group name:
-        # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
-        # eventhub_consumer_group_name = "$Default"
-      }
+      # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+      # existing_eventhub = {
+      #     use = true
+      #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+      #     eventhub_consumer_group_name = "$Default"
+      # }
     }
     entra_id_log = {
       enabled = true
-      existing_eventhub = {
-        use = false
-        # If use = true, provide existing Event Hub resource ID and consumer group name:
-        # eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
-        # eventhub_consumer_group_name = "$Default"
-      }
+      # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
+      # existing_eventhub = {
+      #     use = true
+      #     eventhub_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-existing-eventhub/providers/Microsoft.EventHub/namespaces/existing-eventhub-namespace/eventhubs/existing-eventhub"
+      #     eventhub_consumer_group_name = "$Default"
+      # }
     }
   }
 
@@ -122,11 +122,11 @@ module "crowdstrike_azure_registration" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_azure_client_id"></a> [azure\_client\_id](#input\_azure\_client\_id) | Client ID of CrowdStrike's multi-tenant application in Azure. This is typically provided by CrowdStrike and is used to establish the connection between Azure and Falcon Cloud Security. | `string` | `""` | no |
-| <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. | `string` | n/a | yes |
+| <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `log_ingestion_settings.enabled` is set to `true`. | `string` | `""` | no |
 | <a name="input_env"></a> [env](#input\_env) | Environment identifier used in resource naming and tagging. Examples include 'prod', 'dev', 'test', etc. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions. | `string` | `"prod"` | no |
-| <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. | `list(string)` | `[]` | no |
+| <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `log_ingestion_settings.enabled` is set to `true`. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
-| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones. | <pre>object({<br/>    enabled = bool<br/>    activity_log = object({<br/>      enabled = bool<br/>      existing_eventhub = object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string)<br/>        eventhub_consumer_group_name = optional(string)<br/>      })<br/>    })<br/>    entra_id_log = object({<br/>      enabled = bool<br/>      existing_eventhub = object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string)<br/>        eventhub_consumer_group_name = optional(string)<br/>      })<br/>    })<br/>  })</pre> | <pre>{<br/>  "activity_log": {<br/>    "enabled": true,<br/>    "existing_eventhub": {<br/>      "eventhub_consumer_group_name": "",<br/>      "eventhub_resource_id": "",<br/>      "use": false<br/>    }<br/>  },<br/>  "enabled": true,<br/>  "entra_id_log": {<br/>    "enabled": true,<br/>    "existing_eventhub": {<br/>      "eventhub_consumer_group_name": "",<br/>      "eventhub_resource_id": "",<br/>      "use": false<br/>    }<br/>  }<br/>}</pre> | no |
+| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones. | <pre>object({<br/>    enabled = bool<br/>    activity_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>    entra_id_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>  })</pre> | <pre>{<br/>  "enabled": false<br/>}</pre> | no |
 | <a name="input_management_group_ids"></a> [management\_group\_ids](#input\_management\_group\_ids) | List of Azure management group IDs to monitor with CrowdStrike Falcon Cloud Security. All subscriptions within these management groups will be automatically discovered and monitored. | `list(string)` | `[]` | no |
 | <a name="input_microsoft_graph_permission_ids"></a> [microsoft\_graph\_permission\_ids](#input\_microsoft\_graph\_permission\_ids) | Optional list of Microsoft Graph permission IDs to assign to the service principal. If provided, these will replace the default permissions. Must include 'Application.Read.All' (ID: 9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30) at minimum. | `list(string)` | `null` | no |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |

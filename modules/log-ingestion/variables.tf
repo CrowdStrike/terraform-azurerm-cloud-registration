@@ -1,17 +1,5 @@
-variable "management_group_ids" {
-  type        = list(string)
-  default     = []
-  description = "List of Azure management group IDs to monitor for log ingestion"
-
-  validation {
-    condition     = alltrue([for id in var.management_group_ids : can(regex("^[a-zA-Z0-9-_]{1,90}$", id))])
-    error_message = "Management group IDs must be 1-90 characters consisting of alphanumeric characters, hyphens, and underscores."
-  }
-}
-
 variable "subscription_ids" {
   type        = list(string)
-  default     = []
   description = "List of Azure subscription IDs to monitor for log ingestion"
 
   validation {
@@ -41,16 +29,6 @@ variable "falcon_ip_addresses" {
   }
 }
 
-variable "cs_infra_subscription_id" {
-  type        = string
-  description = "Azure subscription ID that will host CrowdStrike log ingestion infrastructure"
-
-  validation {
-    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
-    error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
 variable "resource_group_name" {
   type        = string
   description = "Azure resource group name that will host CrowdStrike log ingestion infrastructure"
@@ -60,19 +38,14 @@ variable "activity_log_settings" {
   description = "Configuration settings for Azure Activity Log ingestion"
   type = object({
     enabled = bool
-    existing_eventhub = object({
+    existing_eventhub = optional(object({
       use                          = bool
-      eventhub_resource_id         = optional(string)
-      eventhub_consumer_group_name = optional(string)
-    })
+      eventhub_resource_id         = optional(string, "")
+      eventhub_consumer_group_name = optional(string, "")
+    }), { use = false })
   })
   default = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""
-      eventhub_consumer_group_name = ""
-    }
   }
 }
 
@@ -80,19 +53,14 @@ variable "entra_id_log_settings" {
   description = "Configuration settings for Microsoft Entra ID log ingestion"
   type = object({
     enabled = bool
-    existing_eventhub = object({
+    existing_eventhub = optional(object({
       use                          = bool
       eventhub_resource_id         = optional(string)
       eventhub_consumer_group_name = optional(string)
-    })
+    }), { use = false })
   })
   default = {
     enabled = true
-    existing_eventhub = {
-      use                          = false
-      eventhub_resource_id         = ""
-      eventhub_consumer_group_name = ""
-    }
   }
 }
 

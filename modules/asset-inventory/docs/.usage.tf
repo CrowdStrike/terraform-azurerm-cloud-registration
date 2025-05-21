@@ -23,4 +23,8 @@ module "asset_inventory" {
   # Service principal object ID that will be granted permissions
   # This can be obtained from the service-principal module output
   app_service_principal_id = "00000000-0000-0000-0000-000000000000"
+
+  # Optional: Resource naming
+  resource_prefix = "cs-"
+  resource_suffix = "-prod"
 }

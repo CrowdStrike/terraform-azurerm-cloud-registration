@@ -35,6 +35,10 @@ module "asset_inventory" {
   # Service principal object ID that will be granted permissions
   # This can be obtained from the service-principal module output
   app_service_principal_id = "00000000-0000-0000-0000-000000000000"
+
+  # Optional: Resource naming
+  resource_prefix = "cs-"
+  resource_suffix = "-prod"
 }
 ```
 
@@ -58,6 +62,8 @@ module "asset_inventory" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of CrowdStrike app to which all the roles will be assigned | `string` | n/a | yes |
 | <a name="input_management_group_ids"></a> [management\_group\_ids](#input\_management\_group\_ids) | List of management group IDs to monitor | `list(string)` | `[]` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of subscription IDs to monitor | `list(string)` | `[]` | no |
 ## Outputs
 
