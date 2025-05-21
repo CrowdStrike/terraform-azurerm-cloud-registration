@@ -5,6 +5,7 @@ locals {
   should_deploy_eventhub_for_activity_log       = var.activity_log_settings.enabled && !var.activity_log_settings.existing_eventhub.use
   should_deploy_eventhub_for_entra_id_log       = var.entra_id_log_settings.enabled && !var.entra_id_log_settings.existing_eventhub.use
   should_deploy_eventhub_namespace              = local.should_deploy_eventhub_for_activity_log || local.should_deploy_eventhub_for_entra_id_log
+  use_existing_eventhub_for_entra_id_log        = var.entra_id_log_settings.enabled && var.entra_id_log_settings.existing_eventhub.use
   env                                           = var.env == "" ? "" : "-${var.env}"
 }
 
@@ -97,7 +98,10 @@ resource "azurerm_role_assignment" "activity_log_event_hub_data_receiver" {
 }
 
 resource "azurerm_role_assignment" "entra_id_eventhub_data_receiver" {
-  count                            = var.entra_id_log_settings.enabled && (var.entra_id_log_settings.existing_eventhub.use && var.entra_id_log_settings.existing_eventhub.eventhub_resource_id != var.activity_log_settings.existing_eventhub.eventhub_resource_id) ? 1 : 0
+  count = local.should_deploy_eventhub_for_entra_id_log || (
+    local.use_existing_eventhub_for_entra_id_log &&
+    var.entra_id_log_settings.existing_eventhub.eventhub_resource_id != var.activity_log_settings.existing_eventhub.eventhub_resource_id
+  ) ? 1 : 0
   scope                            = local.entra_id_log_eventhub_id
   role_definition_name             = "Azure Event Hubs Data Receiver"
   principal_id                     = var.app_service_principal_id
