@@ -6,10 +6,24 @@ locals {
   env               = var.env == "" ? "" : "-${var.env}"
 }
 
+resource "crowdstrike_cloud_azure_tenant" "this" {
+  tenant_id                      = data.azurerm_client_config.current.tenant_id
+  microsoft_graph_permission_ids = var.microsoft_graph_permission_ids
+  realtime_visibility = {
+    enabled = var.log_ingestion_settings.enabled
+  }
+  resource_name_prefix = var.resource_suffix
+  resource_name_suffix = var.resource_suffix
+  environment          = var.env
+  management_group_ids = var.management_group_ids
+  subscription_ids     = var.subscription_ids
+  tags                 = var.tags
+}
+
 module "service_principal" {
   source = "./modules/service-principal/"
 
-  azure_client_id                = var.azure_client_id
+  azure_client_id                = crowdstrike_cloud_azure_tenant.this.cs_azure_client_id
   microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : []
 }
 
@@ -62,4 +76,14 @@ module "log_ingestion" {
     module.deployment_scope,
     azurerm_resource_group.this
   ]
+}
+
+resource "crowdstrike_cloud_azure_event_hub_settings" "update_event_hub_settings" {
+  count = var.log_ingestion_settings.enabled ? 1 : 0
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+  event_hub_settings = concat(
+    var.log_ingestion_settings.activity_log.enabled ? [{ purpose = "activity_log", event_hub_id = module.log_ingestion.activity_log_eventhub_id, consumer_group = module.log_ingestion.activity_log_eventhub_consumer_group_name }] : [],
+    var.log_ingestion_settings.entra_id_log.enabled ? [{ purpose = "entra_log", event_hub_id = module.log_ingestion.entra_id_log_eventhub_id, consumer_group = module.log_ingestion.entra_id_log_eventhub_consumer_group_name }] : [],
+  )
 }

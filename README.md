@@ -27,6 +27,11 @@ terraform {
       source  = "hashicorp/azuread"
       version = ">= 1.6.0"
     }
+
+    crowdstrike = {
+      source  = "Crowdstrike/crowdstrike"
+      version = ">= 0.0.19" # TODO: change to use the finalized version for FCS Azure Cloud Registration
+    }
   }
 }
 
@@ -39,22 +44,20 @@ provider "azuread" {
 }
 
 module "crowdstrike_azure_registration" {
-  source = "CrowdStrike/cloud-registration/azure"
-  providers = {
-    azurerm = azurerm
-  }
-
-  # CrowdStrike multi-tenant application client ID
-  azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
+  source = "CrowdStrike/cloud-registration/azurerm"
 
   # Azure configuration - You can use subscriptions, management groups, or both
   subscription_ids     = ["subscription-id-1", "subscription-id-2"]
   management_group_ids = ["mg-id-1", "mg-id-2"]
 
-  # Azure subscription that will host CrowdStrike infrastructure
+  # Azure subscription that will host CrowdStrike infrastructure. Required when `log_ingestion_settings.enabled` is set to `true`.
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
-  # Optional: CrowdStrike IP addresses for network security
+  # Optional: CrowdStrike API credential. Required when `log_ingestion_settings.enabled` is set to `true`.
+  falcon_client_id     = "<Falcon API client ID>"
+  falcon_client_secret = "<Falcon API client secret>"
+
+  # Optional: CrowdStrike IP addresses for network security. Required when `log_ingestion_settings.enabled` is set to `true`.
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
 
   # Optional: Configure log ingestion settings
@@ -111,11 +114,14 @@ module "crowdstrike_azure_registration" {
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.63.0 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.19 |
 ## Resources
 
 | Name | Type |
 |------|------|
 | [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [crowdstrike_cloud_azure_event_hub_settings.update_event_hub_settings](https://registry.terraform.io/providers/Crowdstrike/crowdstrike/latest/docs/resources/cloud_azure_event_hub_settings) | resource |
+| [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/Crowdstrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 
@@ -124,6 +130,8 @@ module "crowdstrike_azure_registration" {
 | <a name="input_azure_client_id"></a> [azure\_client\_id](#input\_azure\_client\_id) | Client ID of CrowdStrike's multi-tenant application in Azure. This is typically provided by CrowdStrike and is used to establish the connection between Azure and Falcon Cloud Security. | `string` | `""` | no |
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `log_ingestion_settings.enabled` is set to `true`. | `string` | `""` | no |
 | <a name="input_env"></a> [env](#input\_env) | Environment identifier used in resource naming and tagging. Examples include 'prod', 'dev', 'test', etc. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions. | `string` | `"prod"` | no |
+| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. Required when `log_ingestion_settings.enabled` is set to `true`. | `string` | `""` | no |
+| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. Required when `log_ingestion_settings.enabled` is set to `true`. | `string` | `""` | no |
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `log_ingestion_settings.enabled` is set to `true`. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
 | <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones. | <pre>object({<br/>    enabled = bool<br/>    activity_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>    entra_id_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>  })</pre> | <pre>{<br/>  "enabled": false<br/>}</pre> | no |

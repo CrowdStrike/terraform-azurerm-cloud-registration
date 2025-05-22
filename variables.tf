@@ -20,6 +20,28 @@ variable "subscription_ids" {
   }
 }
 
+variable "falcon_client_id" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Falcon API client ID. Required when `log_ingestion_settings.enabled` is set to `true`."
+  validation {
+    condition     = var.falcon_client_id == "" || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
+    error_message = "falcon_client_id must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
+variable "falcon_client_secret" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Falcon API client secret. Required when `log_ingestion_settings.enabled` is set to `true`."
+  validation {
+    condition     = var.falcon_client_secret == "" || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
+    error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []

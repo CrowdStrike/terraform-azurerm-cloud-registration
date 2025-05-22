@@ -9,6 +9,11 @@ terraform {
       source  = "hashicorp/azuread"
       version = ">= 1.6.0"
     }
+
+    crowdstrike = {
+      source  = "Crowdstrike/crowdstrike"
+      version = ">= 0.0.19" # TODO: change to use the finalized version for FCS Azure Cloud Registration
+    }
   }
 }
 
@@ -21,22 +26,20 @@ provider "azuread" {
 }
 
 module "crowdstrike_azure_registration" {
-  source = "CrowdStrike/cloud-registration/azure"
-  providers = {
-    azurerm = azurerm
-  }
-
-  # CrowdStrike multi-tenant application client ID
-  azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
+  source = "CrowdStrike/cloud-registration/azurerm"
 
   # Azure configuration - You can use subscriptions, management groups, or both
   subscription_ids     = ["subscription-id-1", "subscription-id-2"]
   management_group_ids = ["mg-id-1", "mg-id-2"]
 
-  # Azure subscription that will host CrowdStrike infrastructure
+  # Azure subscription that will host CrowdStrike infrastructure. Required when `log_ingestion_settings.enabled` is set to `true`.
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
-  # Optional: CrowdStrike IP addresses for network security
+  # Optional: CrowdStrike API credential. Required when `log_ingestion_settings.enabled` is set to `true`.
+  falcon_client_id     = "<Falcon API client ID>"
+  falcon_client_secret = "<Falcon API client secret>"
+
+  # Optional: CrowdStrike IP addresses for network security. Required when `log_ingestion_settings.enabled` is set to `true`.
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
 
   # Optional: Configure log ingestion settings
