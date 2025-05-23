@@ -32,19 +32,21 @@ module "crowdstrike_azure_registration" {
   subscription_ids     = ["subscription-id-1", "subscription-id-2"]
   management_group_ids = ["mg-id-1", "mg-id-2"]
 
-  # Azure subscription that will host CrowdStrike infrastructure. Required when `log_ingestion_settings.enabled` is set to `true`.
+  # Azure subscription that will host CrowdStrike infrastructure. Required when `enable_realtime_visibility` is set to `true`.
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
-  # Optional: CrowdStrike API credential. Required when `log_ingestion_settings.enabled` is set to `true`.
+  # Optional: CrowdStrike API credential. Required when `enable_realtime_visibility` is set to `true`.
   falcon_client_id     = "<Falcon API client ID>"
   falcon_client_secret = "<Falcon API client secret>"
 
-  # Optional: CrowdStrike IP addresses for network security. Required when `log_ingestion_settings.enabled` is set to `true`.
+  # Optional: CrowdStrike IP addresses for network security. Required when `enable_realtime_visibility` is set to `true`.
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
+
+  # Optional: Enable Real Time Visibility and Detection
+  enable_realtime_visibility = true
 
   # Optional: Configure log ingestion settings
   log_ingestion_settings = {
-    enabled = true
     activity_log = {
       enabled = true
       # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name

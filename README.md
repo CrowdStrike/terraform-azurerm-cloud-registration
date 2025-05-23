@@ -50,19 +50,21 @@ module "crowdstrike_azure_registration" {
   subscription_ids     = ["subscription-id-1", "subscription-id-2"]
   management_group_ids = ["mg-id-1", "mg-id-2"]
 
-  # Azure subscription that will host CrowdStrike infrastructure. Required when `log_ingestion_settings.enabled` is set to `true`.
+  # Azure subscription that will host CrowdStrike infrastructure. Required when `enable_realtime_visibility` is set to `true`.
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
-  # Optional: CrowdStrike API credential. Required when `log_ingestion_settings.enabled` is set to `true`.
+  # Optional: CrowdStrike API credential. Required when `enable_realtime_visibility` is set to `true`.
   falcon_client_id     = "<Falcon API client ID>"
   falcon_client_secret = "<Falcon API client secret>"
 
-  # Optional: CrowdStrike IP addresses for network security. Required when `log_ingestion_settings.enabled` is set to `true`.
+  # Optional: CrowdStrike IP addresses for network security. Required when `enable_realtime_visibility` is set to `true`.
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
+
+  # Optional: Enable Real Time Visibility and Detection
+  enable_realtime_visibility = true
 
   # Optional: Configure log ingestion settings
   log_ingestion_settings = {
-    enabled = true
     activity_log = {
       enabled = true
       # To use existing Event Hub resource ID and consumer group name, specify this section with existing_eventhub.use = true and provide existing Event Hub resource ID and consumer group name
@@ -127,14 +129,14 @@ module "crowdstrike_azure_registration" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_azure_client_id"></a> [azure\_client\_id](#input\_azure\_client\_id) | Client ID of CrowdStrike's multi-tenant application in Azure. This is typically provided by CrowdStrike and is used to establish the connection between Azure and Falcon Cloud Security. | `string` | `""` | no |
-| <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `log_ingestion_settings.enabled` is set to `true`. | `string` | `""` | no |
+| <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`. | `string` | `""` | no |
+| <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Controls whether to enable Real Time Visibility and Detection feature for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
 | <a name="input_env"></a> [env](#input\_env) | Environment identifier used in resource naming and tagging. Examples include 'prod', 'dev', 'test', etc. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions. | `string` | `"prod"` | no |
-| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. Required when `log_ingestion_settings.enabled` is set to `true`. | `string` | `""` | no |
-| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. Required when `log_ingestion_settings.enabled` is set to `true`. | `string` | `""` | no |
-| <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `log_ingestion_settings.enabled` is set to `true`. | `list(string)` | `[]` | no |
+| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. Required when `enable_realtime_visibility` is set to `true`. | `string` | `""` | no |
+| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. Required when `enable_realtime_visibility` is set to `true`. | `string` | `""` | no |
+| <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
-| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones. | <pre>object({<br/>    enabled = bool<br/>    activity_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>    entra_id_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>  })</pre> | <pre>{<br/>  "enabled": false<br/>}</pre> | no |
+| <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones. | <pre>object({<br/>    activity_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>    entra_id_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>  })</pre> | `{}` | no |
 | <a name="input_management_group_ids"></a> [management\_group\_ids](#input\_management\_group\_ids) | List of Azure management group IDs to monitor with CrowdStrike Falcon Cloud Security. All subscriptions within these management groups will be automatically discovered and monitored. | `list(string)` | `[]` | no |
 | <a name="input_microsoft_graph_permission_ids"></a> [microsoft\_graph\_permission\_ids](#input\_microsoft\_graph\_permission\_ids) | Optional list of Microsoft Graph permission IDs to assign to the service principal. If provided, these will replace the default permissions. Must include 'Application.Read.All' (ID: 9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30) at minimum. | `list(string)` | `null` | no |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |

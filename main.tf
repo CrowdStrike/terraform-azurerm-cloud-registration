@@ -1,16 +1,17 @@
 data "azurerm_client_config" "current" {}
 
 locals {
-  subscriptions     = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
-  management_groups = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
-  env               = var.env == "" ? "" : "-${var.env}"
+  subscriptions               = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
+  management_groups           = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
+  env                         = var.env == "" ? "" : "-${var.env}"
+  should_deploy_log_ingestion = var.enable_realtime_visibility
 }
 
 resource "crowdstrike_cloud_azure_tenant" "this" {
   tenant_id                      = data.azurerm_client_config.current.tenant_id
   microsoft_graph_permission_ids = var.microsoft_graph_permission_ids
   realtime_visibility = {
-    enabled = var.log_ingestion_settings.enabled
+    enabled = var.enable_realtime_visibility
   }
   resource_name_prefix = var.resource_suffix
   resource_name_suffix = var.resource_suffix
@@ -42,7 +43,7 @@ module "asset_inventory" {
 }
 
 resource "azurerm_resource_group" "this" {
-  count = var.log_ingestion_settings.enabled ? 1 : 0
+  count = local.should_deploy_log_ingestion ? 1 : 0
 
   name     = "${var.resource_prefix}rg-cs${local.env}${var.resource_suffix}"
   location = var.location
@@ -57,7 +58,7 @@ module "deployment_scope" {
 }
 
 module "log_ingestion" {
-  count  = var.log_ingestion_settings.enabled ? 1 : 0
+  count  = local.should_deploy_log_ingestion ? 1 : 0
   source = "./modules/log-ingestion/"
 
   subscription_ids         = module.deployment_scope.all_active_subscription_ids
@@ -79,7 +80,7 @@ module "log_ingestion" {
 }
 
 resource "crowdstrike_cloud_azure_event_hub_settings" "update_event_hub_settings" {
-  count = var.log_ingestion_settings.enabled ? 1 : 0
+  count = local.should_deploy_log_ingestion ? 1 : 0
 
   tenant_id = data.azurerm_client_config.current.tenant_id
   event_hub_settings = concat(
