@@ -43,6 +43,11 @@ provider "azurerm" {
 provider "azuread" {
 }
 
+provider "crowdstrike" {
+  client_id     = "<Falcon API client ID>"
+  client_secret = "<Falcon API client secret>"
+}
+
 module "crowdstrike_azure_registration" {
   source = "CrowdStrike/cloud-registration/azurerm"
 
@@ -122,8 +127,8 @@ module "crowdstrike_azure_registration" {
 | Name | Type |
 |------|------|
 | [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [crowdstrike_cloud_azure_event_hub_settings.update_event_hub_settings](https://registry.terraform.io/providers/Crowdstrike/crowdstrike/latest/docs/resources/cloud_azure_event_hub_settings) | resource |
 | [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/Crowdstrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
+| [crowdstrike_cloud_azure_tenant_eventhub_settings.update_event_hub_settings](https://registry.terraform.io/providers/Crowdstrike/crowdstrike/latest/docs/resources/cloud_azure_tenant_eventhub_settings) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 

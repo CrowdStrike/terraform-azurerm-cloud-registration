@@ -25,6 +25,11 @@ provider "azurerm" {
 provider "azuread" {
 }
 
+provider "crowdstrike" {
+  client_id     = "<Falcon API client ID>"
+  client_secret = "<Falcon API client secret>"
+}
+
 module "crowdstrike_azure_registration" {
   source = "CrowdStrike/cloud-registration/azurerm"
 
