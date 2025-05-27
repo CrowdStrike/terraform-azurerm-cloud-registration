@@ -16,5 +16,10 @@ terraform {
       source  = "hashicorp/random"
       version = ">= 3.1.0"
     }
+
+    crowdstrike = {
+      source  = "Crowdstrike/crowdstrike"
+      version = ">= 0.0.19" # TODO: change to use the finalized version for FCS Azure Cloud Registration
+    }
   }
 }

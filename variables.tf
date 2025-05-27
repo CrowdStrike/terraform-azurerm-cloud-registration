@@ -20,10 +20,32 @@ variable "subscription_ids" {
   }
 }
 
+variable "falcon_client_id" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Falcon API client ID. Required when `enable_realtime_visibility` is set to `true`."
+  validation {
+    condition     = var.falcon_client_id == "" || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
+    error_message = "falcon_client_id must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
+variable "falcon_client_secret" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Falcon API client secret. Required when `enable_realtime_visibility` is set to `true`."
+  validation {
+    condition     = var.falcon_client_secret == "" || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
+    error_message = "falcon_client_secret must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
-  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `log_ingestion_settings.enabled` is set to `true`."
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -34,22 +56,11 @@ variable "falcon_ip_addresses" {
 variable "cs_infra_subscription_id" {
   type        = string
   default     = ""
-  description = "Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `log_ingestion_settings.enabled` is set to `true`."
+  description = "Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`."
 
   validation {
     condition     = var.cs_infra_subscription_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
     error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
-  }
-}
-
-variable "azure_client_id" {
-  type        = string
-  default     = ""
-  description = "Client ID of CrowdStrike's multi-tenant application in Azure. This is typically provided by CrowdStrike and is used to establish the connection between Azure and Falcon Cloud Security."
-
-  validation {
-    condition     = var.azure_client_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.azure_client_id))
-    error_message = "The azure_client_id must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
 
@@ -81,10 +92,15 @@ variable "microsoft_graph_permission_ids" {
   }
 }
 
+variable "enable_realtime_visibility" {
+  description = "Controls whether to enable Real Time Visibility and Detection feature for CrowdStrike Falcon Cloud Security in Azure."
+  type        = bool
+  default     = false
+}
+
 variable "log_ingestion_settings" {
   description = "Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones."
   type = object({
-    enabled = bool
     activity_log = optional(object({
       enabled = bool
       existing_eventhub = optional(object({
@@ -102,9 +118,7 @@ variable "log_ingestion_settings" {
       }), { use = false })
     }), { enabled = true })
   })
-  default = {
-    enabled = false
-  }
+  default = {}
 }
 
 variable "resource_prefix" {
