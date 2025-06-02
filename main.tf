@@ -5,11 +5,20 @@ locals {
   management_groups           = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
   env                         = var.env == "" ? "" : "-${var.env}"
   should_deploy_log_ingestion = var.enable_realtime_visibility
+
+  microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : [
+    "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All (Role)
+    "98830695-27a2-44f7-8c18-0c3ebc9698f6", # GroupMember.Read.All (Role)
+    "246dd0d5-5bd0-4def-940b-0421030a5b68", # Policy.Read.All (Role)
+    "230c1aed-a721-4c5d-9cb4-a90514e508ef", # Reports.Read.All (Role)
+    "483bed4a-2ad3-4361-a73b-c83ccdbdc53c", # RoleManagement.Read.Directory (Role)
+    "df021288-bdef-4463-88db-98f22de89214"  # User.Read.All (Role)
+  ]
 }
 
 resource "crowdstrike_cloud_azure_tenant" "this" {
   tenant_id                      = data.azurerm_client_config.current.tenant_id
-  microsoft_graph_permission_ids = var.microsoft_graph_permission_ids
+  microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
   realtime_visibility = {
     enabled = var.enable_realtime_visibility
   }
@@ -25,7 +34,7 @@ module "service_principal" {
   source = "./modules/service-principal/"
 
   azure_client_id                = crowdstrike_cloud_azure_tenant.this.cs_azure_client_id
-  microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : []
+  microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
 }
 
 module "asset_inventory" {
