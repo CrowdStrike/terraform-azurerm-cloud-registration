@@ -33,6 +33,16 @@ export TF_VAR_cs_infra_subscription_id=<your subscription ID where global infras
 export TF_VAR_location=<Azure location where global resources will be deployed>
 ```
 
+> [!NOTE]
+> You can also specify the parameters in a `.tfvars` file
+> ```hcl
+> falcon_client_id="<your Falcon API client ID>"
+> falcon_client_secret="<your Falcon API client secret>"
+> falcon_ip_addresses=["<Falcon IP address 1>", "<Falcon IP address 2>", ...]
+> cs_infra_subscription_id="<your subscription ID where global infrastructure resources will be deployed>"
+> location="<Azure location where global resources will be deployed>"
+> ```
+
 3. Initialize and apply Terraform:
 ```sh
 terraform init
