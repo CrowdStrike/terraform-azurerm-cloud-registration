@@ -22,12 +22,14 @@ resource "crowdstrike_cloud_azure_tenant" "this" {
   realtime_visibility = {
     enabled = var.enable_realtime_visibility
   }
-  resource_name_prefix = var.resource_suffix
-  resource_name_suffix = var.resource_suffix
-  environment          = var.env
-  management_group_ids = var.management_group_ids
-  subscription_ids     = var.subscription_ids
-  tags                 = var.tags
+  cs_infra_subscription_id = var.cs_infra_subscription_id
+  cs_infra_location        = var.location
+  resource_name_prefix     = var.resource_prefix
+  resource_name_suffix     = var.resource_suffix
+  environment              = var.env
+  management_group_ids     = var.management_group_ids
+  subscription_ids         = var.subscription_ids
+  tags                     = var.tags
 }
 
 module "service_principal" {
