@@ -43,8 +43,9 @@ resource "azurerm_eventhub_namespace" "this" {
   minimum_tls_version           = "1.2"
   public_network_access_enabled = true
   network_rulesets {
-    default_action                = "Deny"
-    public_network_access_enabled = true
+    default_action                 = "Deny"
+    public_network_access_enabled  = true
+    trusted_service_access_enabled = true
     ip_rule = [for ip in var.falcon_ip_addresses : {
       ip_mask = ip
       action  = "Allow"
