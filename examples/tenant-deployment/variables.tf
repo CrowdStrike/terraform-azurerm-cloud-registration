@@ -40,7 +40,7 @@ variable "cs_infra_subscription_id" {
 }
 
 variable "location" {
-  description = "Azure location (region) where global resources, such as role definitions and Event Hub, will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
+  description = "Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }

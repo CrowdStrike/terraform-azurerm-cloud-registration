@@ -31,7 +31,7 @@ variable "falcon_client_secret" {
 variable "cs_infra_subscription_id" {
   type        = string
   default     = ""
-  description = "Azure subscription ID where CrowdStrike infrastructure resources such as Event Hubs will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`."
+  description = "Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`."
 
   validation {
     condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
