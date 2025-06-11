@@ -4,8 +4,8 @@ This example demonstrates how to register the entire Azure tenant with CrowdStri
 
 ## Features Enabled
 
-- Asset Inventory
-- Real-time Visibility
+- Asset inventory
+- Real-time visibility
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ This example demonstrates how to register the entire Azure tenant with CrowdStri
 
 ## Deploy
 
-1. Login into the Azure tenant you want to register
+1. Log in into the Azure tenant you want to register:
 ```sh
 az login -t "<tenant ID>"
 ```
@@ -25,7 +25,7 @@ az login -t "<tenant ID>"
 export TF_VAR_falcon_client_id=<your Falcon API client ID>
 export TF_VAR_falcon_client_secret=<your Falcon API client secret>
 
-# List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. 
+# List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations.
 # Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region.
 export TF_VAR_falcon_ip_addresses='["<Falcon IP address 1>", "<Falcon IP address 2>", ...]'
 
@@ -49,12 +49,12 @@ terraform init
 terraform apply
 ```
 
-Enter `yes` at command prompt to apply
+Enter `yes` at command prompt to apply.
 
 
 ## Destroy
 
-To teardown and remove all resources created by this example:
+To tear down and remove all resources created by this example:
 
 ```sh
 terraform destroy -auto-approve

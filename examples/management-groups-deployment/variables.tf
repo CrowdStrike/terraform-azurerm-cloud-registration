@@ -40,7 +40,7 @@ variable "falcon_client_secret" {
 
 variable "falcon_ip_addresses" {
   type        = list(string)
-  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`."
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -60,7 +60,7 @@ variable "cs_infra_subscription_id" {
 }
 
 variable "location" {
-  description = "Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
+  description = "Azure location (region) where global resources, such as role definitions and Event Hub, will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }

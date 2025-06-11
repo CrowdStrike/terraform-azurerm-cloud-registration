@@ -66,7 +66,7 @@ module "service_principal" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_azure_client_id"></a> [azure\_client\_id](#input\_azure\_client\_id) | Client ID of CrowdStrike's multi-tenant app | `string` | n/a | yes |
-| <a name="input_microsoft_graph_permission_ids"></a> [microsoft\_graph\_permission\_ids](#input\_microsoft\_graph\_permission\_ids) | List of Microsoft Graph app role IDs to assign to the service principal | `list(string)` | <pre>[<br/>  "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30",<br/>  "98830695-27a2-44f7-8c18-0c3ebc9698f6",<br/>  "246dd0d5-5bd0-4def-940b-0421030a5b68",<br/>  "230c1aed-a721-4c5d-9cb4-a90514e508ef",<br/>  "483bed4a-2ad3-4361-a73b-c83ccdbdc53c",<br/>  "df021288-bdef-4463-88db-98f22de89214"<br/>]</pre> | no |
+| <a name="input_microsoft_graph_permission_ids"></a> [microsoft\_graph\_permission\_ids](#input\_microsoft\_graph\_permission\_ids) | List of Microsoft Graph app role IDs to assign to the service principal | `list(string)` | `[]` | no |
 ## Outputs
 
 | Name | Description |

@@ -45,7 +45,7 @@ variable "falcon_client_secret" {
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
-  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`."
+  description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`."
 
   validation {
     condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
@@ -56,7 +56,7 @@ variable "falcon_ip_addresses" {
 variable "cs_infra_subscription_id" {
   type        = string
   default     = ""
-  description = "Azure subscription ID where CrowdStrike infrastructure resources (such as Event Hubs) will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`."
+  description = "Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`."
 
   validation {
     condition     = var.cs_infra_subscription_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
@@ -65,24 +65,24 @@ variable "cs_infra_subscription_id" {
 }
 
 variable "env" {
-  description = "Environment identifier used in resource naming and tagging. Examples include 'prod', 'dev', 'test', etc. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions."
+  description = "Environment label (for example, prod, stag, dev) used for resource naming and tagging. Helps distinguish between different deployment environments. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions."
   default     = "prod"
   type        = string
 
   validation {
     condition     = var.env == "" || can(regex("^[0-9a-zA-Z]{4}$", var.env))
-    error_message = "The 'env' must only contain alphanumeric characters and be exactly 4 characters in length."
+    error_message = "The 'env' must only contain alphanumeric characters and has a limit of 4 characters."
   }
 }
 
 variable "location" {
-  description = "Azure location (aka region) where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
+  description = "Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }
 
 variable "microsoft_graph_permission_ids" {
-  description = "Optional list of Microsoft Graph permission IDs to assign to the service principal. If provided, these will replace the default permissions. Must include 'Application.Read.All' (ID: 9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30) at minimum."
+  description = "Optional list of Microsoft Graph permission IDs to assign to the service principal. If provided, these will replace the default permissions. Must include 'Application.Read.All' (ID: 9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30) at a minimum."
   type        = list(string)
   default     = null
 
