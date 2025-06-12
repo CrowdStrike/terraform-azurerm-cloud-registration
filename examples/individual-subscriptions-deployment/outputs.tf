@@ -14,12 +14,12 @@ output "subscription_scopes" {
 }
 
 output "activity_log_eventhub_id" {
-  description = "Resource ID of the Event Hub used for Azure Activity Log ingestion"
+  description = "Resource ID of the Event Hub used for Azure activity log ingestion"
   value       = module.crowdstrike_azure_registration.activity_log_eventhub_id
 }
 
 output "activity_log_eventhub_consumer_group_name" {
-  description = "Consumer group name for Azure Activity Log ingestion via Event Hub"
+  description = "Consumer group name for Azure activity log ingestion via Event Hub"
   value       = module.crowdstrike_azure_registration.activity_log_eventhub_consumer_group_name
 }
 

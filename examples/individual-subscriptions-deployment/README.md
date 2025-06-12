@@ -4,7 +4,7 @@ This example demonstrates how to register specific subscriptions with CrowdStrik
 
 ## Features Enabled
 
-- Asset Inventory
+- Asset inventory
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ This example demonstrates how to register specific subscriptions with CrowdStrik
 
 ## Deploy
 
-1. Login into the Azure tenant you want to register
+1. Log in into the Azure tenant you want to register
 ```sh
 az login -t "<tenant ID>"
 ```
@@ -47,12 +47,12 @@ terraform init
 terraform apply
 ```
 
-Enter `yes` at command prompt to apply
+Enter `yes` at command prompt to apply.
 
 
 ## Destroy
 
-To teardown and remove all resources created by this example:
+To tear down and remove all resources created by this example:
 
 ```sh
 terraform destroy -auto-approve

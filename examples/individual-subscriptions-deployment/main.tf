@@ -1,13 +1,13 @@
 locals {
-  # Environment identifier used in resource naming and tagging. Examples include 'prod', 'dev', 'test', etc. 
+  # Environment identifier used in resource naming and tagging. Examples include 'prod', 'dev', 'test', etc.
   # Limited to 4 alphanumeric characters for compatibility with resource naming restrictions.
   # Set it to empty if you don't want it added to the resource names.
   env = "prod"
 
-  # Controls whether to enable Real Time Visibility and Detection feature for CrowdStrike Falcon Cloud Security in Azure.
+  # Controls whether to enable real-time visibility and detection for CrowdStrike Falcon Cloud Security in Azure.
   enable_realtime_visibility = false
 
-  # Prefix/Suffix to be added to all created resource names for identification
+  # Prefix/suffix to be added to all created resource names for identification.
   resource_prefix = "pfx-"
   resource_suffix = "-sux"
 

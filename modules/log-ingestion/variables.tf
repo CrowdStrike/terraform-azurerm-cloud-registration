@@ -65,13 +65,13 @@ variable "entra_id_log_settings" {
 }
 
 variable "env" {
-  description = "Custom label indicating the environment to be monitored (e.g., prod, staging, dev)"
+  description = "Environment label (for example, prod, stag, dev) used for resource naming and tagging. Helps distinguish between different deployment environments. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions."
   default     = "prod"
   type        = string
 }
 
 variable "location" {
-  description = "Azure region where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
+  description = "Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
 }
