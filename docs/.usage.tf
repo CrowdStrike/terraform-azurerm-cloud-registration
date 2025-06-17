@@ -12,7 +12,7 @@ terraform {
 
     crowdstrike = {
       source  = "Crowdstrike/crowdstrike"
-      version = ">= 0.0.19" # TODO: change to use the finalized version for FCS Azure Cloud Registration
+      version = ">= 0.0.29"
     }
   }
 }
