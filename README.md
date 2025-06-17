@@ -3,6 +3,13 @@
 
 [![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)
 
+> [!WARNING]
+> **This repository is in closed beta and not yet officially released.**
+> 
+> This Terraform module offers an improved deployment method for integrating Azure environments with CrowdStrike Falcon Cloud Security. It provides enhanced capabilities and a more streamlined experience compared to previous integration methods.
+> 
+> This repository will be available for production use once development and testing are complete.
+
 ## Introduction
 
 This Terraform module enables registration and configuration of Azure accounts with CrowdStrike's Falcon Cloud Security. It provides a comprehensive solution for integrating Azure environments with CrowdStrike's cloud security services, including service principal creation, asset inventory configuration, and real-time visibility through log ingestion.
