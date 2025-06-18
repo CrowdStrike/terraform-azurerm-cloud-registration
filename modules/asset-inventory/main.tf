@@ -5,6 +5,7 @@ locals {
 
   app_service_permissions = [
     "Microsoft.Web/sites/config/list/Action",
+    "Microsoft.Web/sites/publish/action",
     "Microsoft.Web/sites/Read",
     "Microsoft.Web/sites/config/Read"
   ]
