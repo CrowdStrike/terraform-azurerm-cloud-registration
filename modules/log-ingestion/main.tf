@@ -1,6 +1,6 @@
 locals {
-  activity_log_diagnostic_settings_default_name = "${var.resource_prefix}diag-cslogact${var.resource_suffix}"
-  entra_id_log_diagnostic_settings_default_name = "${var.resource_prefix}diag-cslogentid${var.resource_suffix}"
+  activity_log_diagnostic_settings_default_name = "${var.resource_prefix}diag-cslogact${local.env}${var.resource_suffix}"
+  entra_id_log_diagnostic_settings_default_name = "${var.resource_prefix}diag-cslogentid${local.env}${var.resource_suffix}"
   subscription_scopes                           = [for id in var.subscription_ids : "/subscriptions/${id}"]
   should_deploy_eventhub_for_activity_log       = var.activity_log_settings.enabled && !var.activity_log_settings.existing_eventhub.use
   should_deploy_eventhub_for_entra_id_log       = var.entra_id_log_settings.enabled && !var.entra_id_log_settings.existing_eventhub.use
