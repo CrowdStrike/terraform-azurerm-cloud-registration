@@ -5,7 +5,6 @@ locals {
   should_deploy_eventhub_for_activity_log       = var.activity_log_settings.enabled && !var.activity_log_settings.existing_eventhub.use
   should_deploy_eventhub_for_entra_id_log       = var.entra_id_log_settings.enabled && !var.entra_id_log_settings.existing_eventhub.use
   should_deploy_eventhub_namespace              = local.should_deploy_eventhub_for_activity_log || local.should_deploy_eventhub_for_entra_id_log
-  use_existing_eventhub_for_entra_id_log        = var.entra_id_log_settings.enabled && var.entra_id_log_settings.existing_eventhub.use
   env                                           = var.env == "" ? "" : "-${var.env}"
 }
 
@@ -87,24 +86,29 @@ locals {
   activity_log_eventhub_consumer_group_name = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? "$Default" : var.activity_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
   entra_id_log_eventhub_id                  = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? azurerm_eventhub.entra_id_log[0].id : var.entra_id_log_settings.existing_eventhub.eventhub_resource_id) : ""
   entra_id_log_eventhub_consumer_group_name = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? "$Default" : var.entra_id_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
+  parsed_existing_activity_log_eventhub_id  = var.activity_log_settings.enabled && !local.should_deploy_eventhub_for_activity_log ? provider::azurerm::parse_resource_id(var.activity_log_settings.existing_eventhub.eventhub_resource_id) : provider::azurerm::parse_resource_id("/subscriptions/12345678-1234-5678-9abc-123456789012/resourceGroups/fake-rg/providers/Microsoft.EventHub/namespaces/fake-evhns/eventhubs/fake-evh")
+  parsed_existing_entra_id_log_eventhub_id  = var.entra_id_log_settings.enabled && !local.should_deploy_eventhub_for_entra_id_log ? provider::azurerm::parse_resource_id(var.entra_id_log_settings.existing_eventhub.eventhub_resource_id) : provider::azurerm::parse_resource_id("/subscriptions/12345678-1234-5678-9abc-123456789012/resourceGroups/fake-rg/providers/Microsoft.EventHub/namespaces/fake-evhns/eventhubs/fake-evh")
+  activity_log_eventhub_resource_grouop_id  = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? "/subscriptions/${var.cs_infra_subscription_id}/resourceGroups/${var.resource_group_name}" : "/subscriptions/${local.parsed_existing_activity_log_eventhub_id.subscription_id}/resourceGroups/${local.parsed_existing_activity_log_eventhub_id.resource_group_name}") : ""
+  entra_id_log_eventhub_resource_grouop_id  = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? "/subscriptions/${var.cs_infra_subscription_id}/resourceGroups/${var.resource_group_name}" : "/subscriptions/${local.parsed_existing_entra_id_log_eventhub_id.subscription_id}/resourceGroups/${local.parsed_existing_entra_id_log_eventhub_id.resource_group_name}") : ""
 }
 
 # Azure Event Hubs Data Receiver role assignments in the infrastructure subscription if realtime visibility feature is enable
 resource "azurerm_role_assignment" "activity_log_event_hub_data_receiver" {
   count                            = var.activity_log_settings.enabled ? 1 : 0
-  scope                            = local.activity_log_eventhub_id
+  scope                            = local.activity_log_eventhub_resource_grouop_id
   role_definition_name             = "Azure Event Hubs Data Receiver"
   principal_id                     = var.app_service_principal_id
   skip_service_principal_aad_check = false
+
+  depends_on = [data.azurerm_resource_group.this]
 }
 
 resource "azurerm_role_assignment" "entra_id_eventhub_data_receiver" {
-  count = local.should_deploy_eventhub_for_entra_id_log || (
-    local.use_existing_eventhub_for_entra_id_log &&
-    var.entra_id_log_settings.existing_eventhub.eventhub_resource_id != var.activity_log_settings.existing_eventhub.eventhub_resource_id
-  ) ? 1 : 0
-  scope                            = local.entra_id_log_eventhub_id
+  count                            = var.entra_id_log_settings.enabled && local.activity_log_eventhub_resource_grouop_id != local.entra_id_log_eventhub_resource_grouop_id ? 1 : 0
+  scope                            = local.entra_id_log_eventhub_resource_grouop_id
   role_definition_name             = "Azure Event Hubs Data Receiver"
   principal_id                     = var.app_service_principal_id
   skip_service_principal_aad_check = false
+
+  depends_on = [data.azurerm_resource_group.this]
 }

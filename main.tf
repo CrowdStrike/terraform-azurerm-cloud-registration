@@ -74,6 +74,7 @@ module "log_ingestion" {
 
   subscription_ids         = module.deployment_scope.all_active_subscription_ids
   app_service_principal_id = module.service_principal.object_id
+  cs_infra_subscription_id = var.cs_infra_subscription_id
   resource_group_name      = azurerm_resource_group.this[0].name
   activity_log_settings    = var.log_ingestion_settings.activity_log
   entra_id_log_settings    = var.log_ingestion_settings.entra_id_log

@@ -5,9 +5,9 @@
 
 > [!WARNING]
 > **This repository is in closed beta and not yet officially released.**
-> 
+>
 > This Terraform module offers an improved deployment method for integrating Azure environments with CrowdStrike Falcon Cloud Security. It provides enhanced capabilities and a more streamlined experience compared to previous integration methods.
-> 
+>
 > This repository will be available for production use once development and testing are complete.
 
 ## Introduction
@@ -62,11 +62,11 @@ CrowdStrike API keys are required to use this module. It is highly recommended t
 
 ```hcl
 terraform {
-  required_version = ">= 0.15"
+  required_version = ">= 1.8.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.63.0"
+      version = ">= 4.0.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -165,8 +165,8 @@ module "crowdstrike_azure_registration" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.63.0 |
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.19 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.29 |
 ## Resources
 
 | Name | Type |

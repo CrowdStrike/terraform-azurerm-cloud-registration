@@ -11,11 +11,11 @@ This Terraform module helps define the deployment scope for CrowdStrike's cloud 
 
 ```hcl
 terraform {
-  required_version = ">= 0.15"
+  required_version = ">= 1.8.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.63.0"
+      version = ">= 4.0.0"
     }
   }
 }
@@ -39,7 +39,7 @@ module "deployment_scope" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.63.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
 ## Resources
 
 | Name | Type |

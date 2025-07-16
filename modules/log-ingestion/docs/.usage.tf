@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 0.15"
+  required_version = ">= 1.8.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.63.0"
+      version = ">= 4.0.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -64,6 +64,9 @@ module "log_ingestion" {
     #     eventhub_consumer_group_name = "$Default"
     # }
   }
+
+  # Azure subscription that will host CrowdStrike infrastructure.
+  cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
   # Optional: CrowdStrike IP addresses for network security
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
