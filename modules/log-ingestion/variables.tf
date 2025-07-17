@@ -29,6 +29,16 @@ variable "falcon_ip_addresses" {
   }
 }
 
+variable "cs_infra_subscription_id" {
+  type        = string
+  description = "Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials."
+
+  validation {
+    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.cs_infra_subscription_id))
+    error_message = "The infrastructure subscription ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
+}
+
 variable "resource_group_name" {
   type        = string
   description = "Azure resource group name that will host CrowdStrike log ingestion infrastructure"

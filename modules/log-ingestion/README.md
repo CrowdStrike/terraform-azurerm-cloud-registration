@@ -46,11 +46,11 @@ This module is designed to work seamlessly with other CrowdStrike modules:
 
 ```hcl
 terraform {
-  required_version = ">= 0.15"
+  required_version = ">= 1.8.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.63.0"
+      version = ">= 4.0.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
@@ -112,6 +112,9 @@ module "log_ingestion" {
     # }
   }
 
+  # Azure subscription that will host CrowdStrike infrastructure.
+  cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
+
   # Optional: CrowdStrike IP addresses for network security
   falcon_ip_addresses = ["1.2.3.4", "5.6.7.8"]
 
@@ -133,7 +136,7 @@ module "log_ingestion" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.63.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.1.0 |
 ## Resources
 
@@ -156,10 +159,11 @@ module "log_ingestion" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Configuration settings for Azure Activity Log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = optional(object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string, "")<br/>      eventhub_consumer_group_name = optional(string, "")<br/>    }), { use = false })<br/>  })</pre> | <pre>{<br/>  "enabled": true<br/>}</pre> | no |
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of CrowdStrike app to which all the roles will be assigned for log ingestion | `string` | n/a | yes |
+| <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. | `string` | n/a | yes |
 | <a name="input_entra_id_log_settings"></a> [entra\_id\_log\_settings](#input\_entra\_id\_log\_settings) | Configuration settings for Microsoft Entra ID log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = optional(object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string)<br/>      eventhub_consumer_group_name = optional(string)<br/>    }), { use = false })<br/>  })</pre> | <pre>{<br/>  "enabled": true<br/>}</pre> | no |
-| <a name="input_env"></a> [env](#input\_env) | Custom label indicating the environment to be monitored (e.g., prod, staging, dev) | `string` | `"prod"` | no |
+| <a name="input_env"></a> [env](#input\_env) | Environment label (for example, prod, stag, dev) used for resource naming and tagging. Helps distinguish between different deployment environments. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions. | `string` | `"prod"` | no |
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations for log ingestion. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. | `list(string)` | `[]` | no |
-| <a name="input_location"></a> [location](#input\_location) | Azure region where global resources (Role definitions, Event Hub, etc.) will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Azure resource group name that will host CrowdStrike log ingestion infrastructure | `string` | n/a | yes |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
