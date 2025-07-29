@@ -55,7 +55,7 @@ CrowdStrike API keys are required to use this module. It is highly recommended t
 
 ```hcl
 terraform {
-  required_version = ">= 1.8.0"
+  required_version = ">= 1.9.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"

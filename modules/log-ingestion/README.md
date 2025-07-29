@@ -46,7 +46,7 @@ This module is designed to work seamlessly with other CrowdStrike modules:
 
 ```hcl
 terraform {
-  required_version = ">= 1.8.0"
+  required_version = ">= 1.9.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
