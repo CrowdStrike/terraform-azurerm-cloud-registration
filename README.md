@@ -3,13 +3,6 @@
 
 [![Twitter URL](https://img.shields.io/twitter/url?label=Follow%20%40CrowdStrike&style=social&url=https%3A%2F%2Ftwitter.com%2FCrowdStrike)](https://twitter.com/CrowdStrike)
 
-> [!WARNING]
-> **This repository is in closed beta and not yet officially released.**
->
-> This Terraform module offers an improved deployment method for integrating Azure environments with CrowdStrike Falcon Cloud Security. It provides enhanced capabilities and a more streamlined experience compared to previous integration methods.
->
-> This repository will be available for production use once development and testing are complete.
-
 ## Introduction
 
 This Terraform module enables registration and configuration of Azure accounts with CrowdStrike's Falcon Cloud Security. It provides a comprehensive solution for integrating Azure environments with CrowdStrike's cloud security services, including service principal creation, asset inventory configuration, and real-time visibility through log ingestion.
@@ -62,7 +55,7 @@ CrowdStrike API keys are required to use this module. It is highly recommended t
 
 ```hcl
 terraform {
-  required_version = ">= 1.8.0"
+  required_version = ">= 1.9.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -74,7 +67,7 @@ terraform {
     }
 
     crowdstrike = {
-      source  = "Crowdstrike/crowdstrike"
+      source  = "CrowdStrike/crowdstrike"
       version = ">= 0.0.29"
     }
   }
@@ -172,8 +165,8 @@ module "crowdstrike_azure_registration" {
 | Name | Type |
 |------|------|
 | [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
-| [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/Crowdstrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
-| [crowdstrike_cloud_azure_tenant_eventhub_settings.update_event_hub_settings](https://registry.terraform.io/providers/Crowdstrike/crowdstrike/latest/docs/resources/cloud_azure_tenant_eventhub_settings) | resource |
+| [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
+| [crowdstrike_cloud_azure_tenant_eventhub_settings.update_event_hub_settings](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant_eventhub_settings) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 
