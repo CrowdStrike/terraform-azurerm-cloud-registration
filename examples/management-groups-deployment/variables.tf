@@ -34,7 +34,7 @@ variable "falcon_client_secret" {
   description = "Falcon API client secret. Required when `enable_realtime_visibility` is set to `true`."
   validation {
     condition     = !var.enable_realtime_visibility || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
-    error_message = "falcon_client_secret is required when enable_realtime_visibility is set to true must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+    error_message = "falcon_client_secret is required when enable_realtime_visibility is set to true and must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
 }
 
