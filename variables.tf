@@ -87,8 +87,8 @@ variable "microsoft_graph_permission_ids" {
   default     = null
 
   validation {
-    condition     = var.microsoft_graph_permission_ids == null ? true : alltrue(concat([for id in coalesce(var.microsoft_graph_permission_ids, []) : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))], [contains(var.microsoft_graph_permission_ids, "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30")]))
-    error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX. 'Application.Read.All' permission must be included."
+    condition     = var.microsoft_graph_permission_ids == null ? true : alltrue([for id in coalesce(var.microsoft_graph_permission_ids, []) : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
+    error_message = "All Microsoft Graph permission IDs must be valid UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
   }
 }
 
