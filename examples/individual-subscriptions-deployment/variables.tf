@@ -11,6 +11,7 @@ variable "subscription_ids" {
 variable "falcon_client_id" {
   type        = string
   sensitive   = true
+  default     = ""
   description = "Falcon API client ID. Required when `enable_realtime_visibility` is set to `true`."
   validation {
     condition     = !var.enable_realtime_visibility || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
