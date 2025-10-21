@@ -92,18 +92,16 @@ module "log_ingestion" {
 }
 
 resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_settings" {
-  count = local.should_deploy_log_ingestion ? 1 : 0
-
   tenant_id = data.azurerm_client_config.current.tenant_id
 
   settings = concat(
-    var.log_ingestion_settings.activity_log.enabled ? [
+    local.should_deploy_log_ingestion && var.log_ingestion_settings.activity_log.enabled ? [
       {
         type           = "activity_logs",
         id             = module.log_ingestion[0].activity_log_eventhub_id,
         consumer_group = module.log_ingestion[0].activity_log_eventhub_consumer_group_name
     }] : [],
-    var.log_ingestion_settings.entra_id_log.enabled ? [
+    local.should_deploy_log_ingestion && var.log_ingestion_settings.entra_id_log.enabled ? [
       {
         type           = "entra_logs",
         id             = module.log_ingestion[0].entra_id_log_eventhub_id,
