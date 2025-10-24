@@ -108,4 +108,10 @@ resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_se
         consumer_group = module.log_ingestion[0].entra_id_log_eventhub_consumer_group_name
     }] : []
   )
+
+  depends_on = [
+    crowdstrike_cloud_azure_tenant.this,
+    module.asset_inventory,
+    module.log_ingestion
+  ]
 }
