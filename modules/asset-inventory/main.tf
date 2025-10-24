@@ -13,7 +13,7 @@ locals {
 
 # Only create this if we have subscription scopes
 resource "azurerm_role_definition" "custom_appservice_reader_sub" {
-  count       = length(local.subscription_scopes) > 0 ? 1 : 0
+  count       = length(local.subscription_scopes) > 0 && !contains(var.management_group_ids, var.tenant_id) ? 1 : 0
   name        = "${var.resource_prefix}role-csreader-sub${var.resource_suffix}"
   scope       = local.subscription_scopes[0]
   description = "CrowdStrike Web App Service Custom Role"
@@ -26,7 +26,7 @@ resource "azurerm_role_definition" "custom_appservice_reader_sub" {
 }
 
 resource "azurerm_role_assignment" "appservice_reader_sub" {
-  for_each                         = length(local.subscription_scopes) > 0 ? toset(local.subscription_scopes) : []
+  for_each                         = length(local.subscription_scopes) > 0 && !contains(var.management_group_ids, var.tenant_id) ? toset(local.subscription_scopes) : []
   scope                            = each.value
   role_definition_id               = azurerm_role_definition.custom_appservice_reader_sub[0].role_definition_resource_id
   principal_id                     = var.app_service_principal_id
@@ -63,7 +63,7 @@ resource "azurerm_role_assignment" "appservice_reader_mg" {
 
 # Reader role assignments for all scopes
 resource "azurerm_role_assignment" "reader" {
-  for_each                         = toset(local.all_scopes)
+  for_each                         = contains(var.management_group_ids, var.tenant_id) ? local.management_group_scopes : local.all_scopes
   scope                            = each.value
   role_definition_name             = "Reader"
   principal_id                     = var.app_service_principal_id

@@ -42,6 +42,7 @@ module "service_principal" {
 module "asset_inventory" {
   source = "./modules/asset-inventory/"
 
+  tenant_id                = data.azurerm_client_config.current.tenant_id
   management_group_ids     = local.management_groups
   subscription_ids         = local.subscriptions
   app_service_principal_id = module.service_principal.object_id
