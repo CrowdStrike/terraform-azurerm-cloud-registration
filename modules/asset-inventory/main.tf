@@ -63,7 +63,7 @@ resource "azurerm_role_assignment" "appservice_reader_mg" {
 
 # Reader role assignments for all scopes
 resource "azurerm_role_assignment" "reader" {
-  for_each                         = contains(var.management_group_ids, var.tenant_id) ? local.management_group_scopes : local.all_scopes
+  for_each                         = contains(var.management_group_ids, var.tenant_id) ? toset(local.management_group_scopes) : toset(local.all_scopes)
   scope                            = each.value
   role_definition_name             = "Reader"
   principal_id                     = var.app_service_principal_id
