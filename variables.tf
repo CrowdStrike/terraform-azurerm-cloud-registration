@@ -153,4 +153,9 @@ variable "tags" {
     CSTagVendor : "CrowdStrike"
   }
   type = map(string)
+
+  validation {
+      condition     = length(var.tags) <= 45
+      error_message = "A maximum of 45 tags is allowed."
+  }
 }
