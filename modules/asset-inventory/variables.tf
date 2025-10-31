@@ -1,3 +1,8 @@
+variable "tenant_id" {
+  type        = string
+  description = "Tenant ID to monitor"
+}
+
 variable "subscription_ids" {
   type        = list(string)
   default     = []

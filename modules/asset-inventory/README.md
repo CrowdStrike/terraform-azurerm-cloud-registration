@@ -27,6 +27,7 @@ provider "azurerm" {
 module "asset_inventory" {
   source = "CrowdStrike/cloud-registration/azure//modules/asset-inventory"
 
+  tenant_id = "11111111-1111-1111-1111-111111111111"
   # Specify subscription IDs directly
   subscription_ids = ["subscription-id-1", "subscription-id-2"]
   # AND use management groups
@@ -65,6 +66,7 @@ module "asset_inventory" {
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of subscription IDs to monitor | `list(string)` | `[]` | no |
+| <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Tenant ID to monitor | `string` | n/a | yes |
 ## Outputs
 
 | Name | Description |
