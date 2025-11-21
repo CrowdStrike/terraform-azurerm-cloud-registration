@@ -28,6 +28,7 @@ resource "random_string" "eventhub_namespace" {
   special = false
 }
 
+# tflint-ignore: azurerm_resources_missing_prevent_destroy
 resource "azurerm_eventhub_namespace" "this" {
   count = local.should_deploy_eventhub_namespace ? 1 : 0
 
@@ -53,6 +54,7 @@ resource "azurerm_eventhub_namespace" "this" {
   tags = var.tags
 }
 
+# tflint-ignore: azurerm_resources_missing_prevent_destroy
 resource "azurerm_eventhub" "activity_log" {
   count             = local.should_deploy_eventhub_for_activity_log ? 1 : 0
   name              = "${var.resource_prefix}evh-cslogact${local.env}-${var.location}${var.resource_suffix}"
@@ -61,6 +63,7 @@ resource "azurerm_eventhub" "activity_log" {
   message_retention = 1
 }
 
+# tflint-ignore: azurerm_resources_missing_prevent_destroy
 resource "azurerm_eventhub" "entra_id_log" {
   count             = local.should_deploy_eventhub_for_entra_id_log ? 1 : 0
   name              = "${var.resource_prefix}evh-cslogentid${local.env}-${var.location}${var.resource_suffix}"

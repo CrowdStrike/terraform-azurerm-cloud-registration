@@ -21,6 +21,8 @@ repos:
       - id: terraform_tflint
         args:
           - '--args=--recursive'
+          - '--args=--config=__GIT_WORKING_DIR__/.tflint.hcl'
+          - '--args=--format=compact'
       - id: terraform_validate
       - id: terraform_tfsec
         args:
