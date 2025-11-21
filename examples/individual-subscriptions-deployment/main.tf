@@ -32,7 +32,8 @@ provider "crowdstrike" {
 }
 
 module "crowdstrike_azure_registration" {
-  source = "CrowdStrike/cloud-registration/azurerm"
+  source  = "CrowdStrike/cloud-registration/azurerm"
+  version = "~> 0.1.0"
 
   subscription_ids           = var.subscription_ids
   cs_infra_subscription_id   = var.cs_infra_subscription_id
