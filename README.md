@@ -160,6 +160,7 @@ module "crowdstrike_azure_registration" {
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
 | <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.29 |
+| <a name="provider_time"></a> [time](#provider\_time) | >= 0.13.1 |
 ## Resources
 
 | Name | Type |
@@ -167,6 +168,7 @@ module "crowdstrike_azure_registration" {
 | [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
 | [crowdstrike_cloud_azure_tenant_eventhub_settings.update_event_hub_settings](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant_eventhub_settings) | resource |
+| [time_sleep.wait_for_resources_deployed](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 

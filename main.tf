@@ -98,9 +98,9 @@ resource "time_sleep" "wait_for_resources_deployed" {
 
   triggers = {
     service_principal_id           = module.service_principal.object_id
-    management_groups              = local.management_groups
-    subscriptions                  = local.subscriptions
-    microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
+    management_groups              = join(",", var.management_group_ids)
+    subscriptions                  = join(",", var.subscription_ids)
+    microsoft_graph_permission_ids = join(",", local.microsoft_graph_permission_ids)
   }
 
   depends_on = [
