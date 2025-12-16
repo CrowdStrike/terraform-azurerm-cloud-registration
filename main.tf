@@ -92,6 +92,25 @@ module "log_ingestion" {
   ]
 }
 
+# Wait for resources to be applied
+resource "time_sleep" "wait_for_resources_deployed" {
+  create_duration = "30s"
+
+  triggers = {
+    service_principal_id           = module.service_principal.object_id
+    management_groups              = local.management_groups
+    subscriptions                  = local.subscriptions
+    microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
+  }
+
+  depends_on = [
+    crowdstrike_cloud_azure_tenant.this,
+    module.asset_inventory,
+    module.log_ingestion,
+    module.service_principal
+  ]
+}
+
 resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_settings" {
   tenant_id = data.azurerm_client_config.current.tenant_id
 
@@ -111,8 +130,6 @@ resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_se
   )
 
   depends_on = [
-    crowdstrike_cloud_azure_tenant.this,
-    module.asset_inventory,
-    module.log_ingestion
+    time_sleep.wait_for_resources_deployed
   ]
 }
