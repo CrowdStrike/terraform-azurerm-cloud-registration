@@ -20,6 +20,30 @@ variable "subscription_ids" {
   }
 }
 
+# tflint-ignore: terraform_unused_declarations
+variable "falcon_client_id" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Falcon API client ID."
+  validation {
+    condition     = var.falcon_client_id == "" || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
+    error_message = "Must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "falcon_client_secret" {
+  type        = string
+  sensitive   = true
+  default     = ""
+  description = "Falcon API client secret."
+  validation {
+    condition     = var.falcon_client_secret == "" || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
+    error_message = "Must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+  }
+}
+
 variable "falcon_ip_addresses" {
   type        = list(string)
   default     = []
