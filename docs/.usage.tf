@@ -40,7 +40,7 @@ module "crowdstrike_azure_registration" {
   # Azure subscription that will host CrowdStrike infrastructure. Required when `enable_realtime_visibility` is set to `true`.
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
-  # Optional: CrowdStrike API credential. Required when `enable_realtime_visibility` is set to `true`.
+  # Optional: CrowdStrike API credential
   falcon_client_id     = "<Falcon API client ID>"
   falcon_client_secret = "<Falcon API client secret>"
 
