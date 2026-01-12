@@ -92,7 +92,7 @@ variable "location" {
 }
 
 variable "resource_prefix" {
-  description = "Prefix to be added to all created resource names for identification"
+  description = "Prefix to be added to all created resource names for identification."
   default     = ""
   type        = string
 
@@ -107,7 +107,7 @@ variable "resource_prefix" {
 }
 
 variable "resource_suffix" {
-  description = "Suffix to be added to all created resource names for identification"
+  description = "Suffix to be added to all created resource names for identification."
   default     = ""
   type        = string
 
@@ -123,4 +123,9 @@ variable "tags" {
     CSTagVendor : "CrowdStrike"
   }
   type = map(string)
+
+  validation {
+    condition     = length(var.tags) <= 45
+    error_message = "The tags map cannot contain more than 45 entries."
+  }
 }

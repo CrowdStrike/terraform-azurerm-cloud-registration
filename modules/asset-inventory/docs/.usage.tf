@@ -13,7 +13,7 @@ provider "azurerm" {
 }
 
 module "asset_inventory" {
-  source = "CrowdStrike/cloud-registration/azure//modules/asset-inventory"
+  source = "CrowdStrike/cloud-registration/azurerm//modules/asset-inventory"
 
   tenant_id = "11111111-1111-1111-1111-111111111111"
   # Specify subscription IDs directly

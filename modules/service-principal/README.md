@@ -13,26 +13,18 @@ This Terraform module creates and configures the necessary Azure service princip
 terraform {
   required_version = ">= 1.9.0"
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">= 4.0.0"
-    }
     azuread = {
       source  = "hashicorp/azuread"
-      version = ">= 1.6.0"
+      version = ">= 3.0.0"
     }
   }
-}
-
-provider "azurerm" {
-  features {}
 }
 
 provider "azuread" {}
 
 # Create service principal
 module "service_principal" {
-  source = "CrowdStrike/cloud-registration/azure//modules/service-principal"
+  source = "CrowdStrike/cloud-registration/azurerm//modules/service-principal"
 
   # Client ID of CrowdStrike's multi-tenant app
   azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
@@ -53,7 +45,7 @@ module "service_principal" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | >= 1.6.0 |
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 3.7.0 |
 ## Resources
 
 | Name | Type |

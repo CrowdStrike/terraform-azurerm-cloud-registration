@@ -1,6 +1,11 @@
 variable "tenant_id" {
   type        = string
   description = "Tenant ID to monitor"
+
+  validation {
+    condition     = can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.tenant_id))
+    error_message = "Azure tenant ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
 }
 
 variable "subscription_ids" {
@@ -36,7 +41,7 @@ variable "app_service_principal_id" {
 }
 
 variable "resource_prefix" {
-  description = "Prefix to be added to all created resource names for identification"
+  description = "Prefix to be added to all created resource names for identification."
   default     = ""
   type        = string
 
@@ -51,7 +56,7 @@ variable "resource_prefix" {
 }
 
 variable "resource_suffix" {
-  description = "Suffix to be added to all created resource names for identification"
+  description = "Suffix to be added to all created resource names for identification."
   default     = ""
   type        = string
 
