@@ -45,7 +45,7 @@ module "service_principal" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 3.7.0 |
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | >= 3.0.0 |
 ## Resources
 
 | Name | Type |

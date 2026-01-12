@@ -9,6 +9,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host CrowdStrike's infrastructure resources
   features {}
 }
 
