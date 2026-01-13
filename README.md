@@ -68,7 +68,7 @@ terraform {
 
     crowdstrike = {
       source  = "CrowdStrike/crowdstrike"
-      version = ">= 0.0.29"
+      version = ">= 0.0.55"
     }
   }
 }
@@ -159,7 +159,7 @@ module "crowdstrike_azure_registration" {
 | Name | Version |
 |------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.29 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.55 |
 ## Resources
 
 | Name | Type |
