@@ -151,8 +151,6 @@ module "log_ingestion" {
 | [azurerm_role_assignment.activity_log_event_hub_data_receiver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.entra_id_eventhub_data_receiver](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [random_string.eventhub_namespace](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
-| [azurerm_client_config.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
-| [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -169,6 +167,7 @@ module "log_ingestion" {
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
 | <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of Azure subscription IDs to monitor for log ingestion | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources created by this module | `map(string)` | <pre>{<br/>  "CSTagVendor": "CrowdStrike"<br/>}</pre> | no |
+| <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Tenant ID to monitor | `string` | n/a | yes |
 ## Outputs
 
 | Name | Description |
