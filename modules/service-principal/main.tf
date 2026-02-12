@@ -6,7 +6,7 @@ resource "azuread_service_principal" "sp" {
 
 # Get Microsoft Graph Service Principal
 data "azuread_service_principal" "msgraph" {
-  display_name = "Microsoft Graph"
+  client_id = "00000003-0000-0000-c000-000000000000"
 }
 
 # Assign application roles
