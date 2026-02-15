@@ -3,11 +3,15 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0"
+      version = ">= 4.13.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = ">= 1.6.0"
+      version = ">= 3.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.1.0"
     }
   }
 }
@@ -22,17 +26,14 @@ provider "azuread" {
 
 # First, create a service principal using the service-principal module
 module "service_principal" {
-  source = "CrowdStrike/cloud-registration/azure//modules/service-principal"
+  source = "CrowdStrike/cloud-registration/azurerm//modules/service-principal"
 
   azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
 }
 
 # Configure log ingestion
 module "log_ingestion" {
-  source = "CrowdStrike/cloud-registration/azure//modules/log-ingestion"
-  providers = {
-    azurerm = azurerm
-  }
+  source = "CrowdStrike/cloud-registration/azurerm//modules/log-ingestion"
 
   # Service principal ID from the service-principal module
   app_service_principal_id = module.service_principal.object_id

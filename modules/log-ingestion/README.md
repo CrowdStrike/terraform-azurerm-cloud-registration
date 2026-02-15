@@ -50,11 +50,15 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0"
+      version = ">= 4.13.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = ">= 1.6.0"
+      version = ">= 3.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = ">= 3.1.0"
     }
   }
 }
@@ -69,17 +73,14 @@ provider "azuread" {
 
 # First, create a service principal using the service-principal module
 module "service_principal" {
-  source = "CrowdStrike/cloud-registration/azure//modules/service-principal"
+  source = "CrowdStrike/cloud-registration/azurerm//modules/service-principal"
 
   azure_client_id = "0805b105-a007-49b3-b575-14eed38fc1d0"
 }
 
 # Configure log ingestion
 module "log_ingestion" {
-  source = "CrowdStrike/cloud-registration/azure//modules/log-ingestion"
-  providers = {
-    azurerm = azurerm
-  }
+  source = "CrowdStrike/cloud-registration/azurerm//modules/log-ingestion"
 
   # Service principal ID from the service-principal module
   app_service_principal_id = module.service_principal.object_id
@@ -136,7 +137,7 @@ module "log_ingestion" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.13.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.1.0 |
 ## Resources
 
@@ -165,8 +166,8 @@ module "log_ingestion" {
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations for log ingestion. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Azure resource group name that will host CrowdStrike log ingestion infrastructure | `string` | n/a | yes |
-| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
-| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification. | `string` | `""` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification. | `string` | `""` | no |
 | <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of Azure subscription IDs to monitor for log ingestion | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources created by this module | `map(string)` | <pre>{<br/>  "CSTagVendor": "CrowdStrike"<br/>}</pre> | no |
 ## Outputs
