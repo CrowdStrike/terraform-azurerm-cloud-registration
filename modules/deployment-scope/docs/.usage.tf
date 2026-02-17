@@ -13,7 +13,7 @@ provider "azurerm" {
 }
 
 module "deployment_scope" {
-  source = "CrowdStrike/cloud-registration/azure//modules/deployment-scope"
+  source = "CrowdStrike/cloud-registration/azurerm//modules/deployment-scope"
 
   # Specify subscription IDs directly
   subscription_ids = ["subscription-id-1", "subscription-id-2"]

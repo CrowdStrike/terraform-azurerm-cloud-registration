@@ -26,6 +26,7 @@ variable "falcon_client_id" {
   sensitive   = true
   default     = ""
   description = "Falcon API client ID."
+
   validation {
     condition     = var.falcon_client_id == "" || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
     error_message = "Must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
@@ -38,6 +39,7 @@ variable "falcon_client_secret" {
   sensitive   = true
   default     = ""
   description = "Falcon API client secret."
+
   validation {
     condition     = var.falcon_client_secret == "" || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
     error_message = "Must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
@@ -66,21 +68,15 @@ variable "cs_infra_subscription_id" {
   }
 }
 
-variable "env" {
-  description = "Environment label (for example, prod, stag, dev) used for resource naming and tagging. Helps distinguish between different deployment environments. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions."
-  default     = "prod"
-  type        = string
-
-  validation {
-    condition     = var.env == "" || (length(var.env) <= 4 && can(regex("^[0-9a-zA-Z]*$", var.env)))
-    error_message = "The 'env' must only contain alphanumeric characters and has a limit of 4 characters."
-  }
-}
-
 variable "location" {
   description = "Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored."
   default     = "westus"
   type        = string
+
+  validation {
+    condition     = length(var.location) > 0
+    error_message = "Location must not be an empty string"
+  }
 }
 
 variable "microsoft_graph_permission_ids" {
@@ -124,7 +120,7 @@ variable "log_ingestion_settings" {
 }
 
 variable "resource_prefix" {
-  description = "Prefix to be added to all created resource names for identification"
+  description = "Prefix to be added to all created resource names for identification."
   default     = ""
   type        = string
 
@@ -139,7 +135,7 @@ variable "resource_prefix" {
 }
 
 variable "resource_suffix" {
-  description = "Suffix to be added to all created resource names for identification"
+  description = "Suffix to be added to all created resource names for identification."
   default     = ""
   type        = string
 
@@ -149,10 +145,26 @@ variable "resource_suffix" {
   }
 }
 
+variable "env" {
+  description = "Environment label (for example, prod, stag, dev) used for resource naming and tagging. Helps distinguish between different deployment environments. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions."
+  default     = "prod"
+  type        = string
+
+  validation {
+    condition     = var.env == "" || (length(var.env) <= 4 && can(regex("^[0-9a-zA-Z]*$", var.env)))
+    error_message = "The 'env' must only contain alphanumeric characters and has a limit of 4 characters."
+  }
+}
+
 variable "tags" {
   description = "Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag."
   default = {
     CSTagVendor : "CrowdStrike"
   }
   type = map(string)
+
+  validation {
+    condition     = length(var.tags) <= 45
+    error_message = "The tags map cannot contain more than 45 entries."
+  }
 }

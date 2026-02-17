@@ -21,11 +21,12 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "00000000-0000-0000-0000-000000000000" # Replace with your subscription ID that will host CrowdStrike's infrastructure resources
   features {}
 }
 
 module "asset_inventory" {
-  source = "CrowdStrike/cloud-registration/azure//modules/asset-inventory"
+  source = "CrowdStrike/cloud-registration/azurerm//modules/asset-inventory"
 
   tenant_id = "11111111-1111-1111-1111-111111111111"
   # Specify subscription IDs directly
@@ -63,8 +64,8 @@ module "asset_inventory" {
 |------|-------------|------|---------|:--------:|
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of CrowdStrike app to which all the roles will be assigned | `string` | n/a | yes |
 | <a name="input_management_group_ids"></a> [management\_group\_ids](#input\_management\_group\_ids) | List of management group IDs to monitor | `list(string)` | `[]` | no |
-| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification | `string` | `""` | no |
-| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification | `string` | `""` | no |
+| <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification. | `string` | `""` | no |
+| <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification. | `string` | `""` | no |
 | <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of subscription IDs to monitor | `list(string)` | `[]` | no |
 | <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Tenant ID to monitor | `string` | n/a | yes |
 ## Outputs
