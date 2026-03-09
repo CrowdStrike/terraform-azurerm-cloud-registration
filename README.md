@@ -96,7 +96,7 @@ module "crowdstrike_azure_registration" {
   # Azure subscription that will host CrowdStrike infrastructure. Required when `enable_realtime_visibility` is set to `true`.
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
-  # Optional: CrowdStrike API credential
+  # Optional: CrowdStrike API credential. Required when `enable_dspm` is set to `true`.
   falcon_client_id     = "<Falcon API client ID>"
   falcon_client_secret = "<Falcon API client secret>"
 
@@ -105,6 +105,10 @@ module "crowdstrike_azure_registration" {
 
   # Optional: Enable Real Time Visibility and Detection
   enable_realtime_visibility = true
+
+  # Optional: Configure agentless scanning
+  enable_dspm                  = true
+  agentless_scanning_locations = ["westus"]
 
   # Optional: Configure log ingestion settings
   log_ingestion_settings = {
@@ -164,7 +168,6 @@ module "crowdstrike_azure_registration" {
 
 | Name | Type |
 |------|------|
-| [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
 | [crowdstrike_cloud_azure_tenant_eventhub_settings.update_event_hub_settings](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant_eventhub_settings) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
@@ -172,12 +175,17 @@ module "crowdstrike_azure_registration" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_agentless_scanning_deploy_nat_gateway"></a> [agentless\_scanning\_deploy\_nat\_gateway](#input\_agentless\_scanning\_deploy\_nat\_gateway) | Indicates Agentless Scanning environment will be deployed with NAT Gateway. | `bool` | `true` | no |
+| <a name="input_agentless_scanning_locations"></a> [agentless\_scanning\_locations](#input\_agentless\_scanning\_locations) | List of Azure locations (regions) where agentless scanning will be deployed. | `list(string)` | `[]` | no |
+| <a name="input_agentless_scanning_locations_per_subscription"></a> [agentless\_scanning\_locations\_per\_subscription](#input\_agentless\_scanning\_locations\_per\_subscription) | Map of Azure subscription IDs to lists of locations (regions) where agentless scanning will be deployed per subscription. | `map(list(string))` | `{}` | no |
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`. | `string` | `""` | no |
+| <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Controls whether to enable DSPM (Data Security Posture Management) for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Controls whether to enable Real Time Visibility and Detection feature for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
 | <a name="input_env"></a> [env](#input\_env) | Environment label (for example, prod, stag, dev) used for resource naming and tagging. Helps distinguish between different deployment environments. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions. | `string` | `"prod"` | no |
-| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. | `string` | `""` | no |
-| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. | `string` | `""` | no |
+| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. Required when `enable_dspm` is set to `true`. | `string` | `""` | no |
+| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. Required when `enable_dspm` is set to `true`. | `string` | `""` | no |
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`. | `list(string)` | `[]` | no |
+| <a name="input_key_vault_allowed_ip_rules"></a> [key\_vault\_allowed\_ip\_rules](#input\_key\_vault\_allowed\_ip\_rules) | Allowed IP rules (IPs or CIDR blocks) for restricting Key Vault access. If empty all network access will be allowed. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
 | <a name="input_log_ingestion_settings"></a> [log\_ingestion\_settings](#input\_log\_ingestion\_settings) | Configuration settings for log ingestion. Controls whether to enable Azure Activity Logs and Microsoft Entra ID logs collection via Event Hubs, and allows using either newly created Event Hubs or existing ones. | <pre>object({<br/>    activity_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>    entra_id_log = optional(object({<br/>      enabled = bool<br/>      existing_eventhub = optional(object({<br/>        use                          = bool<br/>        eventhub_resource_id         = optional(string, "")<br/>        eventhub_consumer_group_name = optional(string, "")<br/>      }), { use = false })<br/>    }), { enabled = true })<br/>  })</pre> | `{}` | no |
 | <a name="input_management_group_ids"></a> [management\_group\_ids](#input\_management\_group\_ids) | List of Azure management group IDs to monitor with CrowdStrike Falcon Cloud Security. All subscriptions within these management groups will be automatically discovered and monitored. | `list(string)` | `[]` | no |
@@ -193,6 +201,7 @@ module "crowdstrike_azure_registration" {
 | <a name="output_active_subscriptions_in_groups"></a> [active\_subscriptions\_in\_groups](#output\_active\_subscriptions\_in\_groups) | Map of Azure management group scopes to active Azure subscriptions discovered within those groups |
 | <a name="output_activity_log_eventhub_consumer_group_name"></a> [activity\_log\_eventhub\_consumer\_group\_name](#output\_activity\_log\_eventhub\_consumer\_group\_name) | Consumer group name for Azure Activity Log ingestion via Event Hub |
 | <a name="output_activity_log_eventhub_id"></a> [activity\_log\_eventhub\_id](#output\_activity\_log\_eventhub\_id) | Resource ID of the Event Hub used for Azure Activity Log ingestion |
+| <a name="output_agentless_scanning_managed_identity_principal_id"></a> [agentless\_scanning\_managed\_identity\_principal\_id](#output\_agentless\_scanning\_managed\_identity\_principal\_id) | Map of subscription IDs to agentless scanning managed identity IDs |
 | <a name="output_entra_id_log_eventhub_consumer_group_name"></a> [entra\_id\_log\_eventhub\_consumer\_group\_name](#output\_entra\_id\_log\_eventhub\_consumer\_group\_name) | Consumer group name for Microsoft Entra ID (formerly Azure AD) log ingestion via Event Hub |
 | <a name="output_entra_id_log_eventhub_id"></a> [entra\_id\_log\_eventhub\_id](#output\_entra\_id\_log\_eventhub\_id) | Resource ID of the Event Hub used for Microsoft Entra ID (formerly Azure AD) log ingestion |
 | <a name="output_management_group_scopes"></a> [management\_group\_scopes](#output\_management\_group\_scopes) | List of Azure management group scopes configured for CrowdStrike Falcon Cloud Security asset inventory |

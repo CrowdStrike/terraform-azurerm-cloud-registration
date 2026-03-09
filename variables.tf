@@ -20,29 +20,27 @@ variable "subscription_ids" {
   }
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "falcon_client_id" {
   type        = string
   sensitive   = true
   default     = ""
-  description = "Falcon API client ID."
+  description = "Falcon API client ID. Required when `enable_dspm` is set to `true`."
 
   validation {
-    condition     = var.falcon_client_id == "" || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
-    error_message = "Must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+    condition     = !var.enable_dspm || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
+    error_message = "'falcon_client_id' is required when 'enable_dspm' is set to true and must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
 }
 
-# tflint-ignore: terraform_unused_declarations
 variable "falcon_client_secret" {
   type        = string
   sensitive   = true
   default     = ""
-  description = "Falcon API client secret."
+  description = "Falcon API client secret. Required when `enable_dspm` is set to `true`."
 
   validation {
-    condition     = var.falcon_client_secret == "" || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
-    error_message = "Must be a 40-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+    condition     = !var.enable_dspm || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
+    error_message = "'falcon_client_secret' is required when 'enable_dspm' is set to true and must be a 40-character alphanumeric string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
 }
 
@@ -117,6 +115,54 @@ variable "log_ingestion_settings" {
     }), { enabled = true })
   })
   default = {}
+}
+
+variable "enable_dspm" {
+  description = "Controls whether to enable DSPM (Data Security Posture Management) for CrowdStrike Falcon Cloud Security in Azure."
+  type        = bool
+  default     = false
+}
+
+variable "agentless_scanning_locations" {
+  description = "List of Azure locations (regions) where agentless scanning will be deployed."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for loc in var.agentless_scanning_locations : (length(loc) > 0)])
+    error_message = "All agentless scanning locations must be non-empty strings."
+  }
+  validation {
+    condition     = !var.enable_dspm || length(var.agentless_scanning_locations) > 0
+    error_message = "If DSPM is enabled 'agentless_scanning_locations' must be a non-empty list."
+  }
+}
+
+variable "agentless_scanning_locations_per_subscription" {
+  description = "Map of Azure subscription IDs to lists of locations (regions) where agentless scanning will be deployed per subscription."
+  type        = map(list(string))
+  default     = {}
+
+  validation {
+    condition     = alltrue([for id, _ in var.agentless_scanning_locations_per_subscription : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
+    error_message = "All keys in 'agentless_scanning_locations_per_subscription' must be valid subscription UUIDs in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
+  validation {
+    condition     = alltrue([for _, locs in var.agentless_scanning_locations_per_subscription : alltrue([for loc in locs : (length(loc) > 0)])])
+    error_message = "All locations in 'agentless_scanning_locations_per_subscription' must be non-empty strings."
+  }
+}
+
+variable "agentless_scanning_deploy_nat_gateway" {
+  description = "Indicates Agentless Scanning environment will be deployed with NAT Gateway."
+  default     = true
+  type        = bool
+}
+
+variable "key_vault_allowed_ip_rules" {
+  description = "Allowed IP rules (IPs or CIDR blocks) for restricting Key Vault access. If empty all network access will be allowed."
+  type        = list(string)
+  default     = []
 }
 
 variable "resource_prefix" {
