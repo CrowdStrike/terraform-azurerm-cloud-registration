@@ -1,7 +1,7 @@
 locals {
   subscription_id = data.azurerm_client_config.current.subscription_id
 
-  rg_access_actions = [
+  host_rg_access_actions = [
     # ============ Blob Storage ============
     "Microsoft.Network/privateEndpoints/read",
     "Microsoft.Network/privateEndpoints/write",
@@ -47,6 +47,8 @@ locals {
     "Microsoft.KeyVault/vaults/read",
     "Microsoft.Compute/virtualMachines/retrieveBootDiagnosticsData/action",
   ]
+  target_rg_access_actions = []
+
   conditional_public_ip_actions = [
     "Microsoft.Network/publicIPAddresses/read",
     "Microsoft.Network/publicIPAddresses/write",
@@ -94,7 +96,9 @@ resource "azurerm_role_definition" "rg_access" {
   description = "CrowdStrike Scanning Resource Group Access Role"
 
   permissions {
-    actions     = !var.agentless_scanning_deploy_nat_gateway ? concat(local.rg_access_actions, local.conditional_public_ip_actions) : local.rg_access_actions
+    actions = var.agentless_scanning_host_subscription_id == "" ? (
+      var.agentless_scanning_deploy_nat_gateway ? local.host_rg_access_actions : concat(local.host_rg_access_actions, local.conditional_public_ip_actions)
+    ) : local.target_rg_access_actions
     not_actions = []
   }
 

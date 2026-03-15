@@ -29,12 +29,13 @@ module "agentless_scanning_environment" {
   depends_on = [module.crowdstrike_resource_group]
 }
 
-module "agentless_scanning_role" {
-  source = "./role"
+module "agentless_scanning_roles" {
+  source = "./roles"
 
   resource_group_name                     = var.deploy_resource_group ? module.crowdstrike_resource_group[0].resource_group_name : var.resource_group_name
   agentless_scanner_identity_principal_id = local.should_deploy_scanning_environment ? module.agentless_scanning_environment[0].scanner_identity_principal_id : var.agentless_scanner_identity_principal_id
   agentless_scanning_principal_id         = var.agentless_scanning_principal_id
+  agentless_scanning_host_subscription_id = var.agentless_scanning_host_subscription_id
   agentless_scanning_deploy_nat_gateway   = var.agentless_scanning_deploy_nat_gateway
   resource_prefix                         = var.resource_prefix
   resource_suffix                         = var.resource_suffix

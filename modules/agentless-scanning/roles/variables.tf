@@ -3,6 +3,12 @@ variable "agentless_scanning_deploy_nat_gateway" {
   type        = bool
 }
 
+variable "agentless_scanning_host_subscription_id" {
+  description = "If specified, this is a target subscription deployment. Target subscriptions receive a reduced set of resource group permissions."
+  type        = string
+  default     = ""
+}
+
 variable "agentless_scanning_principal_id" {
   type        = string
   description = "Principal ID of the CrowdStrike application registered in Entra ID. This ID is used for role assignments and access control."
