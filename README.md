@@ -135,7 +135,10 @@ module "crowdstrike_azure_registration" {
   #   "246dd0d5-5bd0-4def-940b-0421030a5b68", # Policy.Read.All
   #   "230c1aed-a721-4c5d-9cb4-a90514e508ef", # Reports.Read.All
   #   "483bed4a-2ad3-4361-a73b-c83ccdbdc53c", # RoleManagement.Read.All
-  #   "df021288-bdef-4463-88db-98f22de89214"  # User.Read.All
+  #   "df021288-bdef-4463-88db-98f22de89214", # User.Read.All
+  #   "dbb9058a-0e50-45d7-ae91-66909b5d4664", # Domain.Read.All
+  #   "b0afded3-3588-46d8-8b3d-9842eff778da", # AuditLog.Read.All
+  #   "7438b122-aefc-4978-80ed-43db9fcc7715"  # Device.Read.All
   # ]
 
   # Optional: Resource naming customization
