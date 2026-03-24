@@ -21,6 +21,7 @@ locals {
 
 resource "crowdstrike_cloud_azure_tenant" "this" {
   tenant_id                      = data.azurerm_client_config.current.tenant_id
+  account_type                   = var.account_type
   microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
   realtime_visibility = {
     enabled = var.enable_realtime_visibility
