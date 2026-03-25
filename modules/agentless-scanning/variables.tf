@@ -23,6 +23,21 @@ variable "agentless_scanning_host_subscription_id" {
     condition     = var.agentless_scanning_host_subscription_id == "" || var.agentless_scanner_identity_principal_id != ""
     error_message = "If 'agentless_scanning_host_subscription_id' is specified 'agentless_scanner_identity_principal_id' must be set"
   }
+  validation {
+    condition = var.agentless_scanning_host_subscription_id == "" || (
+      length(var.input_agentless_scanning_locations_per_subscription) == 0 ||
+      alltrue([
+        for sub_id, locations in var.input_agentless_scanning_locations_per_subscription :
+        (length(
+          setsubtract(
+            toset(locations),
+            toset(lookup(var.input_agentless_scanning_locations_per_subscription, var.agentless_scanning_host_subscription_id, []))
+          )
+        ) == 0)
+      ])
+    )
+    error_message = "If 'agentless_scanning_host_subscription_id' is specified, each location in 'input_agentless_scanning_locations_per_subscription' must be a subset of the host subscription's locations."
+  }
 }
 
 variable "agentless_scanner_identity_principal_id" {
