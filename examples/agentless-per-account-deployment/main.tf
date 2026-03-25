@@ -47,7 +47,7 @@ data "http" "public_ip" {
 
 module "crowdstrike_azure_registration" {
   source  = "CrowdStrike/cloud-registration/azurerm"
-  version = "~> 0.1.8"
+  version = "~> 0.1.10"
 
   subscription_ids                              = var.subscription_ids
   management_group_ids                          = var.management_group_ids
@@ -82,7 +82,7 @@ provider "azurerm" {
 
 module "agentless_scanning_host_subscription_2" {
   source  = "CrowdStrike/cloud-registration/azurerm//modules/agentless-scanning"
-  version = "~> 0.1.8"
+  version = "~> 0.1.10"
 
   providers = {
     azurerm = azurerm.host_sub_2
