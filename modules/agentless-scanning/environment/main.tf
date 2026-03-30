@@ -81,6 +81,7 @@ resource "azurerm_role_assignment" "key_vault_terraform_secrets_officer" {
   scope                = azurerm_key_vault.client_credentials.id
   role_definition_name = "Key Vault Secrets Officer"
   principal_id         = data.azurerm_client_config.current.object_id
+  principal_type       = "ServicePrincipal"
 }
 
 # tflint-ignore: azurerm_resources_missing_prevent_destroy

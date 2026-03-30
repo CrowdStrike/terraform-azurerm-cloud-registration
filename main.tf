@@ -5,7 +5,7 @@ locals {
   management_groups                = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
   should_deploy_log_ingestion      = var.enable_realtime_visibility
   should_deploy_agentless_scanning = var.enable_dspm
-  agentless_scanning_locations     = length(var.agentless_scanning_locations_per_subscription) > 0 ? var.agentless_scanning_locations_per_subscription[var.cs_infra_subscription_id] : var.agentless_scanning_locations
+  agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
 
   microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : [
     "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All (Role)
