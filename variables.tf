@@ -133,7 +133,10 @@ variable "enable_dspm" {
   default     = false
 
   validation {
-    condition     = !var.enable_dspm || length(var.agentless_scanning_locations) > 0 || length(var.agentless_scanning_locations_per_subscription) > 0
+    condition = !var.enable_dspm || (
+      (length(var.agentless_scanning_locations) > 0 && length(var.agentless_scanning_locations_per_subscription) == 0) ||
+      (length(var.agentless_scanning_locations_per_subscription) > 0 && length(var.agentless_scanning_locations) == 0)
+    )
     error_message = "If DSPM is enabled either 'agentless_scanning_locations' or 'agentless_scanning_locations_per_subscription' must be provided."
   }
 }

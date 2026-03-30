@@ -1,5 +1,6 @@
 locals {
   subscription_id    = data.azurerm_client_config.current.subscription_id
+  # Only deploy custom subnet roles for host subscription with non-empty map
   use_custom_subnets = length(var.agentless_scanning_custom_vnet_configuration) > 0 && var.agentless_scanning_host_subscription_id == ""
 
   # Collect all unique subnet IDs from the custom vnet configuration
