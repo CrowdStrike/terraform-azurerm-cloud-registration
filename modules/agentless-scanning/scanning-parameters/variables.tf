@@ -53,6 +53,15 @@ variable "agentless_scanning_deploy_nat_gateway" {
   type        = bool
 }
 
+variable "agentless_scanning_custom_vnet_configuration" {
+  description = "Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners_subnet_id and clones_subnet_id."
+  type = map(object({
+    scanners_subnet_id = string
+    clones_subnet_id   = string
+  }))
+  default = {}
+}
+
 variable "resource_prefix" {
   description = "Prefix to be added to all created resource names for identification."
   type        = string

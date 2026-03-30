@@ -131,6 +131,11 @@ variable "enable_dspm" {
   description = "Controls whether to enable DSPM (Data Security Posture Management) for CrowdStrike Falcon Cloud Security in Azure."
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.enable_dspm || length(var.agentless_scanning_locations) > 0 || length(var.agentless_scanning_locations_per_subscription) > 0
+    error_message = "If DSPM is enabled either 'agentless_scanning_locations' or 'agentless_scanning_locations_per_subscription' must be provided."
+  }
 }
 
 variable "agentless_scanning_locations" {
@@ -141,10 +146,6 @@ variable "agentless_scanning_locations" {
   validation {
     condition     = alltrue([for loc in var.agentless_scanning_locations : (length(loc) > 0)])
     error_message = "All agentless scanning locations must be non-empty strings."
-  }
-  validation {
-    condition     = !var.enable_dspm || length(var.agentless_scanning_locations) > 0
-    error_message = "If DSPM is enabled 'agentless_scanning_locations' must be a non-empty list."
   }
 }
 
@@ -160,6 +161,32 @@ variable "agentless_scanning_locations_per_subscription" {
   validation {
     condition     = alltrue([for _, locs in var.agentless_scanning_locations_per_subscription : alltrue([for loc in locs : (length(loc) > 0)])])
     error_message = "All locations in 'agentless_scanning_locations_per_subscription' must be non-empty strings."
+  }
+}
+
+variable "agentless_scanning_custom_vnet_configuration" {
+  description = "Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners_subnet_id and clones_subnet_id."
+  type = map(object({
+    scanners_subnet_id = string
+    clones_subnet_id   = string
+  }))
+  default = {}
+
+  validation {
+    condition = alltrue([
+      for region, config in var.agentless_scanning_custom_vnet_configuration :
+      (length(config.scanners_subnet_id) > 0 && length(config.clones_subnet_id) > 0)
+    ])
+    error_message = "Each custom VNet configuration entry must have non-empty 'scanners_subnet_id' and 'clones_subnet_id'."
+  }
+  validation {
+    condition = length(var.agentless_scanning_custom_vnet_configuration) == 0 || length(
+      setsubtract(
+        setunion(toset(var.agentless_scanning_locations), toset(flatten(values(var.agentless_scanning_locations_per_subscription)))),
+        toset(keys(var.agentless_scanning_custom_vnet_configuration))
+      )
+    ) == 0
+    error_message = "If 'agentless_scanning_custom_vnet_configuration' is specified, all locations in 'agentless_scanning_locations' and 'agentless_scanning_locations_per_subscription' must have a corresponding entry."
   }
 }
 

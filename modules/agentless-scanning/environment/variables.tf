@@ -18,6 +18,15 @@ variable "agentless_scanning_locations" {
   }
 }
 
+variable "agentless_scanning_custom_vnet_configuration" {
+  description = "Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners_subnet_id and clones_subnet_id."
+  type = map(object({
+    scanners_subnet_id = string
+    clones_subnet_id   = string
+  }))
+  default = {}
+}
+
 variable "key_vault_allowed_ip_rules" {
   description = "Allowed IP rules (IPs or CIDR blocks) for restricting Key Vault access. If empty all network access will be allowed."
   type        = list(string)

@@ -1,5 +1,14 @@
 locals {
-  subscription_id = data.azurerm_client_config.current.subscription_id
+  subscription_id    = data.azurerm_client_config.current.subscription_id
+  use_custom_subnets = length(var.agentless_scanning_custom_vnet_configuration) > 0 && var.agentless_scanning_host_subscription_id == ""
+
+  # Collect all unique subnet IDs from the custom vnet configuration
+  custom_subnet_ids = local.use_custom_subnets ? toset(flatten([
+    for region, config in var.agentless_scanning_custom_vnet_configuration : [
+      config.scanners_subnet_id,
+      config.clones_subnet_id,
+    ]
+  ])) : toset([])
 
   host_rg_access_actions = [
     # ============ Blob Storage ============
@@ -7,18 +16,6 @@ locals {
     "Microsoft.Network/privateEndpoints/write",
     "Microsoft.Network/privateEndpoints/delete",
     "Microsoft.Network/virtualNetworks/subnets/join/action",
-    "Microsoft.Resources/subscriptions/resourceGroups/read",
-    "Microsoft.Network/privateDnsZones/read",
-    "Microsoft.Network/privateDnsZones/write",
-    "Microsoft.Network/privateDnsZones/delete",
-    "Microsoft.Network/privateDnsZones/virtualNetworkLinks/read",
-    "Microsoft.Network/privateDnsZones/virtualNetworkLinks/write",
-    "Microsoft.Network/privateDnsZones/virtualNetworkLinks/delete",
-    "Microsoft.Network/virtualNetworks/join/action",
-    "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/read",
-    "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/write",
-    "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/delete",
-    "Microsoft.Network/privateDnsZones/join/action",
     # ============ Scanner VM ============
     "Microsoft.Network/networkSecurityGroups/read",
     "Microsoft.Network/networkSecurityGroups/write",
@@ -96,8 +93,9 @@ resource "azurerm_role_definition" "rg_access" {
   description = "CrowdStrike Scanning Resource Group Access Role"
 
   permissions {
-    actions = var.agentless_scanning_host_subscription_id == "" ? (
-      var.agentless_scanning_deploy_nat_gateway ? local.host_rg_access_actions : concat(local.host_rg_access_actions, local.conditional_public_ip_actions)
+    actions = var.agentless_scanning_host_subscription_id == "" ? concat(
+      local.host_rg_access_actions,
+      !var.agentless_scanning_deploy_nat_gateway ? local.conditional_public_ip_actions : []
     ) : local.target_rg_access_actions
     not_actions = []
   }
@@ -151,4 +149,34 @@ resource "azurerm_role_assignment" "rg_scanner" {
   role_definition_name = "Reader"
   principal_id         = var.agentless_scanner_identity_principal_id
   principal_type       = "ServicePrincipal"
+}
+
+# Custom role for custom VNet subnet access
+resource "azurerm_role_definition" "custom_vnet_subnet" {
+  count = local.use_custom_subnets ? 1 : 0
+
+  name        = "${var.resource_prefix}role-csscanning-custom-vnet-${local.subscription_id}${var.resource_suffix}"
+  scope       = "/subscriptions/${local.subscription_id}"
+  description = "CrowdStrike Scanning Custom VNet Subnet Role"
+
+  permissions {
+    actions = [
+      "Microsoft.Network/virtualNetworks/subnets/join/action",
+      "Microsoft.Network/virtualNetworks/read",
+      "Microsoft.Network/virtualNetworks/subnets/read",
+    ]
+    not_actions = []
+  }
+
+  assignable_scopes = local.custom_subnet_ids
+}
+
+# Role assignment for custom VNet subnet access - one per subnet
+resource "azurerm_role_assignment" "custom_vnet_subnet" {
+  for_each = local.custom_subnet_ids
+
+  scope              = each.value
+  role_definition_id = azurerm_role_definition.custom_vnet_subnet[0].role_definition_resource_id
+  principal_id       = var.agentless_scanning_principal_id
+  principal_type     = "ServicePrincipal"
 }

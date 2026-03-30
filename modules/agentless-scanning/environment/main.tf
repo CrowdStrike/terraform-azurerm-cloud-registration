@@ -1,6 +1,18 @@
 locals {
   environment       = var.env == "" ? "" : "-${var.env}"
   key_vault_uniq_id = substr(md5("${data.azurerm_client_config.current.subscription_id}${var.resource_group_name}CrowdStrikeScanningKeyVault"), 0, 18)
+
+  # Locations that do NOT have custom VNet configuration — these need the scanning-region module
+  managed_vnet_locations = toset([
+    for loc in var.agentless_scanning_locations :
+    loc if !contains(keys(var.agentless_scanning_custom_vnet_configuration), loc)
+  ])
+
+  # Resolve clones subnet ID per location: custom or module-created
+  clones_subnet_id_per_location = {
+    for loc in var.agentless_scanning_locations :
+    loc => contains(keys(var.agentless_scanning_custom_vnet_configuration), loc) ? var.agentless_scanning_custom_vnet_configuration[loc].clones_subnet_id : module.scanning_region[loc].clones_subnet_id
+  }
 }
 
 data "azurerm_client_config" "current" {}
@@ -44,8 +56,7 @@ resource "azurerm_private_endpoint" "key_vault" {
   name                = "${var.resource_prefix}pep-csscanning-vault${local.environment}-${each.key}${var.resource_suffix}"
   location            = each.key
   resource_group_name = var.resource_group_name
-  subnet_id           = module.scanning_region[each.key].clones_subnet_id
-  tags                = var.tags
+  subnet_id           = local.clones_subnet_id_per_location[each.key]
 
   private_service_connection {
     name                           = "${var.resource_prefix}plsc-csscanning-vault${local.environment}-${each.key}${var.resource_suffix}"
@@ -53,6 +64,10 @@ resource "azurerm_private_endpoint" "key_vault" {
     is_manual_connection           = false
     subresource_names              = ["Vault"]
   }
+
+  tags = merge(var.tags, {
+    CSTagResourceType = "VaultPrivateEndpoint"
+  })
 }
 
 resource "azurerm_role_assignment" "key_vault_scanner_secrets_user" {
@@ -86,9 +101,9 @@ resource "azurerm_key_vault_secret" "client_credentials" {
   ]
 }
 
-# Deploy regional scanning resources
+# Deploy regional scanning resources only for locations without custom VNet
 module "scanning_region" {
-  for_each = toset(var.agentless_scanning_locations)
+  for_each = local.managed_vnet_locations
 
   source = "./scanning-region"
 

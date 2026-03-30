@@ -61,6 +61,22 @@ variable "agentless_scanning_principal_id" {
   }
 }
 
+variable "agentless_scanning_custom_vnet_configuration" {
+  description = "Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners_subnet_id and clones_subnet_id."
+  type = map(object({
+    scanners_subnet_id = string
+    clones_subnet_id   = string
+  }))
+  default = {}
+
+  validation {
+    condition = var.agentless_scanning_host_subscription_id != "" || length(var.agentless_scanning_custom_vnet_configuration) == 0 || length(
+      setsubtract(toset(var.agentless_scanning_locations), toset(keys(var.agentless_scanning_custom_vnet_configuration)))
+    ) == 0
+    error_message = "If 'agentless_scanning_custom_vnet_configuration' is specified, all locations in 'agentless_scanning_locations' must have a corresponding entry."
+  }
+}
+
 variable "agentless_scanning_locations" {
   type        = list(string)
   description = "List of Azure locations (regions) where scanning environment will be deployed."

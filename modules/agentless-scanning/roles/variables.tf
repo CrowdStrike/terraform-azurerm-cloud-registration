@@ -29,6 +29,15 @@ variable "agentless_scanner_identity_principal_id" {
   }
 }
 
+variable "agentless_scanning_custom_vnet_configuration" {
+  description = "Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners_subnet_id and clones_subnet_id."
+  type = map(object({
+    scanners_subnet_id = string
+    clones_subnet_id   = string
+  }))
+  default = {}
+}
+
 variable "resource_group_name" {
   type        = string
   description = "Name of the resource group where CrowdStrike infrastructure resources will be deployed."

@@ -57,7 +57,6 @@ module "crowdstrike_azure_registration" {
   falcon_ip_addresses                           = var.falcon_ip_addresses
   enable_realtime_visibility                    = local.enable_realtime_visibility
   enable_dspm                                   = local.enable_dspm
-  agentless_scanning_locations                  = local.agentless_scanning_locations_per_subscription[var.cs_infra_subscription_id]
   agentless_scanning_locations_per_subscription = local.agentless_scanning_locations_per_subscription
   agentless_scanning_deploy_nat_gateway         = local.agentless_scanning_deploy_nat_gateway
   key_vault_allowed_ip_rules                    = ["${chomp(data.http.public_ip.response_body)}/32"]
