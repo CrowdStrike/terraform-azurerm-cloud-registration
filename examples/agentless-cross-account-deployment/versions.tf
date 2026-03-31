@@ -9,7 +9,7 @@ terraform {
 
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0"
+      version = ">= 4.42.0"
     }
 
     random = {
@@ -20,6 +20,11 @@ terraform {
     crowdstrike = {
       source  = "CrowdStrike/crowdstrike"
       version = ">= 0.0.66"
+    }
+
+    http = {
+      source  = "hashicorp/http"
+      version = ">= 3.0.0"
     }
   }
 }

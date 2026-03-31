@@ -11,11 +11,13 @@ locals {
   ]
 }
 
+data "azurerm_client_config" "current" {}
+
 # Only create this if we have subscription scopes
 resource "azurerm_role_definition" "custom_appservice_reader_sub" {
   count       = length(local.subscription_scopes) > 0 && !contains(var.management_group_ids, var.tenant_id) ? 1 : 0
-  name        = "${var.resource_prefix}role-csreader-sub${var.resource_suffix}"
-  scope       = local.subscription_scopes[0]
+  name        = "${var.resource_prefix}role-csreader-${data.azurerm_client_config.current.subscription_id}${var.resource_suffix}"
+  scope       = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
   description = "CrowdStrike Web App Service Custom Role"
   permissions {
     actions     = local.app_service_permissions

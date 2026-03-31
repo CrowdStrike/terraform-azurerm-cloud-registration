@@ -1,10 +1,11 @@
 data "azurerm_client_config" "current" {}
 
 locals {
-  subscriptions               = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
-  management_groups           = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
-  env                         = var.env == "" ? "" : "-${var.env}"
-  should_deploy_log_ingestion = var.enable_realtime_visibility
+  subscriptions                    = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
+  management_groups                = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
+  should_deploy_log_ingestion      = var.enable_realtime_visibility
+  should_deploy_agentless_scanning = var.enable_dspm
+  agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
 
   microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : [
     "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All (Role)
@@ -25,6 +26,9 @@ resource "crowdstrike_cloud_azure_tenant" "this" {
   microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
   realtime_visibility = {
     enabled = var.enable_realtime_visibility
+  }
+  dspm = {
+    enabled = var.enable_dspm
   }
   cs_infra_subscription_id = var.cs_infra_subscription_id
   cs_infra_location        = var.location
@@ -52,18 +56,17 @@ module "asset_inventory" {
   app_service_principal_id = module.service_principal.object_id
   resource_prefix          = var.resource_prefix
   resource_suffix          = var.resource_suffix
-
-  depends_on = [
-    module.service_principal
-  ]
 }
 
-resource "azurerm_resource_group" "this" {
-  count = local.should_deploy_log_ingestion ? 1 : 0
+module "crowdstrike_resource_group" {
+  count  = local.should_deploy_log_ingestion || local.should_deploy_agentless_scanning ? 1 : 0
+  source = "./modules/resource-group"
 
-  name     = "${var.resource_prefix}rg-cs${local.env}${var.resource_suffix}"
-  location = var.location
-  tags     = var.tags
+  location        = var.location
+  resource_prefix = var.resource_prefix
+  resource_suffix = var.resource_suffix
+  env             = var.env
+  tags            = var.tags
 }
 
 module "deployment_scope" {
@@ -80,7 +83,7 @@ module "log_ingestion" {
   subscription_ids         = module.deployment_scope.all_active_subscription_ids
   app_service_principal_id = module.service_principal.object_id
   cs_infra_subscription_id = var.cs_infra_subscription_id
-  resource_group_name      = azurerm_resource_group.this[0].name
+  resource_group_name      = module.crowdstrike_resource_group[0].resource_group_name
   activity_log_settings    = var.log_ingestion_settings.activity_log
   entra_id_log_settings    = var.log_ingestion_settings.entra_id_log
   falcon_ip_addresses      = var.falcon_ip_addresses
@@ -90,10 +93,30 @@ module "log_ingestion" {
   resource_suffix          = var.resource_suffix
   tags                     = var.tags
 
-  depends_on = [
-    module.deployment_scope,
-    azurerm_resource_group.this
-  ]
+  depends_on = [module.crowdstrike_resource_group]
+}
+
+module "agentless_scanning" {
+  count  = local.should_deploy_agentless_scanning ? 1 : 0
+  source = "./modules/agentless-scanning"
+
+  deploy_resource_group                               = false
+  agentless_scanning_locations                        = local.agentless_scanning_locations
+  agentless_scanning_principal_id                     = module.service_principal.object_id
+  agentless_scanning_deploy_nat_gateway               = var.agentless_scanning_deploy_nat_gateway
+  agentless_scanning_custom_vnet_configuration        = var.agentless_scanning_custom_vnet_configuration
+  key_vault_allowed_ip_rules                          = var.key_vault_allowed_ip_rules
+  input_enable_dspm                                   = var.enable_dspm
+  input_agentless_scanning_locations_per_subscription = var.agentless_scanning_locations_per_subscription
+  falcon_client_id                                    = var.falcon_client_id
+  falcon_client_secret                                = var.falcon_client_secret
+  resource_group_name                                 = module.crowdstrike_resource_group[0].resource_group_name
+  resource_prefix                                     = var.resource_prefix
+  resource_suffix                                     = var.resource_suffix
+  env                                                 = var.env
+  tags                                                = var.tags
+
+  depends_on = [module.crowdstrike_resource_group]
 }
 
 resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_settings" {

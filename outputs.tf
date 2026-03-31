@@ -42,3 +42,8 @@ output "entra_id_log_eventhub_consumer_group_name" {
   description = "Consumer group name for Microsoft Entra ID (formerly Azure AD) log ingestion via Event Hub"
   value       = local.should_deploy_log_ingestion && var.log_ingestion_settings.entra_id_log.enabled ? module.log_ingestion[0].entra_id_log_eventhub_consumer_group_name : null
 }
+
+output "agentless_scanning_managed_identity_principal_id" {
+  description = "Map of subscription IDs to agentless scanning managed identity IDs"
+  value       = local.should_deploy_agentless_scanning ? module.agentless_scanning[0].scanning_managed_identity_principal_id : null
+}
