@@ -2,7 +2,7 @@ locals {
   environment = var.env == "" ? "" : "-${var.env}"
 
   parameter_definitions = {
-    deploymentVersion                         = "1.1.0+terraform.1"
+    deploymentVersion                         = jsonencode("1.1.0+terraform.1")
     scanningPrincipalId                       = jsonencode(var.agentless_scanning_principal_id)
     falconClientId                            = jsonencode(var.falcon_client_id)
     enableDspm                                = jsonencode(var.enable_dspm)
