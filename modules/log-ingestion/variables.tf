@@ -24,8 +24,8 @@ variable "falcon_ip_addresses" {
   description = "List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations for log ingestion. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589/add-crowdstrike-ip-addresses-to-cloud-provider-allowlists-0 for the IP address list specific to your Falcon cloud region."
 
   validation {
-    condition     = alltrue([for ip in var.falcon_ip_addresses : can(regex("^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])(\\.((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9]))){3}$", ip))])
-    error_message = "All IP addresses must be valid IPv4 address format."
+    condition     = alltrue([for ip in var.falcon_ip_addresses : can(cidrhost("${ip}${strcontains(ip, "/") ? "" : "/32"}", 0))])
+    error_message = "All entries must be valid IPv4 addresses or CIDR blocks (e.g. 1.2.3.4 or 10.0.0.0/8)."
   }
 }
 
