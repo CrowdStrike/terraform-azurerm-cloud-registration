@@ -41,6 +41,7 @@ module "agentless_scanning_roles" {
   agentless_scanning_custom_vnet_configuration = var.agentless_scanning_custom_vnet_configuration
   resource_prefix                              = var.resource_prefix
   resource_suffix                              = var.resource_suffix
+  external_role_definition_ids                 = var.scanning_role_definition_ids
 
   depends_on = [module.crowdstrike_resource_group, module.agentless_scanning_environment]
 }

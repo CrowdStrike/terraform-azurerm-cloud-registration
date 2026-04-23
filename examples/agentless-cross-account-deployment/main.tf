@@ -18,7 +18,7 @@ locals {
 
   # Optional: Custom tags
   tags = {
-    Environment = "Production"
+    method = "cross-sub"
   }
 }
 
@@ -56,6 +56,14 @@ module "crowdstrike_azure_registration" {
   key_vault_allowed_ip_rules            = ["${chomp(data.http.public_ip.response_body)}/32"]
   location                              = var.location
 
+  # Optional: Agentless Scanning Custom Vnet Configuration per location
+  # agentless_scanning_custom_vnet_configuration = {
+  #    "westus": {
+  #      "scanners_subnet_id": "/subscriptions/<subscription_id>/resourceGroups/<resource_group_name>/providers/Microsoft.Network/virtualNetworks/<vnet_name>/subnets/<scanners_subnet>"
+  #      "clones_subnet_id": "/subscriptions/<subscription_id>/resourceGroups/<resource_group_name>/providers/Microsoft.Network/virtualNetworks/<vnet_name>/subnets/<clones_subnet>"
+  #    }
+  #  }
+
   # Optional: Resource naming customization
   resource_prefix = local.resource_prefix
   resource_suffix = local.resource_suffix
@@ -88,9 +96,13 @@ module "agentless_scanning_target_subscription_1" {
   agentless_scanning_principal_id = module.crowdstrike_azure_registration.service_principal_object_id
   agentless_scanning_locations    = local.agentless_scanning_locations
   input_enable_dspm               = local.enable_dspm
-  key_vault_allowed_ip_rules      = ["${chomp(data.http.public_ip.response_body)}/32"]
+  # key_vault_allowed_ip_rules      = ["${chomp(data.http.public_ip.response_body)}/32"]
   falcon_client_id                = var.falcon_client_id
   falcon_client_secret            = var.falcon_client_secret
+
+  # Optional: Use MG-scoped role definitions to reduce the number of custom roles.
+  # Pass the role IDs from the root module output for the management group this target subscription belongs to.
+  # scanning_role_definition_ids = module.crowdstrike_azure_registration.scanning_role_definition_ids_by_mg["<management-group-id>"]
 
   # Optional: Resource naming customization
   resource_prefix = local.resource_prefix

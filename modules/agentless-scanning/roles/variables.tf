@@ -74,3 +74,14 @@ variable "resource_suffix" {
   }
 }
 
+variable "external_role_definition_ids" {
+  description = "External (MG-scoped) role definition resource IDs. When provided, skip creating role definitions and only create assignments."
+  type = object({
+    subscription_access  = string
+    rg_access            = string
+    subscription_scanner = string
+    custom_vnet_subnet   = string
+  })
+  default = null
+}
+

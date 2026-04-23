@@ -7,6 +7,12 @@ locals {
   should_deploy_agentless_scanning = var.enable_dspm
   agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
 
+  # Find which MG contains the cs_infra_subscription_id (host) for MG-scoped scanning roles
+  host_subscription_mg_id = local.should_deploy_agentless_scanning && length(var.management_group_ids) > 0 ? one([
+    for mg_id, sub_ids in module.deployment_scope.active_subscriptions_by_group :
+    mg_id if contains(sub_ids, var.cs_infra_subscription_id)
+  ]) : null
+
   microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : [
     "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All (Role)
     "98830695-27a2-44f7-8c18-0c3ebc9698f6", # GroupMember.Read.All (Role)
@@ -96,6 +102,17 @@ module "log_ingestion" {
   depends_on = [module.crowdstrike_resource_group]
 }
 
+module "agentless_scanning_roles_mg" {
+  for_each = local.should_deploy_agentless_scanning && length(var.management_group_ids) > 0 ? toset(var.management_group_ids) : toset([])
+  source   = "./modules/agentless-scanning/roles-mg"
+
+  management_group_id                   = each.value
+  agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
+  use_custom_subnets                    = length(var.agentless_scanning_custom_vnet_configuration) > 0
+  resource_prefix                       = var.resource_prefix
+  resource_suffix                       = var.resource_suffix
+}
+
 module "agentless_scanning" {
   count  = local.should_deploy_agentless_scanning ? 1 : 0
   source = "./modules/agentless-scanning"
@@ -115,6 +132,7 @@ module "agentless_scanning" {
   resource_suffix                                     = var.resource_suffix
   env                                                 = var.env
   tags                                                = var.tags
+  scanning_role_definition_ids                        = local.host_subscription_mg_id != null ? module.agentless_scanning_roles_mg[local.host_subscription_mg_id].role_definition_ids : null
 
   depends_on = [module.crowdstrike_resource_group]
 }

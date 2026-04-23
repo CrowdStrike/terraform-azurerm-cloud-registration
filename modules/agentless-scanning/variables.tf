@@ -188,3 +188,14 @@ variable "tags" {
     error_message = "The tags map cannot contain more than 45 entries."
   }
 }
+
+variable "scanning_role_definition_ids" {
+  description = "MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs."
+  type = object({
+    subscription_access  = string
+    rg_access            = string
+    subscription_scanner = string
+    custom_vnet_subnet   = string
+  })
+  default = null
+}

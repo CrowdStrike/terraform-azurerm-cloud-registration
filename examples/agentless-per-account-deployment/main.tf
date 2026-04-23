@@ -24,7 +24,7 @@ locals {
 
   # Optional: Custom tags
   tags = {
-    Environment = "Production"
+    method = "per-sub"
   }
 }
 
@@ -95,6 +95,10 @@ module "agentless_scanning_host_subscription_2" {
   input_agentless_scanning_locations_per_subscription = local.agentless_scanning_locations_per_subscription
   falcon_client_id                                    = var.falcon_client_id
   falcon_client_secret                                = var.falcon_client_secret
+
+  # Optional: Use MG-scoped role definitions to reduce the number of custom roles.
+  # Pass the role IDs from the root module output for the management group this subscription belongs to.
+  # scanning_role_definition_ids = module.crowdstrike_azure_registration.scanning_role_definition_ids_by_mg["<management-group-id>"]
 
   # Optional: Resource naming customization
   resource_prefix = local.resource_prefix
