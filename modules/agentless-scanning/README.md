@@ -85,6 +85,7 @@ No resources.
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where CrowdStrike infrastructure resources will be deployed. | `string` | `""` | no |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification. | `string` | `""` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification. | `string` | `""` | no |
+| <a name="input_scanning_role_definition_ids"></a> [scanning\_role\_definition\_ids](#input\_scanning\_role\_definition\_ids) | MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs. | <pre>object({<br/>    subscription_access  = string<br/>    rg_access            = string<br/>    subscription_scanner = string<br/>    custom_vnet_subnet   = string<br/>  })</pre> | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag. | `map(string)` | <pre>{<br/>  "CSTagVendor": "CrowdStrike"<br/>}</pre> | no |
 ## Outputs
 

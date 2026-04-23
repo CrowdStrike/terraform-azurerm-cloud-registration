@@ -97,8 +97,8 @@ module "agentless_scanning_target_subscription_1" {
   agentless_scanning_locations    = local.agentless_scanning_locations
   input_enable_dspm               = local.enable_dspm
   # key_vault_allowed_ip_rules      = ["${chomp(data.http.public_ip.response_body)}/32"]
-  falcon_client_id                = var.falcon_client_id
-  falcon_client_secret            = var.falcon_client_secret
+  falcon_client_id     = var.falcon_client_id
+  falcon_client_secret = var.falcon_client_secret
 
   # Optional: Use MG-scoped role definitions to reduce the number of custom roles.
   # Pass the role IDs from the root module output for the management group this target subscription belongs to.
