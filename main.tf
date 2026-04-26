@@ -7,8 +7,20 @@ locals {
   should_deploy_agentless_scanning = var.enable_dspm
   agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
 
+  # MG scopes for agentless scanning role definitions:
+  # - explicit MGs provided → use them
+  # - no MGs and no sub IDs (whole tenant) → fall back to tenant root MG
+  # - no MGs but sub IDs provided → no MG-scoped roles (per-sub roles used instead)
+  agentless_scanning_mg_scopes = local.should_deploy_agentless_scanning ? (
+    length(var.management_group_ids) > 0
+    ? toset(var.management_group_ids)
+    : length(var.subscription_ids) == 0
+    ? toset([data.azurerm_client_config.current.tenant_id])
+    : toset([])
+  ) : toset([])
+
   # Find which MG contains the cs_infra_subscription_id (host) for MG-scoped scanning roles
-  host_subscription_mg_id = local.should_deploy_agentless_scanning && length(var.management_group_ids) > 0 ? one([
+  host_subscription_mg_id = local.should_deploy_agentless_scanning && length(local.agentless_scanning_mg_scopes) > 0 ? one([
     for mg_id, sub_ids in module.deployment_scope.active_subscriptions_by_group :
     mg_id if contains(sub_ids, var.cs_infra_subscription_id)
   ]) : null
@@ -103,7 +115,7 @@ module "log_ingestion" {
 }
 
 module "agentless_scanning_roles_mg" {
-  for_each = local.should_deploy_agentless_scanning && length(var.management_group_ids) > 0 ? toset(var.management_group_ids) : toset([])
+  for_each = local.agentless_scanning_mg_scopes
   source   = "./modules/agentless-scanning/roles-mg"
 
   management_group_id                   = each.value
