@@ -79,9 +79,23 @@ variable "external_role_definition_ids" {
   type = object({
     subscription_access  = string
     rg_access            = string
+    rg_access_target     = string
     subscription_scanner = string
     custom_vnet_subnet   = string
   })
   default = null
+}
+
+variable "role_actions" {
+  description = "Role action definitions passed from the parent module."
+  type = object({
+    subscription_access_actions       = list(string)
+    host_rg_access_actions            = list(string)
+    target_rg_access_actions          = list(string)
+    conditional_public_ip_actions     = list(string)
+    subscription_scanner_actions      = list(string)
+    subscription_scanner_data_actions = list(string)
+    custom_vnet_subnet_actions        = list(string)
+  })
 }
 

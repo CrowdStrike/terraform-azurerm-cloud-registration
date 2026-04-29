@@ -59,8 +59,11 @@ module "crowdstrike_azure_registration" {
   enable_dspm                                   = local.enable_dspm
   agentless_scanning_locations_per_subscription = local.agentless_scanning_locations_per_subscription
   agentless_scanning_deploy_nat_gateway         = local.agentless_scanning_deploy_nat_gateway
-  key_vault_allowed_ip_rules                    = ["${chomp(data.http.public_ip.response_body)}/32"]
   location                                      = var.location
+
+  # Optional: Restrict Key Vault network access to specific IP addresses or CIDR  blocks.
+  # Note that terraform caller IP range needs to be allowed to manage KeyVault server.
+  # key_vault_allowed_ip_rules            = ["${chomp(data.http.public_ip.response_body)}/32"]
 
   # Optional: Resource naming customization
   resource_prefix = local.resource_prefix

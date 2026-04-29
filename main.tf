@@ -114,17 +114,6 @@ module "log_ingestion" {
   depends_on = [module.crowdstrike_resource_group]
 }
 
-module "agentless_scanning_roles_mg" {
-  for_each = local.agentless_scanning_mg_scopes
-  source   = "./modules/agentless-scanning/roles-mg"
-
-  management_group_id                   = each.value
-  agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
-  use_custom_subnets                    = length(var.agentless_scanning_custom_vnet_configuration) > 0
-  resource_prefix                       = var.resource_prefix
-  resource_suffix                       = var.resource_suffix
-}
-
 module "agentless_scanning" {
   count  = local.should_deploy_agentless_scanning ? 1 : 0
   source = "./modules/agentless-scanning"
@@ -144,7 +133,8 @@ module "agentless_scanning" {
   resource_suffix                                     = var.resource_suffix
   env                                                 = var.env
   tags                                                = var.tags
-  scanning_role_definition_ids                        = local.host_subscription_mg_id != null ? module.agentless_scanning_roles_mg[local.host_subscription_mg_id].role_definition_ids : null
+  management_group_scopes                             = local.agentless_scanning_mg_scopes
+  host_mg_id                                          = local.host_subscription_mg_id != null ? local.host_subscription_mg_id : ""
 
   depends_on = [module.crowdstrike_resource_group]
 }
