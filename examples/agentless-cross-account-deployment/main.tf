@@ -100,8 +100,8 @@ module "agentless_scanning_target_subscription_1" {
   agentless_scanning_principal_id = module.crowdstrike_azure_registration.service_principal_object_id
   agentless_scanning_locations    = local.agentless_scanning_locations
   input_enable_dspm               = local.enable_dspm
-  falcon_client_id     = var.falcon_client_id
-  falcon_client_secret = var.falcon_client_secret
+  falcon_client_id                = var.falcon_client_id
+  falcon_client_secret            = var.falcon_client_secret
 
   # Optional: Restrict Key Vault network access to specific IP addresses or CIDR  blocks.
   # Note that terraform caller IP range needs to be allowed to manage KeyVault server.
