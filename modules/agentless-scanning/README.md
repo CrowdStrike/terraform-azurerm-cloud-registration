@@ -62,17 +62,17 @@ module "crowdstrike_agentless_scanning" {
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.42.0 |
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_agentless_scanner_identity_principal_id"></a> [agentless\_scanner\_identity\_principal\_id](#input\_agentless\_scanner\_identity\_principal\_id) | Optional Azure agentless scanning host scanner managed identity ID. Required when 'scanning\_host\_subscription\_id' is set. | `string` | `""` | no |
 | <a name="input_agentless_scanning_custom_vnet_configuration"></a> [agentless\_scanning\_custom\_vnet\_configuration](#input\_agentless\_scanning\_custom\_vnet\_configuration) | Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners\_subnet\_id and clones\_subnet\_id. | <pre>map(object({<br/>    scanners_subnet_id = string<br/>    clones_subnet_id   = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_agentless_scanning_deploy_nat_gateway"></a> [agentless\_scanning\_deploy\_nat\_gateway](#input\_agentless\_scanning\_deploy\_nat\_gateway) | Indicates Agentless Scanning environment will be deployed with NAT Gateway. | `bool` | `true` | no |
@@ -96,7 +96,7 @@ module "crowdstrike_agentless_scanning" {
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_scanning_managed_identity_principal_id"></a> [scanning\_managed\_identity\_principal\_id](#output\_scanning\_managed\_identity\_principal\_id) | Scanning managed identity principal IDs |
 | <a name="output_scanning_role_definition_ids_by_mg"></a> [scanning\_role\_definition\_ids\_by\_mg](#output\_scanning\_role\_definition\_ids\_by\_mg) | Map of management group ID to MG-scoped scanning role definition resource IDs. |
 <!-- END_TF_DOCS -->

@@ -38,24 +38,24 @@ module "deployment_scope" {
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [azurerm_management_group.groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/management_group) | data source |
 | [azurerm_subscription.subscriptions_mg](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_management_group_ids"></a> [management\_group\_ids](#input\_management\_group\_ids) | List of management group IDs to monitor | `list(string)` | `[]` | no |
 | <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of subscription IDs to monitor | `list(string)` | `[]` | no |
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_active_subscriptions_by_group"></a> [active\_subscriptions\_by\_group](#output\_active\_subscriptions\_by\_group) | Map of management group ID to its enabled subscription IDs |
 | <a name="output_all_active_subscription_ids"></a> [all\_active\_subscription\_ids](#output\_all\_active\_subscription\_ids) | List of total active subscription IDs in the specified individual subscriptions and management groups |
 <!-- END_TF_DOCS -->
