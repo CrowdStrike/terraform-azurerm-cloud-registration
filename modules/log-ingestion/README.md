@@ -136,13 +136,13 @@ module "log_ingestion" {
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.13.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | >= 3.1.0 |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [azurerm_eventhub.activity_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub) | resource |
 | [azurerm_eventhub.entra_id_log](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub) | resource |
 | [azurerm_eventhub_namespace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub_namespace) | resource |
@@ -157,7 +157,7 @@ module "log_ingestion" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Configuration settings for Azure Activity Log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = optional(object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string, "")<br/>      eventhub_consumer_group_name = optional(string, "")<br/>    }), { use = false })<br/>  })</pre> | <pre>{<br/>  "enabled": true<br/>}</pre> | no |
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of CrowdStrike app to which all the roles will be assigned for log ingestion | `string` | n/a | yes |
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. | `string` | n/a | yes |
@@ -173,7 +173,7 @@ module "log_ingestion" {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_activity_log_eventhub_consumer_group_name"></a> [activity\_log\_eventhub\_consumer\_group\_name](#output\_activity\_log\_eventhub\_consumer\_group\_name) | Consumer group name in the EventHub instance dedicated for Activity Log ingestion |
 | <a name="output_activity_log_eventhub_id"></a> [activity\_log\_eventhub\_id](#output\_activity\_log\_eventhub\_id) | Resource ID of the Azure EventHub instance configured for Activity Log ingestion |
 | <a name="output_entra_id_log_eventhub_consumer_group_name"></a> [entra\_id\_log\_eventhub\_consumer\_group\_name](#output\_entra\_id\_log\_eventhub\_consumer\_group\_name) | Consumer group name in the EventHub instance dedicated for Microsoft Entra ID log ingestion |

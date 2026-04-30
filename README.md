@@ -164,20 +164,20 @@ module "crowdstrike_azure_registration" {
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
 | <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.66 |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
 | [crowdstrike_cloud_azure_tenant_eventhub_settings.update_event_hub_settings](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant_eventhub_settings) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_account_type"></a> [account\_type](#input\_account\_type) | Account type can be either 'commercial' or 'gov' | `string` | `"commercial"` | no |
 | <a name="input_agentless_scanning_custom_vnet_configuration"></a> [agentless\_scanning\_custom\_vnet\_configuration](#input\_agentless\_scanning\_custom\_vnet\_configuration) | Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners\_subnet\_id and clones\_subnet\_id. | <pre>map(object({<br/>    scanners_subnet_id = string<br/>    clones_subnet_id   = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_agentless_scanning_deploy_nat_gateway"></a> [agentless\_scanning\_deploy\_nat\_gateway](#input\_agentless\_scanning\_deploy\_nat\_gateway) | Indicates Agentless Scanning environment will be deployed with NAT Gateway. | `bool` | `true` | no |
@@ -202,7 +202,7 @@ module "crowdstrike_azure_registration" {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_active_subscriptions_in_groups"></a> [active\_subscriptions\_in\_groups](#output\_active\_subscriptions\_in\_groups) | Map of Azure management group scopes to active Azure subscriptions discovered within those groups |
 | <a name="output_activity_log_eventhub_consumer_group_name"></a> [activity\_log\_eventhub\_consumer\_group\_name](#output\_activity\_log\_eventhub\_consumer\_group\_name) | Consumer group name for Azure Activity Log ingestion via Event Hub |
 | <a name="output_activity_log_eventhub_id"></a> [activity\_log\_eventhub\_id](#output\_activity\_log\_eventhub\_id) | Resource ID of the Event Hub used for Azure Activity Log ingestion |
