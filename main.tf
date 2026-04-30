@@ -11,13 +11,7 @@ locals {
   # - explicit MGs provided → use them
   # - no MGs and no sub IDs (whole tenant) → fall back to tenant root MG
   # - no MGs but sub IDs provided → no MG-scoped roles (per-sub roles used instead)
-  agentless_scanning_mg_scopes = local.should_deploy_agentless_scanning ? (
-    length(var.management_group_ids) > 0
-    ? toset(var.management_group_ids)
-    : length(var.subscription_ids) == 0
-    ? toset([data.azurerm_client_config.current.tenant_id])
-    : toset([])
-  ) : toset([])
+  agentless_scanning_mg_scopes = local.should_deploy_agentless_scanning ? local.management_groups : toset([])
 
   # Find which MG contains the cs_infra_subscription_id (host) for MG-scoped scanning roles
   host_subscription_mg_id = local.should_deploy_agentless_scanning && length(local.agentless_scanning_mg_scopes) > 0 ? one([
