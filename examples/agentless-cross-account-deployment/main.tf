@@ -35,9 +35,10 @@ provider "crowdstrike" {
   client_secret = var.falcon_client_secret
 }
 
-data "http" "public_ip" {
-  url = "https://ipv4.icanhazip.com"
-}
+# Optional: for key_vault_allowed_ip_rules
+# data "http" "public_ip" {
+#   url = "https://ipv4.icanhazip.com"
+# }
 
 module "crowdstrike_azure_registration" {
   source  = "CrowdStrike/cloud-registration/azurerm"
@@ -99,9 +100,12 @@ module "agentless_scanning_target_subscription_1" {
   agentless_scanning_principal_id = module.crowdstrike_azure_registration.service_principal_object_id
   agentless_scanning_locations    = local.agentless_scanning_locations
   input_enable_dspm               = local.enable_dspm
-  # key_vault_allowed_ip_rules      = ["${chomp(data.http.public_ip.response_body)}/32"]
   falcon_client_id     = var.falcon_client_id
   falcon_client_secret = var.falcon_client_secret
+
+  # Optional: Restrict Key Vault network access to specific IP addresses or CIDR  blocks.
+  # Note that terraform caller IP range needs to be allowed to manage KeyVault server.
+  # key_vault_allowed_ip_rules            = ["${chomp(data.http.public_ip.response_body)}/32"]
 
   # Optional: Use MG-scoped role definitions to reduce the number of custom roles.
   # Pass the role IDs from the root module output for the management group this target subscription belongs to.
