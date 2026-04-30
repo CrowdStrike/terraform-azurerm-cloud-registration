@@ -1,23 +1,34 @@
-variable "management_group_id" {
+variable "scope_type" {
+  description = "Where to create role definitions: 'mg' or 'subscription'."
   type        = string
-  description = "Management group ID for MG-scoped role definitions."
 
   validation {
-    condition     = can(regex("^[a-zA-Z0-9-_]{1,90}$", var.management_group_id))
-    error_message = "'management_group_id' must be 1-90 characters consisting of alphanumeric characters, hyphens, and underscores."
+    condition     = contains(["mg", "subscription"], var.scope_type)
+    error_message = "scope_type must be 'mg' or 'subscription'."
   }
 }
 
+variable "scope_id" {
+  description = "The management group ID or subscription ID to scope definitions to."
+  type        = string
+}
+
 variable "agentless_scanning_deploy_nat_gateway" {
-  description = "Specifies if NAT gateway should be deployed. When false, public IP permissions are included."
+  description = "Whether NAT gateway is deployed (affects rg_access permissions)."
   type        = bool
   default     = true
 }
 
 variable "use_custom_subnets" {
-  description = "Whether custom VNet subnets are used. When true, creates the custom VNet subnet access role."
+  description = "Whether to create the custom VNet subnet role definition."
   type        = bool
   default     = false
+}
+
+variable "is_host" {
+  description = "Whether this is the host subscription (determines rg_access permissions). Only relevant for subscription scope."
+  type        = bool
+  default     = true
 }
 
 variable "resource_prefix" {

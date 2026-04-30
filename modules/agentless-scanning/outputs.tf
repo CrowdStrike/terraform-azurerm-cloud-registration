@@ -6,6 +6,6 @@ output "scanning_managed_identity_principal_id" {
 output "scanning_role_definition_ids_by_mg" {
   description = "Map of management group ID to MG-scoped scanning role definition resource IDs."
   value = {
-    for mg_id, mod in module.agentless_scanning_roles_mg : mg_id => mod.role_definition_ids
+    for mg_id, mod in module.agentless_scanning_role_definitions_mg : mg_id => mod.role_definition_ids
   }
 }
