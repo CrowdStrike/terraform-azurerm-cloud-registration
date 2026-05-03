@@ -82,6 +82,7 @@ module "agentless_scanning_role_definitions_mg" {
 
   scope_type                            = "mg"
   scope_id                              = each.value
+  is_host                               = each.key == var.host_mg_id
   agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
   use_custom_subnets                    = length(var.agentless_scanning_custom_vnet_configuration) > 0
   resource_prefix                       = var.resource_prefix
