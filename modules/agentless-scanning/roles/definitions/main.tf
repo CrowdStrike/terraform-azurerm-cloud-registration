@@ -1,10 +1,10 @@
 locals {
   scope = var.scope_type == "mg" ? "/providers/Microsoft.Management/managementGroups/${var.scope_id}" : "/subscriptions/${var.scope_id}"
 
-  rg_access_actions = var.is_host ? concat(
+  rg_access_actions = concat(
     var.role_actions.host_rg_access_actions,
     !var.agentless_scanning_deploy_nat_gateway ? var.role_actions.conditional_public_ip_actions : []
-  ) : var.role_actions.target_rg_access_actions
+  )
 }
 
 resource "azurerm_role_definition" "subscription_access" {
@@ -21,6 +21,8 @@ resource "azurerm_role_definition" "subscription_access" {
 }
 
 resource "azurerm_role_definition" "rg_access" {
+  count = var.is_host ? 1 : 0
+
   name        = "${var.resource_prefix}role-csscanning-rgaccess-${var.scope_id}${var.resource_suffix}"
   scope       = local.scope
   description = "CrowdStrike Scanning Resource Group Access Role"
@@ -34,7 +36,7 @@ resource "azurerm_role_definition" "rg_access" {
 }
 
 resource "azurerm_role_definition" "rg_access_target" {
-  count = var.scope_type == "mg" && var.is_host ? 1 : 0
+  count = !var.is_host || var.scope_type == "mg" ? 1 : 0
 
   name        = "${var.resource_prefix}role-csscanning-rgaccess-target-${var.scope_id}${var.resource_suffix}"
   scope       = local.scope
