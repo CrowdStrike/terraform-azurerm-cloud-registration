@@ -128,7 +128,7 @@ module "agentless_scanning" {
   env                                                 = var.env
   tags                                                = var.tags
   management_group_scopes                             = local.agentless_scanning_mg_scopes
-  host_mg_id                                          = local.host_subscription_mg_id != null ? local.host_subscription_mg_id : ""
+  host_mg_id                                          = local.host_subscription_mg_id
 
   depends_on = [module.crowdstrike_resource_group]
 }

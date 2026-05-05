@@ -210,5 +210,5 @@ variable "management_group_scopes" {
 variable "host_mg_id" {
   description = "Management group ID that the host subscription belongs to. Used to automatically wire MG-scoped role definitions for the host subscription."
   type        = string
-  default     = ""
+  default     = null
 }

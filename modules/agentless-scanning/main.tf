@@ -2,7 +2,7 @@ locals {
   should_deploy_scanning_environment = var.agentless_scanning_host_subscription_id == ""
 
   # For the host: use internal MG roles if host is in an MG, otherwise use external scanning_role_definition_ids
-  effective_role_definition_ids = var.host_mg_id != "" ? module.agentless_scanning_role_definitions_mg[var.host_mg_id].role_definition_ids : var.scanning_role_definition_ids
+  effective_role_definition_ids = var.host_mg_id != null ? module.agentless_scanning_role_definitions_mg[var.host_mg_id].role_definition_ids : var.scanning_role_definition_ids
 
   # Custom subnet handling
   use_custom_subnets = length(var.agentless_scanning_custom_vnet_configuration) > 0 && var.agentless_scanning_host_subscription_id == ""
