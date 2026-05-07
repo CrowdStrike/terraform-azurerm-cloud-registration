@@ -21,7 +21,7 @@ resource "azurerm_role_definition" "subscription_access" {
 }
 
 resource "azurerm_role_definition" "rg_access" {
-  count = var.is_host ? 1 : 0
+  count = var.is_host || var.scope_type == "mg" ? 1 : 0
 
   name        = "${var.resource_prefix}role-csscanning-rgaccess-${var.scope_id}${var.resource_suffix}"
   scope       = local.scope
