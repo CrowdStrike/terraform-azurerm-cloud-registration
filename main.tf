@@ -7,6 +7,18 @@ locals {
   should_deploy_agentless_scanning = var.enable_dspm
   agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
 
+  # MG scopes for agentless scanning role definitions:
+  # - explicit MGs provided → use them
+  # - no MGs and no sub IDs (whole tenant) → fall back to tenant root MG
+  # - no MGs but sub IDs provided → no MG-scoped roles (per-sub roles used instead)
+  agentless_scanning_mg_scopes = local.should_deploy_agentless_scanning ? local.management_groups : toset([])
+
+  # Find which MG contains the cs_infra_subscription_id (host) for MG-scoped scanning roles
+  host_subscription_mg_id = local.should_deploy_agentless_scanning && length(local.agentless_scanning_mg_scopes) > 0 ? one([
+    for mg_id, sub_ids in module.deployment_scope.active_subscriptions_by_group :
+    mg_id if contains(sub_ids, var.cs_infra_subscription_id)
+  ]) : null
+
   microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : [
     "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All (Role)
     "98830695-27a2-44f7-8c18-0c3ebc9698f6", # GroupMember.Read.All (Role)
@@ -115,6 +127,8 @@ module "agentless_scanning" {
   resource_suffix                                     = var.resource_suffix
   env                                                 = var.env
   tags                                                = var.tags
+  management_group_scopes                             = local.agentless_scanning_mg_scopes
+  host_mg_id                                          = local.host_subscription_mg_id
 
   depends_on = [module.crowdstrike_resource_group]
 }

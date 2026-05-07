@@ -47,3 +47,8 @@ output "agentless_scanning_managed_identity_principal_id" {
   description = "Map of subscription IDs to agentless scanning managed identity IDs"
   value       = local.should_deploy_agentless_scanning ? module.agentless_scanning[0].scanning_managed_identity_principal_id : null
 }
+
+output "scanning_role_definition_ids_by_mg" {
+  description = "Map of management group ID to MG-scoped scanning role definition resource IDs. Pass to target agentless-scanning modules via scanning_role_definition_ids to avoid creating per-subscription role definitions."
+  value       = local.should_deploy_agentless_scanning ? module.agentless_scanning[0].scanning_role_definition_ids_by_mg : {}
+}

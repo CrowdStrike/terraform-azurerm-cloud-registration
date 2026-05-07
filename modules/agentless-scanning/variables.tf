@@ -188,3 +188,27 @@ variable "tags" {
     error_message = "The tags map cannot contain more than 45 entries."
   }
 }
+
+variable "scanning_role_definition_ids" {
+  description = "MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs."
+  type = object({
+    subscription_access  = string
+    rg_access            = string
+    rg_access_target     = string
+    subscription_scanner = string
+    custom_vnet_subnet   = string
+  })
+  default = null
+}
+
+variable "management_group_scopes" {
+  description = "Set of management group IDs to create MG-scoped role definitions for. When non-empty, role definitions are created at MG scope instead of per-subscription."
+  type        = set(string)
+  default     = []
+}
+
+variable "host_mg_id" {
+  description = "Management group ID that the host subscription belongs to. Used to automatically wire MG-scoped role definitions for the host subscription."
+  type        = string
+  default     = null
+}
