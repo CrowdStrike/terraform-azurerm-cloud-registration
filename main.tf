@@ -50,6 +50,7 @@ resource "crowdstrike_cloud_azure_tenant" "this" {
   management_group_ids     = var.management_group_ids
   subscription_ids         = var.subscription_ids
   tags                     = var.tags
+  agentless_scanning_subscription_ids = length(var.agentless_scanning_locations_per_subscription) > 0 ? toset(keys(var.agentless_scanning_locations_per_subscription)) : null
 }
 
 module "service_principal" {
