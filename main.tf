@@ -42,14 +42,14 @@ resource "crowdstrike_cloud_azure_tenant" "this" {
   dspm = {
     enabled = var.enable_dspm
   }
-  cs_infra_subscription_id = var.cs_infra_subscription_id
-  cs_infra_location        = var.location
-  resource_name_prefix     = var.resource_prefix
-  resource_name_suffix     = var.resource_suffix
-  environment              = var.env
-  management_group_ids     = var.management_group_ids
-  subscription_ids         = var.subscription_ids
-  tags                     = var.tags
+  cs_infra_subscription_id            = var.cs_infra_subscription_id
+  cs_infra_location                   = var.location
+  resource_name_prefix                = var.resource_prefix
+  resource_name_suffix                = var.resource_suffix
+  environment                         = var.env
+  management_group_ids                = var.management_group_ids
+  subscription_ids                    = var.subscription_ids
+  tags                                = var.tags
   agentless_scanning_subscription_ids = length(var.agentless_scanning_locations_per_subscription) > 0 ? toset(keys(var.agentless_scanning_locations_per_subscription)) : null
 }
 
