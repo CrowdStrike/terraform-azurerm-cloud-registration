@@ -96,6 +96,9 @@ module "crowdstrike_azure_registration" {
   # Azure subscription that will host CrowdStrike infrastructure. Required when `enable_realtime_visibility` is set to `true`.
   cs_infra_subscription_id = "00000000-0000-0000-0000-000000000000"
 
+  # Optional: Use existing service principal (if Identity Team already created one)
+  # service_principal_object_id = "existing-sp-object-id"
+
   # Optional: CrowdStrike API credential. Required when `enable_dspm` is set to `true`.
   falcon_client_id     = "<Falcon API client ID>"
   falcon_client_secret = "<Falcon API client secret>"
