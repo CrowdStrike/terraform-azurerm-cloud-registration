@@ -15,11 +15,13 @@ locals {
 
   # Single source of truth for all role action definitions
   role_actions = {
-    subscription_access_actions = [
-      "Microsoft.Storage/storageAccounts/read",
-      "Microsoft.Storage/storageAccounts/PrivateEndpointConnectionsApproval/action",
+    base_subscription_access_actions = [
       "Microsoft.Authorization/roleAssignments/read",
       "Microsoft.Authorization/policyDefinitions/read",
+    ]
+    dspm_subscription_access_actions = [
+      "Microsoft.Storage/storageAccounts/read",
+      "Microsoft.Storage/storageAccounts/PrivateEndpointConnectionsApproval/action",
     ]
     vulnerability_scanning_subscription_actions = [
       "Microsoft.Compute/disks/beginGetAccess/action",
@@ -101,6 +103,7 @@ module "agentless_scanning_role_definitions_mg" {
   scope_id                              = each.value
   is_host                               = each.key == var.host_mg_id
   agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
+  input_enable_dspm                     = var.input_enable_dspm
   input_enable_vulnerability_scanning   = var.input_enable_vulnerability_scanning
   use_custom_subnets                    = length(var.agentless_scanning_custom_vnet_configuration) > 0
   resource_prefix                       = var.resource_prefix
@@ -116,6 +119,7 @@ module "agentless_scanning_role_definitions_sub" {
   scope_type                            = "subscription"
   scope_id                              = data.azurerm_client_config.current.subscription_id
   agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
+  input_enable_dspm                     = var.input_enable_dspm
   input_enable_vulnerability_scanning   = var.input_enable_vulnerability_scanning
   use_custom_subnets                    = local.use_custom_subnets
   is_host                               = local.should_deploy_scanning_environment
@@ -133,6 +137,7 @@ module "agentless_scanning_role_assignments" {
   agentless_scanner_identity_principal_id = local.should_deploy_scanning_environment ? module.agentless_scanning_environment[0].scanner_identity_principal_id : var.agentless_scanner_identity_principal_id
   resource_group_name                     = var.deploy_resource_group ? module.crowdstrike_resource_group[0].resource_group_name : var.resource_group_name
   is_host                                 = local.should_deploy_scanning_environment
+  input_enable_dspm                       = var.input_enable_dspm
   input_enable_vulnerability_scanning     = var.input_enable_vulnerability_scanning
   custom_subnet_ids                       = local.custom_subnet_ids
 

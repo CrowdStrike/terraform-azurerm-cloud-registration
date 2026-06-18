@@ -25,6 +25,12 @@ variable "input_enable_vulnerability_scanning" {
   default     = false
 }
 
+variable "input_enable_dspm" {
+  description = "Whether DSPM is enabled (affects subscription_access and subscription_scanner role creation)."
+  type        = bool
+  default     = true
+}
+
 variable "use_custom_subnets" {
   description = "Whether to create the custom VNet subnet role definition."
   type        = bool
@@ -66,7 +72,8 @@ variable "resource_suffix" {
 variable "role_actions" {
   description = "Role action definitions passed from the parent module."
   type = object({
-    subscription_access_actions                 = list(string)
+    base_subscription_access_actions            = list(string)
+    dspm_subscription_access_actions            = list(string)
     vulnerability_scanning_subscription_actions = list(string)
     host_rg_access_actions                      = list(string)
     vulnerability_scanning_rg_actions           = list(string)

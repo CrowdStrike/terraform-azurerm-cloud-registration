@@ -52,6 +52,12 @@ variable "input_enable_vulnerability_scanning" {
   default     = false
 }
 
+variable "input_enable_dspm" {
+  description = "Whether DSPM is enabled (controls subscription_scanner and rg_scanner assignments)."
+  type        = bool
+  default     = true
+}
+
 variable "custom_subnet_ids" {
   description = "Set of custom subnet IDs for VNet subnet role assignments."
   type        = set(string)

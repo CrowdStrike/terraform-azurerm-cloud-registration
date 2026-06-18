@@ -2,7 +2,8 @@ locals {
   scope = var.scope_type == "mg" ? "/providers/Microsoft.Management/managementGroups/${var.scope_id}" : "/subscriptions/${var.scope_id}"
 
   subscription_access_actions = concat(
-    var.role_actions.subscription_access_actions,
+    var.role_actions.base_subscription_access_actions,
+    var.input_enable_dspm ? var.role_actions.dspm_subscription_access_actions : [],
     var.input_enable_vulnerability_scanning ? var.role_actions.vulnerability_scanning_subscription_actions : []
   )
 
@@ -57,6 +58,8 @@ resource "azurerm_role_definition" "rg_access_target" {
 }
 
 resource "azurerm_role_definition" "subscription_scanner" {
+  count = var.input_enable_dspm ? 1 : 0
+
   name        = "${var.resource_prefix}role-csscanning-scanner-${var.scope_id}${var.resource_suffix}"
   scope       = local.scope
   description = "CrowdStrike Agentless Scanning Subscription Scanner Role"

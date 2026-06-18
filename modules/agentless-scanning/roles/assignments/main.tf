@@ -19,6 +19,8 @@ resource "azurerm_role_assignment" "rg_access" {
 }
 
 resource "azurerm_role_assignment" "subscription_scanner" {
+  count = var.input_enable_dspm ? 1 : 0
+
   scope              = "/subscriptions/${local.subscription_id}"
   role_definition_id = var.role_definition_ids.subscription_scanner
   principal_id       = var.agentless_scanner_identity_principal_id
@@ -26,6 +28,8 @@ resource "azurerm_role_assignment" "subscription_scanner" {
 }
 
 resource "azurerm_role_assignment" "rg_scanner" {
+  count = var.input_enable_dspm ? 1 : 0
+
   scope                = "/subscriptions/${local.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_name = "Reader"
   principal_id         = var.agentless_scanner_identity_principal_id
