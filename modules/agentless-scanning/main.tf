@@ -21,6 +21,13 @@ locals {
       "Microsoft.Authorization/roleAssignments/read",
       "Microsoft.Authorization/policyDefinitions/read",
     ]
+    vulnerability_scanning_subscription_actions = [
+      "Microsoft.Compute/disks/beginGetAccess/action",
+      "Microsoft.Compute/disks/read",
+      "Microsoft.Compute/virtualMachines/read",
+      "Microsoft.Compute/virtualMachineScaleSets/read",
+      "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/read",
+    ]
     host_rg_access_actions = [
       # Blob Storage
       "Microsoft.Network/privateEndpoints/read",
@@ -55,6 +62,13 @@ locals {
       "Microsoft.KeyVault/vaults/read",
       "Microsoft.Compute/virtualMachines/retrieveBootDiagnosticsData/action",
     ]
+    vulnerability_scanning_rg_actions = [
+      "Microsoft.Compute/snapshots/read",
+      "Microsoft.Compute/snapshots/write",
+      "Microsoft.Compute/snapshots/delete",
+      "Microsoft.Compute/disks/write",
+      "Microsoft.Compute/disks/delete",
+    ]
     target_rg_access_actions = []
     conditional_public_ip_actions = [
       "Microsoft.Network/publicIPAddresses/read",
@@ -72,6 +86,9 @@ locals {
       "Microsoft.Network/virtualNetworks/read",
       "Microsoft.Network/virtualNetworks/subnets/read",
     ]
+    rg_scanner_actions = [
+      "Microsoft.Compute/virtualMachines/attachDetachDataDisks/action",
+    ]
   }
 }
 
@@ -84,6 +101,7 @@ module "agentless_scanning_role_definitions_mg" {
   scope_id                              = each.value
   is_host                               = each.key == var.host_mg_id
   agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
+  input_enable_vulnerability_scanning   = var.input_enable_vulnerability_scanning
   use_custom_subnets                    = length(var.agentless_scanning_custom_vnet_configuration) > 0
   resource_prefix                       = var.resource_prefix
   resource_suffix                       = var.resource_suffix
@@ -98,6 +116,7 @@ module "agentless_scanning_role_definitions_sub" {
   scope_type                            = "subscription"
   scope_id                              = data.azurerm_client_config.current.subscription_id
   agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
+  input_enable_vulnerability_scanning   = var.input_enable_vulnerability_scanning
   use_custom_subnets                    = local.use_custom_subnets
   is_host                               = local.should_deploy_scanning_environment
   resource_prefix                       = var.resource_prefix
@@ -114,6 +133,7 @@ module "agentless_scanning_role_assignments" {
   agentless_scanner_identity_principal_id = local.should_deploy_scanning_environment ? module.agentless_scanning_environment[0].scanner_identity_principal_id : var.agentless_scanner_identity_principal_id
   resource_group_name                     = var.deploy_resource_group ? module.crowdstrike_resource_group[0].resource_group_name : var.resource_group_name
   is_host                                 = local.should_deploy_scanning_environment
+  input_enable_vulnerability_scanning     = var.input_enable_vulnerability_scanning
   custom_subnet_ids                       = local.custom_subnet_ids
 
   depends_on = [module.crowdstrike_resource_group, module.agentless_scanning_environment]
@@ -154,6 +174,7 @@ module "agentless_scanning_parameters" {
 
   falcon_client_id                              = var.falcon_client_id
   enable_dspm                                   = var.input_enable_dspm
+  enable_vulnerability_scanning                 = var.input_enable_vulnerability_scanning
   agentless_scanning_locations                  = var.agentless_scanning_locations
   agentless_scanning_locations_per_subscription = var.input_agentless_scanning_locations_per_subscription
   agentless_scanning_principal_id               = var.agentless_scanning_principal_id

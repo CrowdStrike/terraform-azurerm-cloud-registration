@@ -100,6 +100,12 @@ variable "input_enable_dspm" {
   default     = true
 }
 
+variable "input_enable_vulnerability_scanning" {
+  description = "Controls whether to enable Vulnerability Scanning. Affects role permissions and scanning parameters policy."
+  type        = bool
+  default     = false
+}
+
 variable "key_vault_allowed_ip_rules" {
   description = "Allowed IP rules (IPs or CIDR blocks) for restricting Key Vault access. If empty all network access will be allowed."
   type        = list(string)
@@ -197,6 +203,7 @@ variable "scanning_role_definition_ids" {
     rg_access_target     = string
     subscription_scanner = string
     custom_vnet_subnet   = string
+    rg_scanner           = string
   })
   default = null
 }

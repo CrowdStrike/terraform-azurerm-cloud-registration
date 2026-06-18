@@ -19,6 +19,11 @@ variable "enable_dspm" {
   type        = bool
 }
 
+variable "enable_vulnerability_scanning" {
+  description = "Controls whether to enable Vulnerability Scanning."
+  type        = bool
+}
+
 variable "agentless_scanning_locations" {
   type        = list(string)
   description = "List of Azure locations (regions) where scanning environment will be deployed."

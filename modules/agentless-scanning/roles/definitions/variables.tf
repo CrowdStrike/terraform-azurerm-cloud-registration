@@ -19,6 +19,12 @@ variable "agentless_scanning_deploy_nat_gateway" {
   default     = true
 }
 
+variable "input_enable_vulnerability_scanning" {
+  description = "Whether vulnerability scanning is enabled (affects subscription_access and rg_access permissions)."
+  type        = bool
+  default     = false
+}
+
 variable "use_custom_subnets" {
   description = "Whether to create the custom VNet subnet role definition."
   type        = bool
@@ -60,12 +66,15 @@ variable "resource_suffix" {
 variable "role_actions" {
   description = "Role action definitions passed from the parent module."
   type = object({
-    subscription_access_actions       = list(string)
-    host_rg_access_actions            = list(string)
-    target_rg_access_actions          = list(string)
-    conditional_public_ip_actions     = list(string)
-    subscription_scanner_actions      = list(string)
-    subscription_scanner_data_actions = list(string)
-    custom_vnet_subnet_actions        = list(string)
+    subscription_access_actions                 = list(string)
+    vulnerability_scanning_subscription_actions = list(string)
+    host_rg_access_actions                      = list(string)
+    vulnerability_scanning_rg_actions           = list(string)
+    target_rg_access_actions                    = list(string)
+    conditional_public_ip_actions               = list(string)
+    subscription_scanner_actions                = list(string)
+    subscription_scanner_data_actions           = list(string)
+    custom_vnet_subnet_actions                  = list(string)
+    rg_scanner_actions                          = list(string)
   })
 }
