@@ -197,6 +197,7 @@ module "crowdstrike_azure_registration" {
 | <a name="input_microsoft_graph_permission_ids"></a> [microsoft\_graph\_permission\_ids](#input\_microsoft\_graph\_permission\_ids) | Optional list of Microsoft Graph permission IDs to assign to the service principal. If provided, these will replace the default permissions. | `list(string)` | `null` | no |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification. | `string` | `""` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification. | `string` | `""` | no |
+| <a name="input_service_principal_object_id"></a> [service\_principal\_object\_id](#input\_service\_principal\_object\_id) | Optional object ID of an existing service principal. If provided, a new service principal will not be created and this existing one will be used instead. | `string` | `""` | no |
 | <a name="input_subscription_ids"></a> [subscription\_ids](#input\_subscription\_ids) | List of specific Azure subscription IDs to monitor with CrowdStrike Falcon Cloud Security. Use this for targeted monitoring of individual subscriptions. | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag. | `map(string)` | <pre>{<br/>  "CSTagVendor": "CrowdStrike"<br/>}</pre> | no |
 ## Outputs
