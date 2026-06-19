@@ -62,17 +62,17 @@ module "crowdstrike_agentless_scanning" {
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.42.0 |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_agentless_scanner_identity_principal_id"></a> [agentless\_scanner\_identity\_principal\_id](#input\_agentless\_scanner\_identity\_principal\_id) | Optional Azure agentless scanning host scanner managed identity ID. Required when 'scanning\_host\_subscription\_id' is set. | `string` | `""` | no |
 | <a name="input_agentless_scanning_custom_vnet_configuration"></a> [agentless\_scanning\_custom\_vnet\_configuration](#input\_agentless\_scanning\_custom\_vnet\_configuration) | Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners\_subnet\_id and clones\_subnet\_id. | <pre>map(object({<br/>    scanners_subnet_id = string<br/>    clones_subnet_id   = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_agentless_scanning_deploy_nat_gateway"></a> [agentless\_scanning\_deploy\_nat\_gateway](#input\_agentless\_scanning\_deploy\_nat\_gateway) | Indicates Agentless Scanning environment will be deployed with NAT Gateway. | `bool` | `true` | no |
@@ -86,17 +86,18 @@ module "crowdstrike_agentless_scanning" {
 | <a name="input_host_mg_id"></a> [host\_mg\_id](#input\_host\_mg\_id) | Management group ID that the host subscription belongs to. Used to automatically wire MG-scoped role definitions for the host subscription. | `string` | `null` | no |
 | <a name="input_input_agentless_scanning_locations_per_subscription"></a> [input\_agentless\_scanning\_locations\_per\_subscription](#input\_input\_agentless\_scanning\_locations\_per\_subscription) | Map of Azure subscription IDs to lists of locations (regions) where agentless scanning will be deployed per subscription. | `map(list(string))` | `{}` | no |
 | <a name="input_input_enable_dspm"></a> [input\_enable\_dspm](#input\_input\_enable\_dspm) | Controls whether to enable DSPM (Data Security Posture Management). Stored in scanning parameters policy. | `bool` | `true` | no |
+| <a name="input_input_enable_vulnerability_scanning"></a> [input\_enable\_vulnerability\_scanning](#input\_input\_enable\_vulnerability\_scanning) | Controls whether to enable Vulnerability Scanning. Affects role permissions and scanning parameters policy. | `bool` | `false` | no |
 | <a name="input_key_vault_allowed_ip_rules"></a> [key\_vault\_allowed\_ip\_rules](#input\_key\_vault\_allowed\_ip\_rules) | Allowed IP rules (IPs or CIDR blocks) for restricting Key Vault access. If empty all network access will be allowed. | `list(string)` | `[]` | no |
 | <a name="input_management_group_scopes"></a> [management\_group\_scopes](#input\_management\_group\_scopes) | Set of management group IDs to create MG-scoped role definitions for. When non-empty, role definitions are created at MG scope instead of per-subscription. | `set(string)` | `[]` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group where CrowdStrike infrastructure resources will be deployed. | `string` | `""` | no |
 | <a name="input_resource_prefix"></a> [resource\_prefix](#input\_resource\_prefix) | Prefix to be added to all created resource names for identification. | `string` | `""` | no |
 | <a name="input_resource_suffix"></a> [resource\_suffix](#input\_resource\_suffix) | Suffix to be added to all created resource names for identification. | `string` | `""` | no |
-| <a name="input_scanning_role_definition_ids"></a> [scanning\_role\_definition\_ids](#input\_scanning\_role\_definition\_ids) | MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs. | <pre>object({<br/>    subscription_access  = string<br/>    rg_access            = string<br/>    rg_access_target     = string<br/>    subscription_scanner = string<br/>    custom_vnet_subnet   = string<br/>  })</pre> | `null` | no |
+| <a name="input_scanning_role_definition_ids"></a> [scanning\_role\_definition\_ids](#input\_scanning\_role\_definition\_ids) | MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs. | <pre>object({<br/>    subscription_access  = string<br/>    rg_access            = string<br/>    rg_access_target     = string<br/>    subscription_scanner = string<br/>    custom_vnet_subnet   = string<br/>    rg_scanner           = string<br/>  })</pre> | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag. | `map(string)` | <pre>{<br/>  "CSTagVendor": "CrowdStrike"<br/>}</pre> | no |
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_scanning_managed_identity_principal_id"></a> [scanning\_managed\_identity\_principal\_id](#output\_scanning\_managed\_identity\_principal\_id) | Scanning managed identity principal IDs |
 | <a name="output_scanning_role_definition_ids_by_mg"></a> [scanning\_role\_definition\_ids\_by\_mg](#output\_scanning\_role\_definition\_ids\_by\_mg) | Map of management group ID to MG-scoped scanning role definition resource IDs. |
 <!-- END_TF_DOCS -->

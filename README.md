@@ -164,20 +164,20 @@ module "crowdstrike_azure_registration" {
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
-| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | >= 0.0.66 |
+| ---- | ------- |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.77.0 |
+| <a name="provider_crowdstrike"></a> [crowdstrike](#provider\_crowdstrike) | 0.0.76 |
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [crowdstrike_cloud_azure_tenant.this](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant) | resource |
 | [crowdstrike_cloud_azure_tenant_eventhub_settings.update_event_hub_settings](https://registry.terraform.io/providers/CrowdStrike/crowdstrike/latest/docs/resources/cloud_azure_tenant_eventhub_settings) | resource |
 | [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_account_type"></a> [account\_type](#input\_account\_type) | Account type can be either 'commercial' or 'gov' | `string` | `"commercial"` | no |
 | <a name="input_agentless_scanning_custom_vnet_configuration"></a> [agentless\_scanning\_custom\_vnet\_configuration](#input\_agentless\_scanning\_custom\_vnet\_configuration) | Per-region custom VNet configuration for agentless scanning. Keys are Azure region names; values contain scanners\_subnet\_id and clones\_subnet\_id. | <pre>map(object({<br/>    scanners_subnet_id = string<br/>    clones_subnet_id   = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_agentless_scanning_deploy_nat_gateway"></a> [agentless\_scanning\_deploy\_nat\_gateway](#input\_agentless\_scanning\_deploy\_nat\_gateway) | Indicates Agentless Scanning environment will be deployed with NAT Gateway. | `bool` | `true` | no |
@@ -186,9 +186,10 @@ module "crowdstrike_azure_registration" {
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`. | `string` | `""` | no |
 | <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Controls whether to enable DSPM (Data Security Posture Management) for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Controls whether to enable Real Time Visibility and Detection feature for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
+| <a name="input_enable_vulnerability_scanning"></a> [enable\_vulnerability\_scanning](#input\_enable\_vulnerability\_scanning) | Controls whether to enable Vulnerability Scanning for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
 | <a name="input_env"></a> [env](#input\_env) | Environment label (for example, prod, stag, dev) used for resource naming and tagging. Helps distinguish between different deployment environments. Limited to 4 alphanumeric characters for compatibility with resource naming restrictions. | `string` | `"prod"` | no |
-| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. Required when `enable_dspm` is set to `true`. | `string` | `""` | no |
-| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. Required when `enable_dspm` is set to `true`. | `string` | `""` | no |
+| <a name="input_falcon_client_id"></a> [falcon\_client\_id](#input\_falcon\_client\_id) | Falcon API client ID. Required when `enable_dspm` or `enable_vulnerability_scanning` is set to `true`. | `string` | `""` | no |
+| <a name="input_falcon_client_secret"></a> [falcon\_client\_secret](#input\_falcon\_client\_secret) | Falcon API client secret. Required when `enable_dspm` or `enable_vulnerability_scanning` is set to `true`. | `string` | `""` | no |
 | <a name="input_falcon_ip_addresses"></a> [falcon\_ip\_addresses](#input\_falcon\_ip\_addresses) | List of CrowdStrike Falcon service IP addresses to be allowed in network security configurations. Refer to https://falcon.crowdstrike.com/documentation/page/re07d589 for the IP address list specific to your Falcon cloud region. Required when `enable_realtime_visibility` is set to `true`. | `list(string)` | `[]` | no |
 | <a name="input_key_vault_allowed_ip_rules"></a> [key\_vault\_allowed\_ip\_rules](#input\_key\_vault\_allowed\_ip\_rules) | Allowed IP rules (IPs or CIDR blocks) for restricting Key Vault access. If empty all network access will be allowed. | `list(string)` | `[]` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure location (region) where global resources such as role definitions and event hub will be deployed. These tenant-wide resources only need to be created once regardless of how many subscriptions are monitored. | `string` | `"westus"` | no |
@@ -202,7 +203,7 @@ module "crowdstrike_azure_registration" {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_active_subscriptions_in_groups"></a> [active\_subscriptions\_in\_groups](#output\_active\_subscriptions\_in\_groups) | Map of Azure management group scopes to active Azure subscriptions discovered within those groups |
 | <a name="output_activity_log_eventhub_consumer_group_name"></a> [activity\_log\_eventhub\_consumer\_group\_name](#output\_activity\_log\_eventhub\_consumer\_group\_name) | Consumer group name for Azure Activity Log ingestion via Event Hub |
 | <a name="output_activity_log_eventhub_id"></a> [activity\_log\_eventhub\_id](#output\_activity\_log\_eventhub\_id) | Resource ID of the Event Hub used for Azure Activity Log ingestion |
