@@ -42,9 +42,10 @@ resource "crowdstrike_cloud_azure_tenant" "this" {
   dspm = {
     enabled = var.enable_dspm
   }
-  vulnerability_scanning = {
-    enabled = var.enable_vulnerability_scanning
-  }
+  # TODO(CSPG-87057): Uncomment when CrowdStrike provider >= X.Y.Z is released with vulnerability_scanning support
+  # vulnerability_scanning = {
+  #   enabled = var.enable_vulnerability_scanning
+  # }
   cs_infra_subscription_id            = var.cs_infra_subscription_id
   cs_infra_location                   = var.location
   resource_name_prefix                = var.resource_prefix
