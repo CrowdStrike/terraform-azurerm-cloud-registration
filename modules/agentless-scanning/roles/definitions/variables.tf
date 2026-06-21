@@ -19,16 +19,16 @@ variable "agentless_scanning_deploy_nat_gateway" {
   default     = true
 }
 
-variable "input_enable_vulnerability_scanning" {
-  description = "Whether vulnerability scanning is enabled (affects subscription_access and rg_access permissions)."
+variable "enable_vulnerability_scanning" {
+  description = "Enable vulnerability scanning."
   type        = bool
   default     = false
 }
 
-variable "input_enable_dspm" {
-  description = "Whether DSPM is enabled (affects subscription_access and subscription_scanner role creation)."
+variable "enable_dspm" {
+  description = "Enable DSPM (Data Security Posture Management)."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "use_custom_subnets" {
@@ -82,6 +82,6 @@ variable "role_actions" {
     subscription_scanner_actions                = list(string)
     subscription_scanner_data_actions           = list(string)
     custom_vnet_subnet_actions                  = list(string)
-    rg_scanner_actions                          = list(string)
+    vulnerability_scanning_rg_scanner_actions   = list(string)
   })
 }

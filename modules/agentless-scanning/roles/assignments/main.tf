@@ -19,7 +19,7 @@ resource "azurerm_role_assignment" "rg_access" {
 }
 
 resource "azurerm_role_assignment" "subscription_scanner" {
-  count = var.input_enable_dspm ? 1 : 0
+  count = var.enable_dspm ? 1 : 0
 
   scope              = "/subscriptions/${local.subscription_id}"
   role_definition_id = var.role_definition_ids.subscription_scanner
@@ -27,15 +27,15 @@ resource "azurerm_role_assignment" "subscription_scanner" {
   principal_type     = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "rg_scanner" {
+resource "azurerm_role_assignment" "rg_scanner_reader" {
   scope                = "/subscriptions/${local.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_name = "Reader"
   principal_id         = var.agentless_scanner_identity_principal_id
   principal_type       = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "rg_scanner_vuln" {
-  count = var.input_enable_vulnerability_scanning ? 1 : 0
+resource "azurerm_role_assignment" "rg_scanner" {
+  count = var.enable_vulnerability_scanning ? 1 : 0
 
   scope              = "/subscriptions/${local.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_id = var.role_definition_ids.rg_scanner

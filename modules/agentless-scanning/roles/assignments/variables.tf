@@ -46,16 +46,16 @@ variable "is_host" {
   default     = true
 }
 
-variable "input_enable_vulnerability_scanning" {
-  description = "Whether vulnerability scanning is enabled (controls rg_scanner_vuln assignment)."
+variable "enable_vulnerability_scanning" {
+  description = "Enable vulnerability scanning."
   type        = bool
   default     = false
 }
 
-variable "input_enable_dspm" {
-  description = "Whether DSPM is enabled (controls subscription_scanner and rg_scanner assignments)."
+variable "enable_dspm" {
+  description = "Enable DSPM (Data Security Posture Management)."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "custom_subnet_ids" {
