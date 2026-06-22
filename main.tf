@@ -97,6 +97,7 @@ module "log_ingestion" {
   count  = local.should_deploy_log_ingestion ? 1 : 0
   source = "./modules/log-ingestion/"
 
+  tenant_id                = data.azurerm_client_config.current.tenant_id
   subscription_ids         = module.deployment_scope.all_active_subscription_ids
   app_service_principal_id = local.service_principal_object_id
   cs_infra_subscription_id = var.cs_infra_subscription_id
