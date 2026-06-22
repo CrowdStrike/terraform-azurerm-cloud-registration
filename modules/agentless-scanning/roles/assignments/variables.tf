@@ -47,13 +47,13 @@ variable "is_host" {
 }
 
 variable "enable_vulnerability_scanning" {
-  description = "Enable vulnerability scanning."
+  description = "Whether vulnerability scanning feature is enabled."
   type        = bool
   default     = false
 }
 
 variable "enable_dspm" {
-  description = "Enable DSPM (Data Security Posture Management)."
+  description = "Whether DSPM (Data Security Posture Management) feature is enabled."
   type        = bool
   default     = false
 }
