@@ -253,6 +253,17 @@ variable "service_principal_object_id" {
   }
 }
 
+variable "azure_client_id" {
+  description = "Optional Azure client ID for the service principal. If not provided, will use the client_id from the CrowdStrike tenant registration."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.azure_client_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.azure_client_id))
+    error_message = "The azure client ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
+}
+
 variable "tags" {
   description = "Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag."
   default = {
