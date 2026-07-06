@@ -242,6 +242,17 @@ variable "env" {
   }
 }
 
+variable "service_principal_object_id" {
+  description = "Optional object ID of an existing service principal. If provided, a new service principal will not be created and this existing one will be used instead."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.service_principal_object_id == "" || can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", var.service_principal_object_id))
+    error_message = "The service principal object ID must be a valid UUID in the format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX."
+  }
+}
+
 variable "tags" {
   description = "Map of tags to be applied to all resources created by this module. Default includes the CrowdStrike vendor tag."
   default = {

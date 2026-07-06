@@ -7,6 +7,9 @@ locals {
   should_deploy_agentless_scanning = var.enable_dspm
   agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
 
+  # Determine service principal object ID - use existing one if provided, otherwise use the created one
+  service_principal_object_id = var.service_principal_object_id != "" ? var.service_principal_object_id : module.service_principal[0].object_id
+
   # MG scopes for agentless scanning role definitions:
   # - explicit MGs provided → use them
   # - no MGs and no sub IDs (whole tenant) → fall back to tenant root MG
@@ -54,6 +57,7 @@ resource "crowdstrike_cloud_azure_tenant" "this" {
 }
 
 module "service_principal" {
+  count  = var.service_principal_object_id == "" ? 1 : 0
   source = "./modules/service-principal/"
 
   azure_client_id                = crowdstrike_cloud_azure_tenant.this.cs_azure_client_id
@@ -66,7 +70,7 @@ module "asset_inventory" {
   tenant_id                = data.azurerm_client_config.current.tenant_id
   management_group_ids     = local.management_groups
   subscription_ids         = local.subscriptions
-  app_service_principal_id = module.service_principal.object_id
+  app_service_principal_id = local.service_principal_object_id
   resource_prefix          = var.resource_prefix
   resource_suffix          = var.resource_suffix
 }
@@ -94,7 +98,7 @@ module "log_ingestion" {
   source = "./modules/log-ingestion/"
 
   subscription_ids         = module.deployment_scope.all_active_subscription_ids
-  app_service_principal_id = module.service_principal.object_id
+  app_service_principal_id = local.service_principal_object_id
   cs_infra_subscription_id = var.cs_infra_subscription_id
   resource_group_name      = module.crowdstrike_resource_group[0].resource_group_name
   activity_log_settings    = var.log_ingestion_settings.activity_log
@@ -115,7 +119,7 @@ module "agentless_scanning" {
 
   deploy_resource_group                               = false
   agentless_scanning_locations                        = local.agentless_scanning_locations
-  agentless_scanning_principal_id                     = module.service_principal.object_id
+  agentless_scanning_principal_id                     = local.service_principal_object_id
   agentless_scanning_deploy_nat_gateway               = var.agentless_scanning_deploy_nat_gateway
   agentless_scanning_custom_vnet_configuration        = var.agentless_scanning_custom_vnet_configuration
   key_vault_allowed_ip_rules                          = var.key_vault_allowed_ip_rules
