@@ -78,7 +78,7 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra_id_log" {
     category = "ServicePrincipalRiskEvents"
   }
   enabled_log {
-    category = "NetworkAccessTraffic"
+    category = "NetworkAccessTrafficLogs"
   }
   depends_on = [
     azurerm_eventhub.entra_id_log
