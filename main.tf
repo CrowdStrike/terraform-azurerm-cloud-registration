@@ -63,7 +63,7 @@ module "service_principal" {
   count  = var.service_principal_object_id == "" ? 1 : 0
   source = "./modules/service-principal/"
 
-  azure_client_id                = crowdstrike_cloud_azure_tenant.this.cs_azure_client_id
+  azure_client_id                = var.azure_client_id != "" ? var.azure_client_id : crowdstrike_cloud_azure_tenant.this.cs_azure_client_id
   microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
 }
 
