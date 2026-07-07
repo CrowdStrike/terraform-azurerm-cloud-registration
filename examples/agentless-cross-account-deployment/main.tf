@@ -9,6 +9,7 @@ locals {
 
   # Controls agentless scanning settings
   enable_dspm                           = true
+  enable_vulnerability_scanning         = true
   agentless_scanning_locations          = ["westus"]
   agentless_scanning_deploy_nat_gateway = false
 
@@ -52,6 +53,7 @@ module "crowdstrike_azure_registration" {
   falcon_ip_addresses                   = var.falcon_ip_addresses
   enable_realtime_visibility            = local.enable_realtime_visibility
   enable_dspm                           = local.enable_dspm
+  enable_vulnerability_scanning         = local.enable_vulnerability_scanning
   agentless_scanning_locations          = local.agentless_scanning_locations
   agentless_scanning_deploy_nat_gateway = local.agentless_scanning_deploy_nat_gateway
   location                              = var.location
@@ -97,11 +99,12 @@ module "agentless_scanning_target_subscription_1" {
   agentless_scanning_host_subscription_id = var.cs_infra_subscription_id
   agentless_scanner_identity_principal_id = module.crowdstrike_azure_registration.agentless_scanning_managed_identity_principal_id
 
-  agentless_scanning_principal_id = module.crowdstrike_azure_registration.service_principal_object_id
-  agentless_scanning_locations    = local.agentless_scanning_locations
-  input_enable_dspm               = local.enable_dspm
-  falcon_client_id                = var.falcon_client_id
-  falcon_client_secret            = var.falcon_client_secret
+  agentless_scanning_principal_id     = module.crowdstrike_azure_registration.service_principal_object_id
+  agentless_scanning_locations        = local.agentless_scanning_locations
+  input_enable_dspm                   = local.enable_dspm
+  input_enable_vulnerability_scanning = local.enable_vulnerability_scanning
+  falcon_client_id                    = var.falcon_client_id
+  falcon_client_secret                = var.falcon_client_secret
 
   # Optional: Restrict Key Vault network access to specific IP addresses or CIDR  blocks.
   # Note that terraform caller IP range needs to be allowed to manage KeyVault server.

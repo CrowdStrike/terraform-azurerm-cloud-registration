@@ -34,11 +34,11 @@ variable "falcon_client_id" {
   type        = string
   sensitive   = true
   default     = ""
-  description = "Falcon API client ID. Required when `enable_dspm` is set to `true`."
+  description = "Falcon API client ID. Required when `enable_dspm` or `enable_vulnerability_scanning` is set to `true`."
 
   validation {
-    condition     = !var.enable_dspm || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
-    error_message = "'falcon_client_id' is required when 'enable_dspm' is set to true and must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+    condition     = !(var.enable_dspm || var.enable_vulnerability_scanning) || (length(var.falcon_client_id) == 32 && can(regex("^[a-fA-F0-9]+$", var.falcon_client_id)))
+    error_message = "'falcon_client_id' is required when 'enable_dspm' or 'enable_vulnerability_scanning' is set to true and must be a 32-character hexadecimal string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
 }
 
@@ -46,11 +46,11 @@ variable "falcon_client_secret" {
   type        = string
   sensitive   = true
   default     = ""
-  description = "Falcon API client secret. Required when `enable_dspm` is set to `true`."
+  description = "Falcon API client secret. Required when `enable_dspm` or `enable_vulnerability_scanning` is set to `true`."
 
   validation {
-    condition     = !var.enable_dspm || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
-    error_message = "'falcon_client_secret' is required when 'enable_dspm' is set to true and must be a 40-character alphanumeric string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
+    condition     = !(var.enable_dspm || var.enable_vulnerability_scanning) || (length(var.falcon_client_secret) == 40 && can(regex("^[a-zA-Z0-9]+$", var.falcon_client_secret)))
+    error_message = "'falcon_client_secret' is required when 'enable_dspm' or 'enable_vulnerability_scanning' is set to true and must be a 40-character alphanumeric string. Please use the Falcon console to generate a new API key/secret pair with appropriate scopes."
   }
 }
 
@@ -138,6 +138,20 @@ variable "enable_dspm" {
       (length(var.agentless_scanning_locations_per_subscription) > 0 && length(var.agentless_scanning_locations) == 0)
     )
     error_message = "If DSPM is enabled either 'agentless_scanning_locations' or 'agentless_scanning_locations_per_subscription' must be provided."
+  }
+}
+
+variable "enable_vulnerability_scanning" {
+  description = "Controls whether to enable Vulnerability Scanning for CrowdStrike Falcon Cloud Security in Azure."
+  type        = bool
+  default     = false
+
+  validation {
+    condition = !var.enable_vulnerability_scanning || (
+      (length(var.agentless_scanning_locations) > 0 && length(var.agentless_scanning_locations_per_subscription) == 0) ||
+      (length(var.agentless_scanning_locations_per_subscription) > 0 && length(var.agentless_scanning_locations) == 0)
+    )
+    error_message = "If vulnerability scanning is enabled either 'agentless_scanning_locations' or 'agentless_scanning_locations_per_subscription' must be provided."
   }
 }
 
