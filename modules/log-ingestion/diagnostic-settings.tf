@@ -59,6 +59,27 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra_id_log" {
   enabled_log {
     category = "ADFSSignInLogs"
   }
+  enabled_log {
+    category = "MicrosoftGraphActivityLogs"
+  }
+  enabled_log {
+    category = "ProvisioningLogs"
+  }
+  enabled_log {
+    category = "UserRiskEvents"
+  }
+  enabled_log {
+    category = "RiskyUsers"
+  }
+  enabled_log {
+    category = "RiskyServicePrincipals"
+  }
+  enabled_log {
+    category = "ServicePrincipalRiskEvents"
+  }
+  enabled_log {
+    category = "NetworkAccessTrafficLogs"
+  }
   depends_on = [
     azurerm_eventhub.entra_id_log
   ]

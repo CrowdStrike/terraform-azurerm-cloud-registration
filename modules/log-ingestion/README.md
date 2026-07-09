@@ -25,7 +25,7 @@ This module performs several key actions:
 
 The module supports two main log types:
 1. **Azure Activity Logs** - Administrative, security, service health, alert, recommendation, policy, autoscale, and resource health logs
-2. **Microsoft Entra ID Logs** - Audit logs, sign-in logs, non-interactive user sign-in logs, service principal sign-in logs, managed identity sign-in logs, and ADFS sign-in logs
+2. **Microsoft Entra ID Logs** - Audit logs, sign-in logs, non-interactive user sign-in logs, service principal sign-in logs, managed identity sign-in logs, ADFS sign-in logs, Microsoft Graph activity logs, provisioning logs, user risk events, risky users, risky service principals, service principal risk events, and network access traffic logs
 
 ## Flexibility Options
 
