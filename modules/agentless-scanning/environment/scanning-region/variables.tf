@@ -73,3 +73,4 @@ variable "tags" {
     error_message = "The tags map cannot contain more than 45 entries."
   }
 }
+
