@@ -4,7 +4,7 @@ locals {
   subscriptions                    = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
   management_groups                = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
   should_deploy_log_ingestion      = var.enable_realtime_visibility
-  should_deploy_agentless_scanning = var.enable_dspm
+  should_deploy_agentless_scanning = var.enable_dspm || var.enable_vulnerability_scanning
   agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
 
   # Determine service principal object ID - use existing one if provided, otherwise use the created one
@@ -45,6 +45,9 @@ resource "crowdstrike_cloud_azure_tenant" "this" {
   dspm = {
     enabled = var.enable_dspm
   }
+  vulnerability_scanning = {
+    enabled = var.enable_vulnerability_scanning
+  }
   cs_infra_subscription_id            = var.cs_infra_subscription_id
   cs_infra_location                   = var.location
   resource_name_prefix                = var.resource_prefix
@@ -60,7 +63,7 @@ module "service_principal" {
   count  = var.service_principal_object_id == "" ? 1 : 0
   source = "./modules/service-principal/"
 
-  azure_client_id                = crowdstrike_cloud_azure_tenant.this.cs_azure_client_id
+  azure_client_id                = var.azure_client_id != "" ? var.azure_client_id : crowdstrike_cloud_azure_tenant.this.cs_azure_client_id
   microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
 }
 
@@ -124,6 +127,7 @@ module "agentless_scanning" {
   agentless_scanning_custom_vnet_configuration        = var.agentless_scanning_custom_vnet_configuration
   key_vault_allowed_ip_rules                          = var.key_vault_allowed_ip_rules
   input_enable_dspm                                   = var.enable_dspm
+  input_enable_vulnerability_scanning                 = var.enable_vulnerability_scanning
   input_agentless_scanning_locations_per_subscription = var.agentless_scanning_locations_per_subscription
   falcon_client_id                                    = var.falcon_client_id
   falcon_client_secret                                = var.falcon_client_secret

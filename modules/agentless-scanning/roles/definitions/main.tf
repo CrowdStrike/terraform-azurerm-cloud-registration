@@ -1,9 +1,16 @@
 locals {
   scope = var.scope_type == "mg" ? "/providers/Microsoft.Management/managementGroups/${var.scope_id}" : "/subscriptions/${var.scope_id}"
 
+  subscription_access_actions = concat(
+    var.role_actions.base_subscription_access_actions,
+    var.enable_dspm ? var.role_actions.dspm_subscription_access_actions : [],
+    var.enable_vulnerability_scanning ? var.role_actions.vulnerability_scanning_subscription_actions : []
+  )
+
   rg_access_actions = concat(
     var.role_actions.host_rg_access_actions,
-    !var.agentless_scanning_deploy_nat_gateway ? var.role_actions.conditional_public_ip_actions : []
+    !var.agentless_scanning_deploy_nat_gateway ? var.role_actions.conditional_public_ip_actions : [],
+    var.enable_vulnerability_scanning ? var.role_actions.vulnerability_scanning_rg_actions : []
   )
 }
 
@@ -13,7 +20,7 @@ resource "azurerm_role_definition" "subscription_access" {
   description = "CrowdStrike Agentless Scanning Subscription Access Role"
 
   permissions {
-    actions     = var.role_actions.subscription_access_actions
+    actions     = local.subscription_access_actions
     not_actions = []
   }
 
@@ -51,6 +58,8 @@ resource "azurerm_role_definition" "rg_access_target" {
 }
 
 resource "azurerm_role_definition" "subscription_scanner" {
+  count = var.enable_dspm ? 1 : 0
+
   name        = "${var.resource_prefix}role-csscanning-scanner-${var.scope_id}${var.resource_suffix}"
   scope       = local.scope
   description = "CrowdStrike Agentless Scanning Subscription Scanner Role"
@@ -74,6 +83,21 @@ resource "azurerm_role_definition" "custom_vnet_subnet" {
 
   permissions {
     actions     = var.role_actions.custom_vnet_subnet_actions
+    not_actions = []
+  }
+
+  assignable_scopes = [local.scope]
+}
+
+resource "azurerm_role_definition" "rg_scanner" {
+  count = var.enable_vulnerability_scanning && (var.is_host || var.scope_type == "mg") ? 1 : 0
+
+  name        = "${var.resource_prefix}role-csscanning-rg-scanner-${var.scope_id}${var.resource_suffix}"
+  scope       = local.scope
+  description = "CrowdStrike Agentless Scanning Scanner Resource Group Role"
+
+  permissions {
+    actions     = var.role_actions.vulnerability_scanning_rg_scanner_actions
     not_actions = []
   }
 

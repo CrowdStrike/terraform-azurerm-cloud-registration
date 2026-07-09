@@ -6,6 +6,7 @@ variable "role_definition_ids" {
     rg_access_target     = string
     subscription_scanner = string
     custom_vnet_subnet   = string
+    rg_scanner           = string
   })
 }
 
@@ -43,6 +44,18 @@ variable "is_host" {
   description = "Whether this is the host subscription (uses rg_access vs rg_access_target)."
   type        = bool
   default     = true
+}
+
+variable "enable_vulnerability_scanning" {
+  description = "Whether vulnerability scanning feature is enabled."
+  type        = bool
+  default     = false
+}
+
+variable "enable_dspm" {
+  description = "Whether DSPM (Data Security Posture Management) feature is enabled."
+  type        = bool
+  default     = false
 }
 
 variable "custom_subnet_ids" {
