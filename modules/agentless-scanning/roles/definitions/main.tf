@@ -90,7 +90,7 @@ resource "azurerm_role_definition" "custom_vnet_subnet" {
 }
 
 resource "azurerm_role_definition" "rg_scanner" {
-  count = var.enable_vulnerability_scanning && var.is_host ? 1 : 0
+  count = var.enable_vulnerability_scanning && (var.is_host || var.scope_type == "mg") ? 1 : 0
 
   name        = "${var.resource_prefix}role-csscanning-rg-scanner-${var.scope_id}${var.resource_suffix}"
   scope       = local.scope
