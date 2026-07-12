@@ -35,7 +35,7 @@ resource "azurerm_role_assignment" "rg_scanner_reader" {
 }
 
 resource "azurerm_role_assignment" "rg_scanner" {
-  count = var.enable_vulnerability_scanning ? 1 : 0
+  count = var.enable_vulnerability_scanning && var.is_host ? 1 : 0
 
   scope              = "/subscriptions/${local.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_id = var.role_definition_ids.rg_scanner
