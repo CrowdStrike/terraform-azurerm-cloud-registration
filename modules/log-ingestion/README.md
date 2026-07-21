@@ -158,6 +158,7 @@ module "log_ingestion" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_account_type"></a> [account\_type](#input\_account\_type) | Azure account type: 'commercial' or 'gov'. Used to omit diagnostic log categories not supported in Azure Government. | `string` | `"commercial"` | no |
 | <a name="input_activity_log_settings"></a> [activity\_log\_settings](#input\_activity\_log\_settings) | Configuration settings for Azure Activity Log ingestion | <pre>object({<br/>    enabled = bool<br/>    existing_eventhub = optional(object({<br/>      use                          = bool<br/>      eventhub_resource_id         = optional(string, "")<br/>      eventhub_consumer_group_name = optional(string, "")<br/>    }), { use = false })<br/>  })</pre> | <pre>{<br/>  "enabled": true<br/>}</pre> | no |
 | <a name="input_app_service_principal_id"></a> [app\_service\_principal\_id](#input\_app\_service\_principal\_id) | Service principal ID of CrowdStrike app to which all the roles will be assigned for log ingestion | `string` | n/a | yes |
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. | `string` | n/a | yes |
