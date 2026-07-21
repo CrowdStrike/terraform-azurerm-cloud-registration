@@ -112,6 +112,7 @@ module "log_ingestion" {
   resource_prefix          = var.resource_prefix
   resource_suffix          = var.resource_suffix
   tags                     = var.tags
+  account_type             = var.account_type
 
   depends_on = [module.crowdstrike_resource_group]
 }
