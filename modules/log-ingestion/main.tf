@@ -6,6 +6,36 @@ locals {
   should_deploy_eventhub_for_entra_id_log       = var.entra_id_log_settings.enabled && !var.entra_id_log_settings.existing_eventhub.use
   should_deploy_eventhub_namespace              = local.should_deploy_eventhub_for_activity_log || local.should_deploy_eventhub_for_entra_id_log
   env                                           = var.env == "" ? "" : "-${var.env}"
+
+  # Full set of Entra ID diagnostic log categories CrowdStrike ingests.
+  # Kept as a list so gov-incompatible entries can be filtered below.
+  entra_id_log_categories_all = [
+    "AuditLogs",
+    "SignInLogs",
+    "NonInteractiveUserSignInLogs",
+    "ServicePrincipalSignInLogs",
+    "ManagedIdentitySignInLogs",
+    "ADFSSignInLogs",
+    "MicrosoftGraphActivityLogs",
+    "ProvisioningLogs",
+    "UserRiskEvents",
+    "RiskyUsers",
+    "RiskyServicePrincipals",
+    "ServicePrincipalRiskEvents",
+    "NetworkAccessTrafficLogs",
+  ]
+
+  # Categories tied to Microsoft Entra Internet Access / Private Access (Global Secure Access),
+  # which is not available in Azure Government. Azure rejects the whole diagnostic setting
+  # if any of these are included in a Gov deployment.
+  entra_id_log_categories_gov_unsupported = [
+    "NetworkAccessTrafficLogs",
+  ]
+
+  entra_id_log_categories = var.account_type == "gov" ? [
+    for c in local.entra_id_log_categories_all :
+    c if !contains(local.entra_id_log_categories_gov_unsupported, c)
+  ] : local.entra_id_log_categories_all
 }
 
 data "azurerm_client_config" "this" {}

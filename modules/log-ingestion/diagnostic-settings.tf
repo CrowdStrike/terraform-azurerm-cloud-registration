@@ -41,45 +41,14 @@ resource "azurerm_monitor_aad_diagnostic_setting" "entra_id_log" {
   name                           = local.entra_id_log_diagnostic_settings_default_name
   eventhub_name                  = azurerm_eventhub.entra_id_log[0].name
   eventhub_authorization_rule_id = azurerm_eventhub_namespace_authorization_rule.this[0].id
-  enabled_log {
-    category = "AuditLogs"
+
+  dynamic "enabled_log" {
+    for_each = local.entra_id_log_categories
+    content {
+      category = enabled_log.value
+    }
   }
-  enabled_log {
-    category = "SignInLogs"
-  }
-  enabled_log {
-    category = "NonInteractiveUserSignInLogs"
-  }
-  enabled_log {
-    category = "ServicePrincipalSignInLogs"
-  }
-  enabled_log {
-    category = "ManagedIdentitySignInLogs"
-  }
-  enabled_log {
-    category = "ADFSSignInLogs"
-  }
-  enabled_log {
-    category = "MicrosoftGraphActivityLogs"
-  }
-  enabled_log {
-    category = "ProvisioningLogs"
-  }
-  enabled_log {
-    category = "UserRiskEvents"
-  }
-  enabled_log {
-    category = "RiskyUsers"
-  }
-  enabled_log {
-    category = "RiskyServicePrincipals"
-  }
-  enabled_log {
-    category = "ServicePrincipalRiskEvents"
-  }
-  enabled_log {
-    category = "NetworkAccessTrafficLogs"
-  }
+
   depends_on = [
     azurerm_eventhub.entra_id_log
   ]

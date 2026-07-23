@@ -129,3 +129,13 @@ variable "tags" {
     error_message = "The tags map cannot contain more than 45 entries."
   }
 }
+
+variable "account_type" {
+  type        = string
+  default     = "commercial"
+  description = "Azure account type: 'commercial' or 'gov'. Used to omit diagnostic log categories not supported in Azure Government."
+  validation {
+    condition     = var.account_type == "commercial" || var.account_type == "gov"
+    error_message = "must be either 'commercial' or 'gov'"
+  }
+}
