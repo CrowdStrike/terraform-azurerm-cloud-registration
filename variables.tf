@@ -179,6 +179,10 @@ variable "agentless_scanning_locations_per_subscription" {
     condition     = alltrue([for _, locs in var.agentless_scanning_locations_per_subscription : alltrue([for loc in locs : (length(loc) > 0)])])
     error_message = "All locations in 'agentless_scanning_locations_per_subscription' must be non-empty strings."
   }
+  validation {
+    condition     = length(var.agentless_scanning_locations_per_subscription) == 0 || contains(keys(var.agentless_scanning_locations_per_subscription), var.cs_infra_subscription_id)
+    error_message = "'agentless_scanning_locations_per_subscription' must include the infrastructure subscription (cs_infra_subscription_id) in order to deploy agentless scanning infrastructure per region."
+  }
 }
 
 variable "agentless_scanning_custom_vnet_configuration" {
