@@ -1,5 +1,18 @@
 data "azurerm_client_config" "current" {}
 
+# State-address reconciliation for breaking refactors in prior module versions.
+moved {
+  # Resource group moved from the root module into its own submodule in v0.1.10.
+  from = azurerm_resource_group.this[0]
+  to   = module.crowdstrike_resource_group[0].azurerm_resource_group.this[0]
+}
+
+moved {
+  # service_principal gained a count meta-argument in v0.1.15.
+  from = module.service_principal
+  to   = module.service_principal[0]
+}
+
 locals {
   subscriptions                    = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
   management_groups                = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
@@ -113,8 +126,6 @@ module "log_ingestion" {
   resource_suffix          = var.resource_suffix
   tags                     = var.tags
   account_type             = var.account_type
-
-  depends_on = [module.crowdstrike_resource_group]
 }
 
 module "agentless_scanning" {
@@ -139,8 +150,6 @@ module "agentless_scanning" {
   tags                                                = var.tags
   management_group_scopes                             = local.agentless_scanning_mg_scopes
   host_mg_id                                          = local.host_subscription_mg_id
-
-  depends_on = [module.crowdstrike_resource_group]
 }
 
 resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_settings" {
