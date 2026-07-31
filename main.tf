@@ -4,7 +4,7 @@ data "azurerm_client_config" "current" {}
 moved {
   # Resource group moved from the root module into its own submodule in v0.1.10.
   from = azurerm_resource_group.this[0]
-  to   = module.crowdstrike_resource_group[0].azurerm_resource_group.this[0]
+  to   = module.crowdstrike_resource_group[0].azurerm_resource_group.this
 }
 
 moved {
