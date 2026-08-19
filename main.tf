@@ -126,6 +126,8 @@ module "log_ingestion" {
   resource_suffix          = var.resource_suffix
   tags                     = var.tags
   account_type             = var.account_type
+
+  depends_on = [module.crowdstrike_resource_group]
 }
 
 module "agentless_scanning" {
@@ -150,6 +152,8 @@ module "agentless_scanning" {
   tags                                                = var.tags
   management_group_scopes                             = local.agentless_scanning_mg_scopes
   host_mg_id                                          = local.host_subscription_mg_id
+
+  depends_on = [module.crowdstrike_resource_group]
 }
 
 resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_settings" {
