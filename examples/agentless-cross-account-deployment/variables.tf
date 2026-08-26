@@ -1,6 +1,6 @@
 variable "management_group_ids" {
   type        = list(string)
-  description = "List of Azure management group IDs to monitor with CrowdStrike Falcon Cloud Security. All subscriptions within these management groups will be automatically discovered and monitored."
+  description = "List of Azure management group IDs to monitor with the CrowdStrike Falcon platform. All subscriptions within these management groups will be automatically discovered and monitored."
 
   validation {
     condition     = alltrue([for id in var.management_group_ids : can(regex("^[a-zA-Z0-9-_]{1,90}$", id))])
@@ -10,7 +10,7 @@ variable "management_group_ids" {
 
 variable "subscription_ids" {
   type        = list(string)
-  description = "List of specific Azure subscription IDs to monitor with CrowdStrike Falcon Cloud Security. Use this for targeted monitoring of individual subscriptions."
+  description = "List of specific Azure subscription IDs to monitor with the CrowdStrike Falcon platform. Use this for targeted monitoring of individual subscriptions."
 
   validation {
     condition     = alltrue([for id in var.subscription_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])

@@ -1,6 +1,6 @@
-# FCS Single Account Registration (Multi-Region with Custom Providers)
+# Single Account Registration (Multi-Region with Custom Providers)
 
-This example demonstrates how to register management groups and/or subscriptions with CrowdStrike Falcon Cloud Security (FCS).
+This example demonstrates how to register management groups and/or subscriptions with the CrowdStrike Falcon platform.
 
 ## Features Enabled
 
@@ -32,10 +32,10 @@ export TF_VAR_falcon_ip_addresses='["<Falcon IP address 1>", "<Falcon IP address
 export TF_VAR_cs_infra_subscription_id=<your subscription ID where global infrastructure resources will be deployed>
 export TF_VAR_location=<Azure location where global resources will be deployed>
 
-# List of specific Azure subscription IDs to monitor with CrowdStrike Falcon Cloud Security. Use this for targeted monitoring of individual subscriptions.
+# List of specific Azure subscription IDs to monitor with the CrowdStrike Falcon platform. Use this for targeted monitoring of individual subscriptions.
 export TF_VAR_subscription_ids='["<subscription 1>", "<subscription 2>", ...]'
 
-# List of Azure management group IDs to monitor with CrowdStrike Falcon Cloud Security. All subscriptions within these management groups will be automatically discovered and monitored.
+# List of Azure management group IDs to monitor with the CrowdStrike Falcon platform. All subscriptions within these management groups will be automatically discovered and monitored.
 export TF_VAR_management_group_ids='["<management group 1>", "<management group 2>", ...]'
 ```
 

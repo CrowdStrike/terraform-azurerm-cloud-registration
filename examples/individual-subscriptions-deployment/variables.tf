@@ -1,6 +1,6 @@
 variable "subscription_ids" {
   type        = list(string)
-  description = "List of specific Azure subscription IDs to monitor with CrowdStrike Falcon Cloud Security. Use this for targeted monitoring of individual subscriptions."
+  description = "List of specific Azure subscription IDs to monitor with the CrowdStrike Falcon platform. Use this for targeted monitoring of individual subscriptions."
 
   validation {
     condition     = alltrue([for id in var.subscription_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
