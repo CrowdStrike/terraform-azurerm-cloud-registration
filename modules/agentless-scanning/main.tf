@@ -153,6 +153,7 @@ module "crowdstrike_resource_group" {
   resource_prefix = var.resource_prefix
   resource_suffix = var.resource_suffix
   env             = var.env
+  tags            = var.tags
 }
 
 module "agentless_scanning_environment" {
