@@ -1,0 +1,183 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.100"
+    }
+    crowdstrike = {
+      source  = "crowdstrike/crowdstrike"
+      version = "~> 0.7.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  subscription_id = var.cs_infra_subscription_id
+  features {}
+}
+
+provider "crowdstrike" {
+  client_id     = var.falcon_client_id
+  client_secret = var.falcon_client_secret
+}
+
+data "azurerm_client_config" "current" {}
+
+locals {
+  subscriptions                    = toset(concat(var.cs_infra_subscription_id == "" ? [] : [var.cs_infra_subscription_id], var.subscription_ids))
+  management_groups                = toset(length(var.subscription_ids) == 0 && length(var.management_group_ids) == 0 ? [data.azurerm_client_config.current.tenant_id] : var.management_group_ids)
+  should_deploy_log_ingestion      = var.enable_realtime_visibility
+  should_deploy_agentless_scanning = var.enable_dspm
+  agentless_scanning_locations     = lookup(var.agentless_scanning_locations_per_subscription, var.cs_infra_subscription_id, var.agentless_scanning_locations)
+
+  # MG scopes for agentless scanning role definitions:
+  # - explicit MGs provided → use them
+  # - no MGs and no sub IDs (whole tenant) → fall back to tenant root MG
+  # - no MGs but sub IDs provided → no MG-scoped roles (per-sub roles used instead)
+  agentless_scanning_mg_scopes = local.should_deploy_agentless_scanning ? local.management_groups : toset([])
+
+  # Find which MG contains the cs_infra_subscription_id (host) for MG-scoped scanning roles
+  host_subscription_mg_id = local.should_deploy_agentless_scanning && length(local.agentless_scanning_mg_scopes) > 0 ? one([
+    for mg_id, sub_ids in module.deployment_scope.active_subscriptions_by_group :
+    mg_id if contains(sub_ids, var.cs_infra_subscription_id)
+  ]) : null
+
+  microsoft_graph_permission_ids = var.microsoft_graph_permission_ids != null ? var.microsoft_graph_permission_ids : [
+    "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30", # Application.Read.All (Role)
+    "98830695-27a2-44f7-8c18-0c3ebc9698f6", # GroupMember.Read.All (Role)
+    "246dd0d5-5bd0-4def-940b-0421030a5b68", # Policy.Read.All (Role)
+    "230c1aed-a721-4c5d-9cb4-a90514e508ef", # Reports.Read.All (Role)
+    "483bed4a-2ad3-4361-a73b-c83ccdbdc53c", # RoleManagement.Read.Directory (Role)
+    "df021288-bdef-4463-88db-98f22de89214", # User.Read.All (Role)
+    "dbb9058a-0e50-45d7-ae91-66909b5d4664", # Domain.Read.All (Role)
+    "b0afded3-3588-46d8-8b3d-9842eff778da", # AuditLog.Read.All (Role)
+    "7438b122-aefc-4978-80ed-43db9fcc7715"  # Device.Read.All (Role)
+  ]
+}
+
+# CrowdStrike tenant registration - this configures the CrowdStrike side of the integration
+# Note: This will use the existing Azure AD application created by the Identity Team
+resource "crowdstrike_cloud_azure_tenant" "this" {
+  tenant_id                      = data.azurerm_client_config.current.tenant_id
+  account_type                   = var.account_type
+  microsoft_graph_permission_ids = local.microsoft_graph_permission_ids
+  realtime_visibility = {
+    enabled = var.enable_realtime_visibility
+  }
+  dspm = {
+    enabled = var.enable_dspm
+  }
+  cs_infra_subscription_id            = var.cs_infra_subscription_id
+  cs_infra_location                   = var.location
+  resource_name_prefix                = var.resource_prefix
+  resource_name_suffix                = var.resource_suffix
+  environment                         = var.env
+  management_group_ids                = var.management_group_ids
+  subscription_ids                    = var.subscription_ids
+  tags                                = var.tags
+  agentless_scanning_subscription_ids = length(var.agentless_scanning_locations_per_subscription) > 0 ? toset(keys(var.agentless_scanning_locations_per_subscription)) : null
+}
+
+# Service principal module skipped - using existing service principal from Identity Team
+
+module "asset_inventory" {
+  source = "../../../modules/asset-inventory/"
+
+  tenant_id                = data.azurerm_client_config.current.tenant_id
+  management_group_ids     = local.management_groups
+  subscription_ids         = local.subscriptions
+  app_service_principal_id = var.crowdstrike_service_principal_object_id
+  resource_prefix          = var.resource_prefix
+  resource_suffix          = var.resource_suffix
+}
+
+module "crowdstrike_resource_group" {
+  count  = local.should_deploy_log_ingestion || local.should_deploy_agentless_scanning ? 1 : 0
+  source = "../../../modules/resource-group"
+
+  location        = var.location
+  resource_prefix = var.resource_prefix
+  resource_suffix = var.resource_suffix
+  env             = var.env
+  tags            = var.tags
+}
+
+module "deployment_scope" {
+  source = "../../../modules/deployment-scope"
+
+  management_group_ids = local.management_groups
+  subscription_ids     = local.subscriptions
+}
+
+module "log_ingestion" {
+  count  = local.should_deploy_log_ingestion ? 1 : 0
+  source = "../../../modules/log-ingestion/"
+
+  subscription_ids         = module.deployment_scope.all_active_subscription_ids
+  app_service_principal_id = var.crowdstrike_service_principal_object_id
+  cs_infra_subscription_id = var.cs_infra_subscription_id
+  resource_group_name      = module.crowdstrike_resource_group[0].resource_group_name
+  activity_log_settings    = var.log_ingestion_settings.activity_log
+  entra_id_log_settings    = var.log_ingestion_settings.entra_id_log
+  falcon_ip_addresses      = var.falcon_ip_addresses
+  env                      = var.env
+  location                 = var.location
+  resource_prefix          = var.resource_prefix
+  resource_suffix          = var.resource_suffix
+  tags                     = var.tags
+
+  depends_on = [module.crowdstrike_resource_group]
+}
+
+module "agentless_scanning" {
+  count  = local.should_deploy_agentless_scanning ? 1 : 0
+  source = "../../../modules/agentless-scanning"
+
+  deploy_resource_group                               = false
+  agentless_scanning_locations                        = local.agentless_scanning_locations
+  agentless_scanning_principal_id                     = var.crowdstrike_service_principal_object_id
+  agentless_scanning_deploy_nat_gateway               = var.agentless_scanning_deploy_nat_gateway
+  agentless_scanning_custom_vnet_configuration        = var.agentless_scanning_custom_vnet_configuration
+  key_vault_allowed_ip_rules                          = var.key_vault_allowed_ip_rules
+  input_enable_dspm                                   = var.enable_dspm
+  input_agentless_scanning_locations_per_subscription = var.agentless_scanning_locations_per_subscription
+  falcon_client_id                                    = var.falcon_client_id
+  falcon_client_secret                                = var.falcon_client_secret
+  resource_group_name                                 = module.crowdstrike_resource_group[0].resource_group_name
+  resource_prefix                                     = var.resource_prefix
+  resource_suffix                                     = var.resource_suffix
+  env                                                 = var.env
+  tags                                                = var.tags
+  management_group_scopes                             = local.agentless_scanning_mg_scopes
+  host_mg_id                                          = local.host_subscription_mg_id
+
+  depends_on = [module.crowdstrike_resource_group]
+}
+
+# Configure CrowdStrike EventHub settings for log ingestion
+resource "crowdstrike_cloud_azure_tenant_eventhub_settings" "update_event_hub_settings" {
+  count     = local.should_deploy_log_ingestion ? 1 : 0
+  tenant_id = data.azurerm_client_config.current.tenant_id
+
+  settings = concat(
+    var.log_ingestion_settings.activity_log.enabled ? [
+      {
+        type           = "activity_logs",
+        id             = module.log_ingestion[0].activity_log_eventhub_id,
+        consumer_group = module.log_ingestion[0].activity_log_eventhub_consumer_group_name
+    }] : [],
+    var.log_ingestion_settings.entra_id_log.enabled ? [
+      {
+        type           = "entra_logs",
+        id             = module.log_ingestion[0].entra_id_log_eventhub_id,
+        consumer_group = module.log_ingestion[0].entra_id_log_eventhub_consumer_group_name
+    }] : []
+  )
+
+  depends_on = [
+    crowdstrike_cloud_azure_tenant.this,
+    module.asset_inventory,
+    module.log_ingestion
+  ]
+}
