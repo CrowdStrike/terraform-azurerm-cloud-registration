@@ -19,11 +19,11 @@ locals {
       "Microsoft.Authorization/roleAssignments/read",
       "Microsoft.Authorization/policyDefinitions/read",
     ]
-    dspm_subscription_access_actions = [
+    dspm_blob_storage_actions = [
       "Microsoft.Storage/storageAccounts/read",
       "Microsoft.Storage/storageAccounts/PrivateEndpointConnectionsApproval/action",
     ]
-    vulnerability_scanning_subscription_actions = [
+    virtual_machines_scanning_actions = [
       "Microsoft.Compute/disks/beginGetAccess/action",
       "Microsoft.Compute/disks/read",
       "Microsoft.Compute/virtualMachines/read",
@@ -64,7 +64,7 @@ locals {
       "Microsoft.KeyVault/vaults/read",
       "Microsoft.Compute/virtualMachines/retrieveBootDiagnosticsData/action",
     ]
-    vulnerability_scanning_rg_actions = [
+    virtual_machines_scanning_rg_actions = [
       "Microsoft.Compute/snapshots/read",
       "Microsoft.Compute/snapshots/write",
       "Microsoft.Compute/snapshots/delete",
@@ -88,7 +88,7 @@ locals {
       "Microsoft.Network/virtualNetworks/read",
       "Microsoft.Network/virtualNetworks/subnets/read",
     ]
-    vulnerability_scanning_rg_scanner_actions = [
+    rg_scanner_actions = [
       "Microsoft.Compute/virtualMachines/attachDetachDataDisks/action",
     ]
   }
