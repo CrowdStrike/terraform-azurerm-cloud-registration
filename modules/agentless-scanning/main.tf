@@ -138,7 +138,6 @@ module "agentless_scanning_role_assignments" {
   resource_group_name                     = var.deploy_resource_group ? module.crowdstrike_resource_group[0].resource_group_name : var.resource_group_name
   is_host                                 = local.should_deploy_scanning_environment
   enable_dspm                             = var.input_enable_dspm
-  enable_vulnerability_scanning           = var.input_enable_vulnerability_scanning
   custom_subnet_ids                       = local.custom_subnet_ids
 
   depends_on = [module.crowdstrike_resource_group, module.agentless_scanning_environment]
