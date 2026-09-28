@@ -43,7 +43,7 @@ resource "azurerm_role_definition" "rg_access" {
 }
 
 resource "azurerm_role_definition" "rg_access_target" {
-  count = !var.is_host || var.scope_type == "mg" ? 1 : 0
+  count = (!var.is_host || var.scope_type == "mg") && length(var.role_actions.target_rg_access_actions) > 0 ? 1 : 0
 
   name        = "${var.resource_prefix}role-csscanning-rgaccess-target-${var.scope_id}${var.resource_suffix}"
   scope       = local.scope
