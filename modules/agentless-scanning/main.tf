@@ -80,13 +80,13 @@ locals {
     subscription_scanner_actions = [
       "Microsoft.Storage/storageAccounts/blobServices/containers/read",
       "Microsoft.Storage/storageAccounts/tableServices/tables/read",
-      "Microsoft.Storage/storageAccounts/fileServices/read",
       "Microsoft.Storage/storageAccounts/fileServices/shares/read",
     ]
     subscription_scanner_data_actions = [
       "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
       "Microsoft.Storage/storageAccounts/tableServices/tables/entities/read",
       "Microsoft.Storage/storageAccounts/fileServices/fileshares/files/read",
+      "Microsoft.Storage/storageAccounts/fileServices/readFileBackupSemantics/action",
     ]
     custom_vnet_subnet_actions = [
       "Microsoft.Network/virtualNetworks/subnets/join/action",
