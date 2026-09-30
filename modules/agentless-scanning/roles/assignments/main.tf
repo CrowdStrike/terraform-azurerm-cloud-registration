@@ -1,9 +1,9 @@
 data "azurerm_client_config" "current" {}
 
 locals {
-  subscription_id                        = data.azurerm_client_config.current.subscription_id
-  subscription_role_definition_prefix    = "/subscriptions/${local.subscription_id}/providers/Microsoft.Authorization/roleDefinitions"
-  role_definition_guid_pattern           = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+  subscription_id                     = data.azurerm_client_config.current.subscription_id
+  subscription_role_definition_prefix = "/subscriptions/${local.subscription_id}/providers/Microsoft.Authorization/roleDefinitions"
+  role_definition_guid_pattern        = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 
   # Azure returns role definition IDs scoped to the assignment's subscription,
   # regardless of where the role was defined (e.g. management group).
