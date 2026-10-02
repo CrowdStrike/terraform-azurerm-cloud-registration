@@ -9,6 +9,12 @@ locals {
     "Microsoft.Web/sites/Read",
     "Microsoft.Web/sites/config/Read"
   ]
+
+  resource_lock_permissions = [
+    "Microsoft.Authorization/locks/read",
+    "Microsoft.Authorization/locks/write",
+    "Microsoft.Authorization/locks/delete",
+  ]
 }
 
 data "azurerm_client_config" "current" {}
@@ -68,6 +74,58 @@ resource "azurerm_role_assignment" "reader" {
   for_each                         = contains(var.management_group_ids, var.tenant_id) ? toset(local.management_group_scopes) : toset(local.all_scopes)
   scope                            = each.value
   role_definition_name             = "Reader"
+  principal_id                     = var.app_service_principal_id
+  skip_service_principal_aad_check = false
+}
+
+# Resource Lock Administrator custom role - subscription scoped
+resource "azurerm_role_definition" "resource_lock_admin_sub" {
+  count       = length(local.subscription_scopes) > 0 && !contains(var.management_group_ids, var.tenant_id) ? 1 : 0
+  name        = "${var.resource_prefix}role-cslock-${data.azurerm_client_config.current.subscription_id}${var.resource_suffix}"
+  scope       = "/subscriptions/${data.azurerm_client_config.current.subscription_id}"
+  description = "CrowdStrike Resource Lock Administrator Role"
+
+  permissions {
+    actions     = local.resource_lock_permissions
+    not_actions = []
+  }
+
+  assignable_scopes = local.subscription_scopes
+}
+
+resource "azurerm_role_assignment" "resource_lock_admin_sub" {
+  for_each                         = length(local.subscription_scopes) > 0 && !contains(var.management_group_ids, var.tenant_id) ? toset(local.subscription_scopes) : []
+  scope                            = each.value
+  role_definition_id               = azurerm_role_definition.resource_lock_admin_sub[0].role_definition_resource_id
+  principal_id                     = var.app_service_principal_id
+  skip_service_principal_aad_check = false
+
+  lifecycle {
+    ignore_changes = [
+      role_definition_id,
+    ]
+  }
+}
+
+# Resource Lock Administrator custom role - management group scoped
+resource "azurerm_role_definition" "resource_lock_admin_mg" {
+  for_each    = { for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}" => id }
+  name        = "${var.resource_prefix}role-cslock-${each.value}${var.resource_suffix}"
+  scope       = each.key
+  description = "CrowdStrike Resource Lock Administrator Role"
+
+  permissions {
+    actions     = local.resource_lock_permissions
+    not_actions = []
+  }
+
+  assignable_scopes = [each.key]
+}
+
+resource "azurerm_role_assignment" "resource_lock_admin_mg" {
+  for_each                         = { for id in var.management_group_ids : "/providers/Microsoft.Management/managementGroups/${id}" => id }
+  scope                            = each.key
+  role_definition_id               = azurerm_role_definition.resource_lock_admin_mg[each.key].role_definition_resource_id
   principal_id                     = var.app_service_principal_id
   skip_service_principal_aad_check = false
 }
