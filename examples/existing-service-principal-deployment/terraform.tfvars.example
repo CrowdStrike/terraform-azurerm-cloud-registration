@@ -1,0 +1,71 @@
+# Required: Service Principal from Identity Team
+# Obtain this from your Identity Team after they complete Entra ID registration
+crowdstrike_service_principal_object_id = "12345678-1234-1234-1234-123456789012"
+
+# Required: CrowdStrike Falcon API Credentials
+# These are needed to register the tenant with CrowdStrike and configure integrations
+falcon_client_id = "your_falcon_api_client_id"
+falcon_client_secret = "your_falcon_api_secret"
+
+# Required: Azure Infrastructure Configuration
+cs_infra_subscription_id = "87654321-4321-4321-4321-210987654321"
+
+# Account Configuration
+account_type = "commercial"  # or "gov" for Azure Government
+
+# Subscriptions to monitor (at least one required)
+subscription_ids = [
+  "11111111-1111-1111-1111-111111111111",
+  "22222222-2222-2222-2222-222222222222"
+]
+
+# Optional: Management Groups (alternative to individual subscriptions)
+# management_group_ids = ["mg-production", "mg-development"]
+
+# Optional: Resource Configuration
+location = "westus"
+env = "prod"
+resource_prefix = "cs-"
+resource_suffix = ""
+
+# Optional: Resource Tagging
+tags = {
+  Environment = "Production"
+  Owner       = "CloudSecurity"
+  Project     = "FalconCloudSecurity"
+}
+
+# Optional: Enable Real-time Visibility & Detection
+enable_realtime_visibility = false
+
+# If enabling real-time visibility, provide Falcon IP addresses
+# Refer to: https://falcon.crowdstrike.com/documentation/page/re07d589
+# falcon_ip_addresses = [
+#   "52.250.124.0/23",
+#   "52.250.126.0/23"
+# ]
+
+# Optional: Enable DSPM (Data Security Posture Management)
+enable_dspm = false
+
+# If enabling DSPM, provide Falcon API credentials and scanning locations
+# falcon_client_id = "your_falcon_api_client_id"
+# falcon_client_secret = "your_falcon_api_secret"
+# agentless_scanning_locations = ["westus", "eastus"]
+
+# Optional: Per-subscription agentless scanning locations (alternative to global)
+# agentless_scanning_locations_per_subscription = {
+#   "11111111-1111-1111-1111-111111111111" = ["westus"]
+#   "22222222-2222-2222-2222-222222222222" = ["eastus"]
+# }
+
+# Optional: Custom VNet configuration for agentless scanning
+# agentless_scanning_custom_vnet_configuration = {
+#   "westus" = {
+#     scanners_subnet_id = "/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Network/virtualNetworks/xxx/subnets/scanners"
+#     clones_subnet_id   = "/subscriptions/xxx/resourceGroups/xxx/providers/Microsoft.Network/virtualNetworks/xxx/subnets/clones"
+#   }
+# }
+
+# Optional: Key Vault IP restrictions
+# key_vault_allowed_ip_rules = ["203.0.113.0/24", "198.51.100.0/24"]
