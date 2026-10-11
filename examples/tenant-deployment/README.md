@@ -1,6 +1,6 @@
-# FCS Single Account Registration (Multi-Region with Custom Providers)
+# Single Account Registration (Multi-Region with Custom Providers)
 
-This example demonstrates how to register the entire Azure tenant with CrowdStrike Falcon Cloud Security (FCS).
+This example demonstrates how to register the entire Azure tenant with the CrowdStrike Falcon platform.
 
 ## Features Enabled
 

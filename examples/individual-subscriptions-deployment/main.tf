@@ -4,7 +4,7 @@ locals {
   # Set it to empty if you don't want it added to the resource names.
   env = "prod"
 
-  # Controls whether to enable real-time visibility and detection for CrowdStrike Falcon Cloud Security in Azure.
+  # Controls whether to enable the real-time visibility and detection feature.
   enable_realtime_visibility = false
 
   # Prefix/suffix to be added to all created resource names for identification.

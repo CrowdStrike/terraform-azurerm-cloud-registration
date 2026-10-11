@@ -11,7 +11,7 @@ variable "account_type" {
 variable "management_group_ids" {
   type        = list(string)
   default     = []
-  description = "List of Azure management group IDs to monitor with CrowdStrike Falcon Cloud Security. All subscriptions within these management groups will be automatically discovered and monitored."
+  description = "List of Azure management group IDs to monitor with the CrowdStrike Falcon platform. All subscriptions within these management groups will be automatically discovered and monitored."
 
   validation {
     condition     = alltrue([for id in var.management_group_ids : can(regex("^[a-zA-Z0-9-_]{1,90}$", id))])
@@ -22,7 +22,7 @@ variable "management_group_ids" {
 variable "subscription_ids" {
   type        = list(string)
   default     = []
-  description = "List of specific Azure subscription IDs to monitor with CrowdStrike Falcon Cloud Security. Use this for targeted monitoring of individual subscriptions."
+  description = "List of specific Azure subscription IDs to monitor with the CrowdStrike Falcon platform. Use this for targeted monitoring of individual subscriptions."
 
   validation {
     condition     = alltrue([for id in var.subscription_ids : can(regex("^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$", id))])
@@ -99,7 +99,7 @@ variable "microsoft_graph_permission_ids" {
 }
 
 variable "enable_realtime_visibility" {
-  description = "Controls whether to enable Real Time Visibility and Detection feature for CrowdStrike Falcon Cloud Security in Azure."
+  description = "Controls whether to enable the real-time visibility and detection feature."
   type        = bool
   default     = false
 }
@@ -128,7 +128,7 @@ variable "log_ingestion_settings" {
 }
 
 variable "enable_dspm" {
-  description = "Controls whether to enable DSPM (Data Security Posture Management) for CrowdStrike Falcon Cloud Security in Azure."
+  description = "Controls whether to enable the data security posture management (DSPM) feature. Requires Falcon Cloud Security SKU."
   type        = bool
   default     = false
 
@@ -142,7 +142,7 @@ variable "enable_dspm" {
 }
 
 variable "enable_vulnerability_scanning" {
-  description = "Controls whether to enable Vulnerability Scanning for CrowdStrike Falcon Cloud Security in Azure."
+  description = "Controls whether to enable the vulnerability scanning feature. Requires Falcon Cloud Security SKU."
   type        = bool
   default     = false
 

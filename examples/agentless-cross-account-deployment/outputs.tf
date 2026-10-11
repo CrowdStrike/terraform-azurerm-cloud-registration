@@ -1,15 +1,15 @@
 output "tenant_id" {
-  description = "Azure tenant ID used for CrowdStrike Falcon Cloud Security integration"
+  description = "Azure tenant ID used for CrowdStrike Falcon platform integration"
   value       = module.crowdstrike_azure_registration.tenant_id
 }
 
 output "subscription_scopes" {
-  description = "List of Azure subscription scopes configured for CrowdStrike Falcon Cloud Security asset inventory"
+  description = "List of Azure subscription scopes configured for the asset inventory feature"
   value       = module.crowdstrike_azure_registration.subscription_scopes
 }
 
 output "management_group_scopes" {
-  description = "List of Azure management group scopes configured for CrowdStrike Falcon Cloud Security asset inventory"
+  description = "List of Azure management group scopes configured for the asset inventory feature"
   value       = module.crowdstrike_azure_registration.management_group_scopes
 }
 
