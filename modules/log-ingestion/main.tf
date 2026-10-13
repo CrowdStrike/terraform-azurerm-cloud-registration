@@ -38,20 +38,14 @@ locals {
   ] : local.entra_id_log_categories_all
 }
 
-data "azurerm_client_config" "this" {}
-
-data "azurerm_resource_group" "this" {
-  name = var.resource_group_name
-}
-
 resource "random_string" "eventhub_namespace" {
   count = local.should_deploy_eventhub_namespace ? 1 : 0
 
   length = 13
   keepers = {
-    tenant_id           = data.azurerm_client_config.this.tenant_id
-    subscription_id     = data.azurerm_client_config.this.subscription_id
-    resource_group_name = data.azurerm_resource_group.this.name
+    tenant_id           = var.tenant_id
+    subscription_id     = var.cs_infra_subscription_id
+    resource_group_name = var.resource_group_name
     env                 = var.env
     location            = var.location
   }
@@ -63,8 +57,8 @@ resource "azurerm_eventhub_namespace" "this" {
   count = local.should_deploy_eventhub_namespace ? 1 : 0
 
   name                          = "${var.resource_prefix}evhns-cslog-${random_string.eventhub_namespace[0].id}${var.resource_suffix}"
-  location                      = data.azurerm_resource_group.this.location
-  resource_group_name           = data.azurerm_resource_group.this.name
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
   sku                           = "Standard"
   capacity                      = 2
   auto_inflate_enabled          = true
@@ -107,7 +101,7 @@ resource "azurerm_eventhub_namespace_authorization_rule" "this" {
 
   name                = "${var.resource_prefix}rule-cslogevhns${local.env}-${var.location}${var.resource_suffix}"
   namespace_name      = azurerm_eventhub_namespace.this[0].name
-  resource_group_name = data.azurerm_resource_group.this.name
+  resource_group_name = var.resource_group_name
 
   listen = false
   send   = true
@@ -134,8 +128,6 @@ resource "azurerm_role_assignment" "activity_log_event_hub_data_receiver" {
   role_definition_name             = "Azure Event Hubs Data Receiver"
   principal_id                     = var.app_service_principal_id
   skip_service_principal_aad_check = false
-
-  depends_on = [data.azurerm_resource_group.this]
 }
 
 resource "azurerm_role_assignment" "entra_id_eventhub_data_receiver" {
@@ -144,6 +136,4 @@ resource "azurerm_role_assignment" "entra_id_eventhub_data_receiver" {
   role_definition_name             = "Azure Event Hubs Data Receiver"
   principal_id                     = var.app_service_principal_id
   skip_service_principal_aad_check = false
-
-  depends_on = [data.azurerm_resource_group.this]
 }
