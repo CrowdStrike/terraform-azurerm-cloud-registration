@@ -83,7 +83,6 @@ locals {
     ]
     dspm_azure_sql_host_rg_access_actions = [
       "Microsoft.Sql/servers/write",
-      "Microsoft.Sql/servers/databases/write",
       "Microsoft.Sql/servers/privateEndpointConnectionsApproval/action",
       "Microsoft.Sql/servers/delete",
       "Microsoft.Sql/servers/databases/delete",
