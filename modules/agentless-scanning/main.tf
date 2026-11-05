@@ -23,6 +23,9 @@ locals {
       "Microsoft.Storage/storageAccounts/read",
       "Microsoft.Storage/storageAccounts/PrivateEndpointConnectionsApproval/action",
     ]
+    dspm_azure_sql_subscription_access_actions = [
+      "Microsoft.Sql/servers/databases/write",
+    ]
     virtual_machines_scanning_actions = [
       "Microsoft.Compute/disks/beginGetAccess/action",
       "Microsoft.Compute/disks/read",
@@ -70,6 +73,13 @@ locals {
       "Microsoft.Compute/snapshots/delete",
       "Microsoft.Compute/disks/write",
       "Microsoft.Compute/disks/delete",
+    ]
+    dspm_azure_sql_host_rg_access_actions = [
+      "Microsoft.Sql/servers/write",
+      "Microsoft.Sql/servers/databases/write",
+      "Microsoft.Sql/servers/privateEndpointConnectionsApproval/action",
+      "Microsoft.Sql/servers/delete",
+      "Microsoft.Sql/servers/databases/delete",
     ]
     target_rg_access_actions = []
     conditional_public_ip_actions = [
