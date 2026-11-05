@@ -46,8 +46,8 @@ variable "is_host" {
   default     = true
 }
 
-variable "enable_dspm" {
-  description = "Whether DSPM (Data Security Posture Management) feature is enabled."
+variable "enable_subscription_scanner" {
+  description = "Whether to assign the subscription Scanner role. True when DSPM is enabled for Blob Storage, Table Storage or Azure Files."
   type        = bool
   default     = false
 }

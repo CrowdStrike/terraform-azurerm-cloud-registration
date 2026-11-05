@@ -100,6 +100,18 @@ variable "input_enable_dspm" {
   default     = true
 }
 
+variable "input_dspm_access_scopes" {
+  description = "DSPM datastores to apply permissions for: `blob_storage`, `table_storage`, `azure_files`, `virtual_machines`, `azure_sql`. Omitted datastores default to `true`. Takes effect only when `input_enable_dspm` is `true`. Use the same value in the host and every target subscription."
+  type        = map(bool)
+  default     = {}
+  nullable    = false
+
+  validation {
+    condition     = alltrue([for datastore in keys(var.input_dspm_access_scopes) : contains(["blob_storage", "table_storage", "azure_files", "virtual_machines", "azure_sql"], datastore)])
+    error_message = "'input_dspm_access_scopes' keys must be one of: blob_storage, table_storage, azure_files, virtual_machines, azure_sql."
+  }
+}
+
 variable "input_enable_vulnerability_scanning" {
   description = "Controls whether to enable Vulnerability Scanning. Affects role permissions and scanning parameters policy."
   type        = bool

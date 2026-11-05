@@ -51,6 +51,30 @@ CrowdStrike API keys are required to use this module. It is highly recommended t
 > [!NOTE]
 > This page is only shown once. Make sure you copy **CLIENT ID**, **SECRET**, and **BASE URL** to a secure location.
 
+## Scoping DSPM permissions
+
+Set a `dspm_access_scopes` attribute to `false` to leave that datastore's permissions out of the custom roles. Falcon Cloud Security then does not scan that datastore type. The resolved scopes are written to the `dspmAccessScopes` parameter of the `policy-csscanning-parameters` policy definition in every registered subscription. Pass the same value as `input_dspm_access_scopes` to every `agentless-scanning` target subscription module.
+
+| Attribute | Access role (subscription) | Scanner role (subscription) | Resource group access role (scanning resource group) |
+|---|---|---|---|
+| `blob_storage` | `Microsoft.Storage/storageAccounts/read`, `Microsoft.Storage/storageAccounts/PrivateEndpointConnectionsApproval/action` (shared by the three storage attributes) | Blob container read, blob data read | — |
+| `table_storage` | as above | Table read, table entity data read | — |
+| `azure_files` | as above | File share read, file data read, `readFileBackupSemantics/action` | — |
+| `virtual_machines` | Disk `beginGetAccess/action` and read, virtual machine and scale set read | — | Snapshot read, write and delete; disk write and delete |
+| `azure_sql` | `Microsoft.Sql/servers/databases/write` | — | `Microsoft.Sql/servers/write`, `Microsoft.Sql/servers/databases/write`, `Microsoft.Sql/servers/privateEndpointConnectionsApproval/action`, `Microsoft.Sql/servers/delete`, `Microsoft.Sql/servers/databases/delete` |
+
+`enable_vulnerability_scanning` grants the `virtual_machines` permissions on its own. With `blob_storage`, `table_storage` and `azure_files` all `false`, the Scanner role and its assignment are not created.
+
+Example that skips Azure SQL and Azure Files:
+
+```hcl
+enable_dspm = true
+dspm_access_scopes = {
+  azure_sql   = false
+  azure_files = false
+}
+```
+
 ## Usage
 
 ```hcl
@@ -185,6 +209,7 @@ module "crowdstrike_azure_registration" {
 | <a name="input_agentless_scanning_locations_per_subscription"></a> [agentless\_scanning\_locations\_per\_subscription](#input\_agentless\_scanning\_locations\_per\_subscription) | Map of Azure subscription IDs to lists of locations (regions) where agentless scanning will be deployed per subscription. | `map(list(string))` | `{}` | no |
 | <a name="input_azure_client_id"></a> [azure\_client\_id](#input\_azure\_client\_id) | Optional Azure client ID for the service principal. If not provided, will use the client\_id from the CrowdStrike tenant registration. | `string` | `""` | no |
 | <a name="input_cs_infra_subscription_id"></a> [cs\_infra\_subscription\_id](#input\_cs\_infra\_subscription\_id) | Azure subscription ID where CrowdStrike infrastructure resources, such as Event Hubs, will be deployed. This subscription must be accessible with the current credentials. Required when `enable_realtime_visibility` is set to `true`. | `string` | `""` | no |
+| <a name="input_dspm_access_scopes"></a> [dspm\_access\_scopes](#input\_dspm\_access\_scopes) | DSPM datastores to apply permissions for: `blob_storage`, `table_storage`, `azure_files`, `virtual_machines`, `azure_sql`. Omitted datastores default to `true`. Takes effect only when `enable_dspm` is `true`. | `map(bool)` | `{}` | no |
 | <a name="input_enable_dspm"></a> [enable\_dspm](#input\_enable\_dspm) | Controls whether to enable DSPM (Data Security Posture Management) for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
 | <a name="input_enable_realtime_visibility"></a> [enable\_realtime\_visibility](#input\_enable\_realtime\_visibility) | Controls whether to enable Real Time Visibility and Detection feature for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
 | <a name="input_enable_vulnerability_scanning"></a> [enable\_vulnerability\_scanning](#input\_enable\_vulnerability\_scanning) | Controls whether to enable Vulnerability Scanning for CrowdStrike Falcon Cloud Security in Azure. | `bool` | `false` | no |
