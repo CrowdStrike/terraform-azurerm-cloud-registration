@@ -19,6 +19,16 @@ locals {
     (local.secondary_subscription_id) : ["westus", "westus2"]
   }
 
+  # Optional: DSPM datastores to apply permissions for. Omitted datastores default to true.
+  # Use the same value for the registration and every agentless scanning subscription module.
+  dspm_access_scopes = {
+    blob_storage     = true
+    table_storage    = true
+    azure_files      = true
+    virtual_machines = true
+    azure_sql        = true
+  }
+
   # Optional: Resource naming customization
   resource_prefix = ""
   resource_suffix = ""
@@ -59,6 +69,7 @@ module "crowdstrike_azure_registration" {
   falcon_ip_addresses                           = var.falcon_ip_addresses
   enable_realtime_visibility                    = local.enable_realtime_visibility
   enable_dspm                                   = local.enable_dspm
+  dspm_access_scopes                            = local.dspm_access_scopes
   enable_vulnerability_scanning                 = local.enable_vulnerability_scanning
   agentless_scanning_locations_per_subscription = local.agentless_scanning_locations_per_subscription
   agentless_scanning_deploy_nat_gateway         = local.agentless_scanning_deploy_nat_gateway
@@ -97,6 +108,7 @@ module "agentless_scanning_host_subscription_2" {
   agentless_scanning_principal_id                     = module.crowdstrike_azure_registration.service_principal_object_id
   agentless_scanning_deploy_nat_gateway               = local.agentless_scanning_deploy_nat_gateway
   input_enable_dspm                                   = local.enable_dspm
+  input_dspm_access_scopes                            = local.dspm_access_scopes
   input_enable_vulnerability_scanning                 = local.enable_vulnerability_scanning
   input_agentless_scanning_locations_per_subscription = local.agentless_scanning_locations_per_subscription
   falcon_client_id                                    = var.falcon_client_id

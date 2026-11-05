@@ -19,6 +19,17 @@ variable "enable_dspm" {
   type        = bool
 }
 
+variable "dspm_access_scopes" {
+  description = "DSPM datastores to apply permissions for, all false when DSPM is disabled."
+  type = object({
+    blob_storage     = bool
+    table_storage    = bool
+    azure_files      = bool
+    virtual_machines = bool
+    azure_sql        = bool
+  })
+}
+
 variable "enable_vulnerability_scanning" {
   description = "Controls whether to enable Vulnerability Scanning."
   type        = bool

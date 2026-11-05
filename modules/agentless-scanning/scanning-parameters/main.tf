@@ -1,11 +1,20 @@
 locals {
   environment = var.env == "" ? "" : "-${var.env}"
 
+  dspm_access_scopes = {
+    blobStorage     = var.dspm_access_scopes.blob_storage
+    tableStorage    = var.dspm_access_scopes.table_storage
+    azureFiles      = var.dspm_access_scopes.azure_files
+    virtualMachines = var.dspm_access_scopes.virtual_machines
+    azureSql        = var.dspm_access_scopes.azure_sql
+  }
+
   parameter_definitions = {
-    deploymentVersion                         = jsonencode("1.4.0+terraform.1")
+    deploymentVersion                         = jsonencode("1.5.0+terraform.1")
     scanningPrincipalId                       = jsonencode(var.agentless_scanning_principal_id)
     falconClientId                            = jsonencode(var.falcon_client_id)
     enableDspm                                = jsonencode(var.enable_dspm)
+    dspmAccessScopes                          = jsonencode(local.dspm_access_scopes)
     enableVulnerabilityScanning               = jsonencode(var.enable_vulnerability_scanning)
     agentlessScanningLocations                = jsonencode(var.agentless_scanning_locations)
     agentlessScanningLocationsPerSubscription = jsonencode(var.agentless_scanning_locations_per_subscription)

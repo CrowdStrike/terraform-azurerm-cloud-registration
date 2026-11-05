@@ -141,6 +141,18 @@ variable "enable_dspm" {
   }
 }
 
+variable "dspm_access_scopes" {
+  description = "DSPM datastores to apply permissions for: `blob_storage`, `table_storage`, `azure_files`, `virtual_machines`, `azure_sql`. Omitted datastores default to `true`. Takes effect only when `enable_dspm` is `true`."
+  type        = map(bool)
+  default     = {}
+  nullable    = false
+
+  validation {
+    condition     = alltrue([for datastore in keys(var.dspm_access_scopes) : contains(["blob_storage", "table_storage", "azure_files", "virtual_machines", "azure_sql"], datastore)])
+    error_message = "'dspm_access_scopes' keys must be one of: blob_storage, table_storage, azure_files, virtual_machines, azure_sql."
+  }
+}
+
 variable "enable_vulnerability_scanning" {
   description = "Controls whether to enable Vulnerability Scanning for CrowdStrike Falcon Cloud Security in Azure."
   type        = bool
