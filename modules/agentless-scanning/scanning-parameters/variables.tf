@@ -19,8 +19,13 @@ variable "enable_dspm" {
   type        = bool
 }
 
-variable "dspm_access_scopes" {
+variable "resolved_dspm_access_scopes" {
   description = "DSPM resource types to apply permissions for, keyed by resource type, all false when DSPM is disabled."
+  type        = map(bool)
+}
+
+variable "input_dspm_access_scopes" {
+  description = "DSPM resource types as set in dspm_access_scopes, before defaults and enable_dspm are applied. Stored as is in the scanning parameters policy."
   type        = map(bool)
 }
 

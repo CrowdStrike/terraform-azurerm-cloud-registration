@@ -17,7 +17,7 @@ locals {
   dspm_resource_types = ["blob_storage", "table_storage", "azure_files", "virtual_machines", "azure_sql"]
 
   # Every scope is false when DSPM is disabled; omitted or null scopes default to true
-  dspm_access_scopes = {
+  resolved_dspm_access_scopes = {
     for resource_type in local.dspm_resource_types :
     resource_type => var.input_enable_dspm && coalesce(lookup(var.input_dspm_access_scopes, resource_type, null), true)
   }
@@ -134,7 +134,7 @@ module "agentless_scanning_role_definitions_mg" {
   scope_id                              = each.value
   is_host                               = each.key == var.host_mg_id
   agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
-  dspm_access_scopes                    = local.dspm_access_scopes
+  dspm_access_scopes                    = local.resolved_dspm_access_scopes
   enable_dspm                           = var.input_enable_dspm
   enable_vulnerability_scanning         = var.input_enable_vulnerability_scanning
   use_custom_subnets                    = length(var.agentless_scanning_custom_vnet_configuration) > 0
@@ -151,7 +151,7 @@ module "agentless_scanning_role_definitions_sub" {
   scope_type                            = "subscription"
   scope_id                              = data.azurerm_client_config.current.subscription_id
   agentless_scanning_deploy_nat_gateway = var.agentless_scanning_deploy_nat_gateway
-  dspm_access_scopes                    = local.dspm_access_scopes
+  dspm_access_scopes                    = local.resolved_dspm_access_scopes
   enable_dspm                           = var.input_enable_dspm
   enable_vulnerability_scanning         = var.input_enable_vulnerability_scanning
   use_custom_subnets                    = local.use_custom_subnets
@@ -171,7 +171,7 @@ module "agentless_scanning_role_assignments" {
   resource_group_name                     = var.deploy_resource_group ? module.crowdstrike_resource_group[0].resource_group_name : var.resource_group_name
   is_host                                 = local.should_deploy_scanning_environment
   enable_dspm                             = var.input_enable_dspm
-  dspm_access_scopes                      = local.dspm_access_scopes
+  dspm_access_scopes                      = local.resolved_dspm_access_scopes
   custom_subnet_ids                       = local.custom_subnet_ids
 
   depends_on = [module.crowdstrike_resource_group, module.agentless_scanning_environment]
@@ -212,7 +212,8 @@ module "agentless_scanning_parameters" {
 
   falcon_client_id                              = var.falcon_client_id
   enable_dspm                                   = var.input_enable_dspm
-  dspm_access_scopes                            = local.dspm_access_scopes
+  resolved_dspm_access_scopes                   = local.resolved_dspm_access_scopes
+  input_dspm_access_scopes                      = var.input_dspm_access_scopes
   enable_vulnerability_scanning                 = var.input_enable_vulnerability_scanning
   agentless_scanning_locations                  = var.agentless_scanning_locations
   agentless_scanning_locations_per_subscription = var.input_agentless_scanning_locations_per_subscription

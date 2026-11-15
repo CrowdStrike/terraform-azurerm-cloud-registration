@@ -53,7 +53,7 @@ CrowdStrike API keys are required to use this module. It is highly recommended t
 
 ## Scoping DSPM permissions
 
-Set a `dspm_access_scopes` attribute to `false` to leave that resource type's permissions out of the custom roles. Falcon Cloud Security then does not scan that resource type. The resolved scopes are written to the `dspmAccessScopes` parameter of the `policy-csscanning-parameters` policy definition in every registered subscription. Pass the same value as `input_dspm_access_scopes` to every `agentless-scanning` target subscription module.
+Set a `dspm_access_scopes` attribute to `false` to leave that resource type's permissions out of the custom roles. Falcon Cloud Security then does not scan that resource type. The `dspm_access_scopes` value as you set it, without defaults filled in and with camelCase keys (`blobStorage`, `azureSql`, ...), is written to the `dspmAccessScopes` parameter of the `policy-csscanning-parameters` policy definition in every registered subscription. Pass the same value as `input_dspm_access_scopes` to every `agentless-scanning` target subscription module.
 
 | Attribute | Access role (subscription) | Scanner role (subscription) | Resource group access role (scanning resource group) |
 |---|---|---|---|

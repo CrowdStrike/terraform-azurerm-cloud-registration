@@ -2,12 +2,17 @@ locals {
   environment = var.env == "" ? "" : "-${var.env}"
 
   # Same keys as the Bicep template writes, so the policy parameter has one shape for both
+  dspm_access_scopes_policy_keys = {
+    blob_storage     = "blobStorage"
+    table_storage    = "tableStorage"
+    azure_files      = "azureFiles"
+    virtual_machines = "virtualMachines"
+    azure_sql        = "azureSql"
+  }
+
+  # Stored as the customer set it, without defaults or enable_dspm applied
   dspm_access_scopes = {
-    blobStorage     = var.dspm_access_scopes.blob_storage
-    tableStorage    = var.dspm_access_scopes.table_storage
-    azureFiles      = var.dspm_access_scopes.azure_files
-    virtualMachines = var.dspm_access_scopes.virtual_machines
-    azureSql        = var.dspm_access_scopes.azure_sql
+    for resource_type, enabled in var.input_dspm_access_scopes : local.dspm_access_scopes_policy_keys[resource_type] => enabled
   }
 
   parameter_definitions = {
@@ -64,7 +69,7 @@ resource "azurerm_policy_definition" "scanning_parameters" {
 
   lifecycle {
     precondition {
-      condition     = !var.enable_dspm || anytrue(values(var.dspm_access_scopes))
+      condition     = !var.enable_dspm || anytrue(values(var.resolved_dspm_access_scopes))
       error_message = "DSPM is enabled but every 'dspm_access_scopes' ('input_dspm_access_scopes' in the agentless-scanning module) resource type is false. Set at least one resource type to true, or set 'enable_dspm' ('input_enable_dspm') to false."
     }
   }
