@@ -146,6 +146,12 @@ variable "dspm_access_scopes" {
   type        = map(bool)
   default     = {}
   nullable    = false
+
+  validation {
+    # Repeats local.dspm_resource_types in modules/agentless-scanning/main.tf, which this module cannot read
+    condition     = alltrue([for resource_type in keys(var.dspm_access_scopes) : contains(["blob_storage", "table_storage", "azure_files", "virtual_machines", "azure_sql"], resource_type)])
+    error_message = "'dspm_access_scopes' keys must be one of: blob_storage, table_storage, azure_files, virtual_machines, azure_sql."
+  }
 }
 
 variable "enable_vulnerability_scanning" {
