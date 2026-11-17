@@ -141,6 +141,7 @@ module "agentless_scanning" {
   agentless_scanning_custom_vnet_configuration        = var.agentless_scanning_custom_vnet_configuration
   key_vault_allowed_ip_rules                          = var.key_vault_allowed_ip_rules
   input_enable_dspm                                   = var.enable_dspm
+  input_dspm_access_scopes                            = var.dspm_access_scopes
   input_enable_vulnerability_scanning                 = var.enable_vulnerability_scanning
   input_agentless_scanning_locations_per_subscription = var.agentless_scanning_locations_per_subscription
   falcon_client_id                                    = var.falcon_client_id

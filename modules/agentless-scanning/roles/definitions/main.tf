@@ -1,16 +1,34 @@
 locals {
   scope = var.scope_type == "mg" ? "/providers/Microsoft.Management/managementGroups/${var.scope_id}" : "/subscriptions/${var.scope_id}"
 
+  include_storage_account_actions = var.dspm_access_scopes.blob_storage || var.dspm_access_scopes.table_storage || var.dspm_access_scopes.azure_files
+  # VM disk scanning (DSPM or Vulnerability Scanning) needs the disk and snapshot actions
+  include_vm_scan_actions = var.dspm_access_scopes.virtual_machines || var.enable_vulnerability_scanning
+
   subscription_access_actions = concat(
     var.role_actions.base_subscription_access_actions,
-    var.enable_dspm ? var.role_actions.dspm_blob_storage_actions : [],
-    (var.enable_dspm || var.enable_vulnerability_scanning) ? var.role_actions.virtual_machines_scanning_actions : []
+    local.include_storage_account_actions ? var.role_actions.dspm_storage_account_subscription_access_actions : [],
+    var.dspm_access_scopes.azure_sql ? var.role_actions.dspm_azure_sql_subscription_access_actions : [],
+    local.include_vm_scan_actions ? var.role_actions.virtual_machines_scanning_actions : []
   )
 
   rg_access_actions = concat(
     var.role_actions.host_rg_access_actions,
     !var.agentless_scanning_deploy_nat_gateway ? var.role_actions.conditional_public_ip_actions : [],
-    var.role_actions.virtual_machines_scanning_rg_actions
+    local.include_vm_scan_actions ? var.role_actions.virtual_machines_scanning_rg_actions : [],
+    var.dspm_access_scopes.azure_sql ? var.role_actions.dspm_azure_sql_host_rg_access_actions : []
+  )
+
+  subscription_scanner_actions = concat(
+    var.dspm_access_scopes.blob_storage ? var.role_actions.dspm_blob_storage_subscription_scanner_actions : [],
+    var.dspm_access_scopes.table_storage ? var.role_actions.dspm_table_storage_subscription_scanner_actions : [],
+    var.dspm_access_scopes.azure_files ? var.role_actions.dspm_azure_files_subscription_scanner_actions : []
+  )
+
+  subscription_scanner_data_actions = concat(
+    var.dspm_access_scopes.blob_storage ? var.role_actions.dspm_blob_storage_subscription_scanner_data_actions : [],
+    var.dspm_access_scopes.table_storage ? var.role_actions.dspm_table_storage_subscription_scanner_data_actions : [],
+    var.dspm_access_scopes.azure_files ? var.role_actions.dspm_azure_files_subscription_scanner_data_actions : []
   )
 }
 
@@ -65,9 +83,9 @@ resource "azurerm_role_definition" "subscription_scanner" {
   description = "CrowdStrike Agentless Scanning Subscription Scanner Role"
 
   permissions {
-    actions          = var.role_actions.subscription_scanner_actions
+    actions          = local.subscription_scanner_actions
     not_actions      = []
-    data_actions     = var.role_actions.subscription_scanner_data_actions
+    data_actions     = local.subscription_scanner_data_actions
     not_data_actions = []
   }
 

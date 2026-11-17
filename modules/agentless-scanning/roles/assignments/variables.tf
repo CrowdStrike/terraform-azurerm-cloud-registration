@@ -7,7 +7,13 @@ variable "role_definition_ids" {
     subscription_scanner = string
     custom_vnet_subnet   = string
     rg_scanner           = string
+    dspm_access_scopes   = optional(map(bool))
   })
+}
+
+variable "dspm_access_scopes" {
+  description = "DSPM resource types this subscription enables, keyed by resource type, all false when DSPM is disabled."
+  type        = map(bool)
 }
 
 variable "agentless_scanning_principal_id" {

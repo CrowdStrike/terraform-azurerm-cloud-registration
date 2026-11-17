@@ -100,6 +100,19 @@ variable "input_enable_dspm" {
   default     = true
 }
 
+variable "input_dspm_access_scopes" {
+  description = "DSPM resource types to apply permissions for: `blob_storage`, `table_storage`, `azure_files`, `virtual_machines`, `azure_sql`. Omitted resource types default to `true`. Takes effect only when `input_enable_dspm` is `true`. Use the same value in the host and every target subscription."
+  type        = map(bool)
+  default     = {}
+  nullable    = false
+
+  validation {
+    # Repeats local.dspm_resource_types in main.tf: validations cannot read locals before Terraform 1.9
+    condition     = alltrue([for resource_type in keys(var.input_dspm_access_scopes) : contains(["blob_storage", "table_storage", "azure_files", "virtual_machines", "azure_sql"], resource_type)])
+    error_message = "'dspm_access_scopes' ('input_dspm_access_scopes' in the agentless-scanning module) keys must be one of: blob_storage, table_storage, azure_files, virtual_machines, azure_sql."
+  }
+}
+
 variable "input_enable_vulnerability_scanning" {
   description = "Controls whether to enable Vulnerability Scanning. Affects role permissions and scanning parameters policy."
   type        = bool
@@ -196,7 +209,7 @@ variable "tags" {
 }
 
 variable "scanning_role_definition_ids" {
-  description = "MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs."
+  description = "MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs. `dspm_access_scopes` is the DSPM resource types the definitions grant permissions for; when set, the plan fails if this subscription enables a resource type the definitions lack."
   type = object({
     subscription_access  = string
     rg_access            = string
@@ -204,6 +217,7 @@ variable "scanning_role_definition_ids" {
     subscription_scanner = string
     custom_vnet_subnet   = string
     rg_scanner           = string
+    dspm_access_scopes   = optional(map(bool))
   })
   default = null
 }

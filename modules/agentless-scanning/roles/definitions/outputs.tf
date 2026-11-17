@@ -1,5 +1,5 @@
 output "role_definition_ids" {
-  description = "Scanning role definition resource IDs."
+  description = "Scanning role definition resource IDs, and the DSPM resource types the definitions grant permissions for."
   value = {
     subscription_access  = azurerm_role_definition.subscription_access.role_definition_resource_id
     rg_access            = length(azurerm_role_definition.rg_access) > 0 ? azurerm_role_definition.rg_access[0].role_definition_resource_id : ""
@@ -7,5 +7,7 @@ output "role_definition_ids" {
     subscription_scanner = length(azurerm_role_definition.subscription_scanner) > 0 ? azurerm_role_definition.subscription_scanner[0].role_definition_resource_id : ""
     custom_vnet_subnet   = length(azurerm_role_definition.custom_vnet_subnet) > 0 ? azurerm_role_definition.custom_vnet_subnet[0].role_definition_resource_id : ""
     rg_scanner           = length(azurerm_role_definition.rg_scanner) > 0 ? azurerm_role_definition.rg_scanner[0].role_definition_resource_id : ""
+    # Vulnerability Scanning grants the virtual_machines permissions on its own
+    dspm_access_scopes = merge(var.dspm_access_scopes, { virtual_machines = local.include_vm_scan_actions })
   }
 }
