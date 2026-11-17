@@ -209,7 +209,7 @@ variable "tags" {
 }
 
 variable "scanning_role_definition_ids" {
-  description = "MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs. `dspm_access_scopes` is the DSPM resource types the definitions were built for; when set, the plan fails if this subscription enables a resource type the definitions lack."
+  description = "MG-scoped role definition resource IDs. When provided, skip creating per-subscription role definitions and only create assignments using these external IDs. `dspm_access_scopes` is the DSPM resource types the definitions grant permissions for; when set, the plan fails if this subscription enables a resource type the definitions lack."
   type = object({
     subscription_access  = string
     rg_access            = string

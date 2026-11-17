@@ -53,7 +53,7 @@ CrowdStrike API keys are required to use this module. It is highly recommended t
 
 ## Scoping DSPM permissions
 
-Set a `dspm_access_scopes` attribute to `false` to leave that resource type's permissions out of the custom roles. Falcon Cloud Security then does not scan that resource type. The `dspm_access_scopes` value as you set it, without defaults filled in and with camelCase keys (`blobStorage`, `azureSql`, ...), is written to the `dspmAccessScopes` parameter of the `policy-csscanning-parameters` policy definition in every registered subscription. Pass the same value as `input_dspm_access_scopes` to every `agentless-scanning` target subscription module.
+Set a `dspm_access_scopes` attribute to `false` to leave that resource type's permissions out of the custom roles. Falcon Cloud Security then does not scan that resource type. The `dspm_access_scopes` value as you set it, without defaults filled in and with camelCase keys (`blobStorage`, `azureSql`, ...), is written to the `dspmAccessScopes` parameter of the `policy-csscanning-parameters` policy definition in the CrowdStrike infrastructure subscription and in each subscription that runs the `agentless-scanning` module. Pass the same value as `input_dspm_access_scopes` to every `agentless-scanning` target subscription module.
 
 | Attribute | Access role (subscription) | Scanner role (subscription) | Resource group access role (scanning resource group) |
 |---|---|---|---|
@@ -65,7 +65,7 @@ Set a `dspm_access_scopes` attribute to `false` to leave that resource type's pe
 
 `enable_vulnerability_scanning` grants the `virtual_machines` permissions on its own. Changing an attribute updates the role definitions in place; no role definition or assignment is created or deleted. With `blob_storage`, `table_storage` and `azure_files` all `false`, the Scanner role has no actions. With `enable_dspm = true`, at least one attribute must be `true`; the plan fails otherwise.
 
-The `scanning_role_definition_ids_by_mg` output records the scopes each set of management group role definitions was built for. A target subscription module that receives it through `scanning_role_definition_ids` fails the plan when its `input_dspm_access_scopes` enables a resource type those definitions lack.
+The `scanning_role_definition_ids_by_mg` output records the resource types each set of management group role definitions grants permissions for. `virtual_machines` is recorded as `true` when `enable_vulnerability_scanning` is `true`, since Vulnerability Scanning grants those permissions on its own. A target subscription module that receives it through `scanning_role_definition_ids` fails the plan when its `input_dspm_access_scopes` enables a resource type those definitions lack.
 
 Example that skips Azure SQL and Azure Files:
 
@@ -240,7 +240,7 @@ module "crowdstrike_azure_registration" {
 | <a name="output_entra_id_log_eventhub_consumer_group_name"></a> [entra\_id\_log\_eventhub\_consumer\_group\_name](#output\_entra\_id\_log\_eventhub\_consumer\_group\_name) | Consumer group name for Microsoft Entra ID (formerly Azure AD) log ingestion via Event Hub |
 | <a name="output_entra_id_log_eventhub_id"></a> [entra\_id\_log\_eventhub\_id](#output\_entra\_id\_log\_eventhub\_id) | Resource ID of the Event Hub used for Microsoft Entra ID (formerly Azure AD) log ingestion |
 | <a name="output_management_group_scopes"></a> [management\_group\_scopes](#output\_management\_group\_scopes) | List of Azure management group scopes configured for CrowdStrike Falcon Cloud Security asset inventory |
-| <a name="output_scanning_role_definition_ids_by_mg"></a> [scanning\_role\_definition\_ids\_by\_mg](#output\_scanning\_role\_definition\_ids\_by\_mg) | Map of management group ID to MG-scoped scanning role definition resource IDs. Pass to target agentless-scanning modules via scanning\_role\_definition\_ids to avoid creating per-subscription role definitions. |
+| <a name="output_scanning_role_definition_ids_by_mg"></a> [scanning\_role\_definition\_ids\_by\_mg](#output\_scanning\_role\_definition\_ids\_by\_mg) | Map of management group ID to MG-scoped scanning role definition resource IDs and the DSPM resource types they grant permissions for (`dspm_access_scopes`). Pass to target agentless-scanning modules via scanning\_role\_definition\_ids to avoid creating per-subscription role definitions. |
 | <a name="output_service_principal_object_id"></a> [service\_principal\_object\_id](#output\_service\_principal\_object\_id) | Object ID of the CrowdStrike service principal used for Azure resource access |
 | <a name="output_subscription_scopes"></a> [subscription\_scopes](#output\_subscription\_scopes) | List of Azure subscription scopes configured for CrowdStrike Falcon Cloud Security asset inventory |
 | <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | Azure tenant ID used for CrowdStrike Falcon Cloud Security integration |
