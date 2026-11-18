@@ -114,11 +114,27 @@ resource "azurerm_eventhub_namespace_authorization_rule" "this" {
   manage = false
 }
 
+resource "azurerm_eventhub_consumer_group" "activity_log" {
+  count               = local.should_deploy_eventhub_for_activity_log ? 1 : 0
+  name                = "crowdstrike"
+  namespace_name      = azurerm_eventhub_namespace.this[0].name
+  eventhub_name       = azurerm_eventhub.activity_log[0].name
+  resource_group_name = data.azurerm_resource_group.this.name
+}
+
+resource "azurerm_eventhub_consumer_group" "entra_id_log" {
+  count               = local.should_deploy_eventhub_for_entra_id_log ? 1 : 0
+  name                = "crowdstrike"
+  namespace_name      = azurerm_eventhub_namespace.this[0].name
+  eventhub_name       = azurerm_eventhub.entra_id_log[0].name
+  resource_group_name = data.azurerm_resource_group.this.name
+}
+
 locals {
   activity_log_eventhub_id                  = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? azurerm_eventhub.activity_log[0].id : var.activity_log_settings.existing_eventhub.eventhub_resource_id) : ""
-  activity_log_eventhub_consumer_group_name = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? "$Default" : var.activity_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
+  activity_log_eventhub_consumer_group_name = var.activity_log_settings.enabled ? (local.should_deploy_eventhub_for_activity_log ? azurerm_eventhub_consumer_group.activity_log[0].name : var.activity_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
   entra_id_log_eventhub_id                  = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? azurerm_eventhub.entra_id_log[0].id : var.entra_id_log_settings.existing_eventhub.eventhub_resource_id) : ""
-  entra_id_log_eventhub_consumer_group_name = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? "$Default" : var.entra_id_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
+  entra_id_log_eventhub_consumer_group_name = var.entra_id_log_settings.enabled ? (local.should_deploy_eventhub_for_entra_id_log ? azurerm_eventhub_consumer_group.entra_id_log[0].name : var.entra_id_log_settings.existing_eventhub.eventhub_consumer_group_name) : ""
   # parsed_existing_activity_log_eventhub_id won't be used if activity log ingestion is not enabled or existing event hub settings for activity log ingestion are not specified
   parsed_existing_activity_log_eventhub_id = var.activity_log_settings.enabled && !local.should_deploy_eventhub_for_activity_log ? provider::azurerm::parse_resource_id(var.activity_log_settings.existing_eventhub.eventhub_resource_id) : provider::azurerm::parse_resource_id("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-placehodler/providers/Microsoft.EventHub/namespaces/evhns-placeholder/eventhubs/evh-placehoder")
   # parsed_existing_entra_id_log_eventhub_id won't be used if Entra ID log ingestion is not enabled or existing event hub settings for Entra ID log ingestion are not specified
